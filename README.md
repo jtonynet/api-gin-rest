@@ -58,13 +58,18 @@ Primeiro inicie o docker-compose de infra/bancos:
 ```bash
 $ docker-compose up
 ```
+Instale as dependências:
+```bash
+$ go mod tidy
+```
+
 Compile e rode o binário:
 
 ```bash
 $ go run main.go
 ```
 
-Acesse: `http://localhost:8000/api/personalidades`
+Acesse: `http://localhost:8080/alunos`
 
 
 [:arrow_heading_up: voltar](#indice)

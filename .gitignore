@@ -1,0 +1,32 @@
+# Ignorar arquivos binários e executáveis
+*.exe
+*.out
+*.o
+
+# Ignorar arquivos de compilação Go
+*.6
+*.8
+*.test
+*.prof
+
+# Ignorar diretórios de build
+/bin/
+/pkg/
+/vendor/
+/dist/
+
+# Ignorar arquivos de cache
+.cache/
+
+# Ignorar arquivos temporários
+*.swp
+*~
+
+# Ignorar arquivos de configuração específicos ao ambiente local
+.env
+
+# Ignorar diretórios e arquivos específicos ao seu projeto
+/data/
+/config.yaml
+
+.vscode/

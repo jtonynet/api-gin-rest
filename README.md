@@ -2,7 +2,8 @@
 <br> 
 <img src="./images/gopher_2.png">
 
-[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+<!-- <img src="./images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> -->
 
 
 
@@ -17,8 +18,10 @@
   :arrow_heading_up: [Índice](#arrow_heading_up-índice)<br>
   :green_book: [Sobre](#green_book-sobre)<br>
   :computer: [Rodando o Projeto](#computer-rodando-o-projeto)<br>
+  :newspaper: [Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)<br>
   :hammer: [Ferramentas](#hammer-ferramentas)<br>
   :clap: [Boas Práticas](#clap-boas-práticas)<br>
+  :1234: [Versões](#1234-versões)
 
 <!--te-->
 ---
@@ -77,6 +80,7 @@ $ swag init --parseDependency --parseInternal
 
 <!-- 
 https://medium.com/@22vinikaanthwal/generating-swagger-docs-from-go-source-code-2ddc8add251a
+https://adityarama1210.medium.com/create-golang-api-doc-with-swag-d73be1767d39
 -->
 ---
 
@@ -105,7 +109,19 @@ As seguintes ferramentas foram usadas na construção do projeto:
 ## :clap: Boas Práticas
 Seguindo boas práticas de desenvolvimento:
 - [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- [keep a changelog](https://keepachangelog.com/en/1.0.0/)
 - [Swagger](https://swagger.io/)
+
+[:arrow_heading_up: voltar](#indice)
+
+---
+
+<a id="versionamento"></a>
+## :1234: Versões
+As tags de versões estao sendo criadas manualmente a medida que os estudos avançam com melhorias notáveis no projeto. Cada funcionalidade é desenvolvida em uma branch a parte quando finalizadas é gerada tag e mergeadas em master.
+
+
+Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.md).
 
 [:arrow_heading_up: voltar](#indice)
 

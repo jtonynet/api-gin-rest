@@ -27,6 +27,9 @@ const docTemplate = `{
         "/aluno": {
             "post": {
                 "description": "Cria novo aluno",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -40,11 +43,43 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Aluno"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
-        "/aluno/:id": {
+        "/aluno/cpf/{cpf}": {
+            "get": {
+                "description": "Busca aluno por CPF",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca aluno por CPF",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/aluno/{id}": {
             "get": {
                 "description": "Busca aluno por id",
                 "produces": [
@@ -59,6 +94,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -76,13 +117,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Aluno"
+                            "type": "string"
                         }
                     }
                 }
             },
             "patch": {
                 "description": "Edita aluno por id",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -96,25 +140,11 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Aluno"
                         }
-                    }
-                }
-            }
-        },
-        "/aluno/cpf/:cpf": {
-            "get": {
-                "description": "Busca aluno por CPF",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Aluno"
-                ],
-                "summary": "Busca aluno por CPF",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.Aluno"
+                            "type": "string"
                         }
                     }
                 }
@@ -145,41 +175,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "gorm.DeletedAt": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
-                }
-            }
-        },
         "models.Aluno": {
             "type": "object",
             "properties": {
                 "cpf": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "id": {
-                    "type": "integer"
+                    "type": "string",
+                    "example": "00000000000"
                 },
                 "nome": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jonh Doe"
                 },
                 "rg": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "12345678901234"
                 }
             }
         }

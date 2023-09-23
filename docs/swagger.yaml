@@ -1,28 +1,15 @@
 basePath: /alunos
 definitions:
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
-    type: object
   models.Aluno:
     properties:
       cpf:
+        example: "00000000000"
         type: string
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      id:
-        type: integer
       nome:
+        example: Jonh Doe
         type: string
       rg:
-        type: string
-      updatedAt:
+        example: "12345678901234"
         type: string
     type: object
 host: localhost:8080
@@ -41,6 +28,8 @@ info:
 paths:
   /aluno:
     post:
+      consumes:
+      - application/json
       description: Cria novo aluno
       produces:
       - application/json
@@ -49,10 +38,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Aluno'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
       summary: Cria novo aluno
       tags:
       - Aluno
-  /aluno/:id:
+  /aluno/{id}:
     delete:
       description: Deleta aluno por id
       produces:
@@ -61,7 +54,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Aluno'
+            type: string
       summary: Deleta aluno por id
       tags:
       - Aluno
@@ -74,10 +67,16 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Aluno'
+        "404":
+          description: Not Found
+          schema:
+            type: string
       summary: Busca aluno por id
       tags:
       - Aluno
     patch:
+      consumes:
+      - application/json
       description: Edita aluno por id
       produces:
       - application/json
@@ -86,10 +85,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Aluno'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
       summary: Edita aluno por id
       tags:
       - Aluno
-  /aluno/cpf/:cpf:
+  /aluno/cpf/{cpf}:
     get:
       description: Busca aluno por CPF
       produces:
@@ -99,6 +102,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Aluno'
+        "404":
+          description: Not Found
+          schema:
+            type: string
       summary: Busca aluno por CPF
       tags:
       - Aluno

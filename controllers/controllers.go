@@ -26,7 +26,9 @@ func ExibeTodosAlunos(c *gin.Context) {
 // @Description Cria novo aluno
 // @Tags Aluno
 // @Produce json
+// @Accept json
 // @Success 200 {object} models.Aluno
+// @Failure 400 {string} Error
 // @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
 	var aluno models.Aluno
@@ -44,7 +46,8 @@ func CriaNovoAluno(c *gin.Context) {
 // @Tags Aluno
 // @Produce json
 // @Success 200 {object} models.Aluno
-// @Router /aluno/:id [get]
+// @Failure 404 {string} Not Found
+// @Router /aluno/{id} [get]
 func BuscaAlunoPorId(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
@@ -64,8 +67,8 @@ func BuscaAlunoPorId(c *gin.Context) {
 // @Description Deleta aluno por id
 // @Tags Aluno
 // @Produce json
-// @Success 200 {object} models.Aluno
-// @Router /aluno/:id [delete]
+// @Success 200 {string} data
+// @Router /aluno/{id} [delete]
 func DeletaAluno(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
@@ -78,8 +81,10 @@ func DeletaAluno(c *gin.Context) {
 // @Description Edita aluno por id
 // @Tags Aluno
 // @Produce json
+// @Accept json
 // @Success 200 {object} models.Aluno
-// @Router /aluno/:id [patch]
+// @Failure 400 {string} error
+// @Router /aluno/{id} [patch]
 func EditaAluno(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
@@ -100,7 +105,8 @@ func EditaAluno(c *gin.Context) {
 // @Tags Aluno
 // @Produce json
 // @Success 200 {object} models.Aluno
-// @Router /aluno/cpf/:cpf [get]
+// @Failure 404 {string} Not Found
+// @Router /aluno/cpf/{cpf} [get]
 func BuscaAlunoPorCPF(c *gin.Context) {
 	var aluno models.Aluno
 	cpf := c.Param("cpf")
@@ -109,7 +115,7 @@ func BuscaAlunoPorCPF(c *gin.Context) {
 
 	if aluno.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
-			"Not Found": "Aluno Nao Encontrado"})
+			"Not Found": "Aluno não Encontrado"})
 		return
 	}
 

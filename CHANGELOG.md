@@ -9,11 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 
+## [0.0.2] - 2023-09-23
+### Added
+
+- Utilizando [gin-swagger](https://github.com/swaggo/gin-swagger) para documentar a API no padrão OpenAPI
+
 ## [0.0.1] - 2023-09-23
 ### Added
 
 - Projeto com base no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) finalizado de acordo com a trilha seguida
 - API Gin dockerizada
 
-
+[0.0.2]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/jtonynet/api-gin-rest/releases/tag/v0.0.1

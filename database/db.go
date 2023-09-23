@@ -14,8 +14,8 @@ var (
 )
 
 func ConectaComBancoDeDados() {
-	stringDeConexao := "host=localhost user=api_user password=api_pass dbname=api_gin_rest_db port=5432 sslmode=disable"
-	//stringDeConexao := "host=postgres-gin-rest user=api_user password=api_pass dbname=api_gin_rest_db port=5432 sslmode=disable"
+	//stringDeConexao := "host=localhost user=api_user password=api_pass dbname=api_gin_rest_db port=5432 sslmode=disable"
+	stringDeConexao := "host=postgres-gin-rest user=api_user password=api_pass dbname=api_gin_rest_db port=5432 sslmode=disable"
 
 	DB, err = gorm.Open(postgres.Open(stringDeConexao))
 	if err != nil {

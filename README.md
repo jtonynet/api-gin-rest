@@ -54,20 +54,11 @@ $ docker inspect container_id | grep IPAddress
 
 ### :computer: Rodando o Projeto
 
-Primeiro inicie o docker-compose de infra/bancos:
+Basta rodar o docker-compose:
 ```bash
-$ docker-compose up
+$ docker compose up
 ```
-Instale as dependências:
-```bash
-$ go mod tidy
-```
-
-Compile e rode o binário:
-
-```bash
-$ go run main.go
-```
+Aguarde as imagens serem criadas e acesse:
 
 Acesse: `http://localhost:8080/alunos`
 
@@ -83,7 +74,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [GVM v1.0.22](https://github.com/moovweb/gvm)
 - [Go v1.21.1](https://go.dev/)
 - [Docker 24.0.6](https://www.docker.com/)
-- [Docker compose 1.29.2](https://www.docker.com/)
+- [Docker compose v2.21.0](https://www.docker.com/)
 
 [:arrow_heading_up: voltar](#indice)
 

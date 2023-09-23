@@ -1,0 +1,122 @@
+basePath: /alunos
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.Aluno:
+    properties:
+      cpf:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      nome:
+        type: string
+      rg:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: learningingenuity@gmail.com
+    name: API GIN Support
+    url: https://github.com/jtonynet/api-gin-rest
+  description: Estudo API Rest em Golang com Gin
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://github.com/jtonynet/api-gin-rest
+  title: api-gin-rest
+  version: "1.0"
+paths:
+  /aluno:
+    post:
+      description: Cria novo aluno
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+      summary: Cria novo aluno
+      tags:
+      - Aluno
+  /aluno/:id:
+    delete:
+      description: Deleta aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+      summary: Deleta aluno por id
+      tags:
+      - Aluno
+    get:
+      description: Busca aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+      summary: Busca aluno por id
+      tags:
+      - Aluno
+    patch:
+      description: Edita aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+      summary: Edita aluno por id
+      tags:
+      - Aluno
+  /aluno/cpf/:cpf:
+    get:
+      description: Busca aluno por CPF
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+      summary: Busca aluno por CPF
+      tags:
+      - Aluno
+  /alunos:
+    get:
+      description: Obtém a lista completa de alunos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Aluno'
+            type: array
+      summary: Retorna todos os alunos
+      tags:
+      - Alunos
+schemes:
+- http
+swagger: "2.0"

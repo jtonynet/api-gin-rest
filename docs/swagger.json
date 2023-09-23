@@ -1,0 +1,184 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Estudo API Rest em Golang com Gin",
+        "title": "api-gin-rest",
+        "termsOfService": "https://github.com/jtonynet/api-gin-rest",
+        "contact": {
+            "name": "API GIN Support",
+            "url": "https://github.com/jtonynet/api-gin-rest",
+            "email": "learningingenuity@gmail.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/alunos",
+    "paths": {
+        "/aluno": {
+            "post": {
+                "description": "Cria novo aluno",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Cria novo aluno",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    }
+                }
+            }
+        },
+        "/aluno/:id": {
+            "get": {
+                "description": "Busca aluno por id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca aluno por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deleta aluno por id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Deleta aluno por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Edita aluno por id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Edita aluno por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    }
+                }
+            }
+        },
+        "/aluno/cpf/:cpf": {
+            "get": {
+                "description": "Busca aluno por CPF",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca aluno por CPF",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    }
+                }
+            }
+        },
+        "/alunos": {
+            "get": {
+                "description": "Obtém a lista completa de alunos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alunos"
+                ],
+                "summary": "Retorna todos os alunos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Aluno"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.Aluno": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "rg": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

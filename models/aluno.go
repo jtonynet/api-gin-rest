@@ -2,9 +2,13 @@ package models
 
 import "gorm.io/gorm"
 
-type Aluno struct {
+type BaseModel struct {
 	gorm.Model
-	Nome string `json:"nome"`
-	CPF  string `json:"cpf`
-	RG   string `json:"rg`
+}
+
+type Aluno struct {
+	BaseModel `swaggerignore:"true"`
+	Nome      string `json:"nome" example:"Jonh Doe"`
+	CPF       string `json:"cpf" example:"00000000000"`
+	RG        string `json:"rg" example:"12345678901234"`
 }

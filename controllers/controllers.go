@@ -8,19 +8,28 @@ import (
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
+// @BasePath /alunos
+
+// @Summary Retorna todos os alunos
+// @Description Obtém a lista completa de alunos
+// @Tags Alunos
+// @Produce json
+// @Success 200 {array} models.Aluno
+// @Router /alunos [get]
 func ExibeTodosAlunos(c *gin.Context) {
 	var alunos []models.Aluno
 	database.DB.Find(&alunos)
 	c.JSON(200, alunos)
 }
 
-func Saudacao(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "E ai " + nome + ", tudo beleza?",
-	})
-}
-
+// @Summary Cria novo aluno
+// @Description Cria novo aluno
+// @Tags Aluno
+// @Produce json
+// @Accept json
+// @Success 200 {object} models.Aluno
+// @Failure 400 {string} Error
+// @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
@@ -32,6 +41,13 @@ func CriaNovoAluno(c *gin.Context) {
 	c.JSON(http.StatusOK, aluno)
 }
 
+// @Summary Busca aluno por id
+// @Description Busca aluno por id
+// @Tags Aluno
+// @Produce json
+// @Success 200 {object} models.Aluno
+// @Failure 404 {string} Not Found
+// @Router /aluno/{id} [get]
 func BuscaAlunoPorId(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
@@ -47,6 +63,12 @@ func BuscaAlunoPorId(c *gin.Context) {
 	c.JSON(http.StatusOK, aluno)
 }
 
+// @Summary Deleta aluno por id
+// @Description Deleta aluno por id
+// @Tags Aluno
+// @Produce json
+// @Success 200 {string} data
+// @Router /aluno/{id} [delete]
 func DeletaAluno(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
@@ -55,6 +77,14 @@ func DeletaAluno(c *gin.Context) {
 		"data": "Aluno deletado com sucesso"})
 }
 
+// @Summary Edita aluno por id
+// @Description Edita aluno por id
+// @Tags Aluno
+// @Produce json
+// @Accept json
+// @Success 200 {object} models.Aluno
+// @Failure 400 {string} error
+// @Router /aluno/{id} [patch]
 func EditaAluno(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
@@ -70,6 +100,13 @@ func EditaAluno(c *gin.Context) {
 	c.JSON(http.StatusOK, aluno)
 }
 
+// @Summary Busca aluno por CPF
+// @Description Busca aluno por CPF
+// @Tags Aluno
+// @Produce json
+// @Success 200 {object} models.Aluno
+// @Failure 404 {string} Not Found
+// @Router /aluno/cpf/{cpf} [get]
 func BuscaAlunoPorCPF(c *gin.Context) {
 	var aluno models.Aluno
 	cpf := c.Param("cpf")
@@ -78,7 +115,7 @@ func BuscaAlunoPorCPF(c *gin.Context) {
 
 	if aluno.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
-			"Not Found": "Aluno Nao Encontrado"})
+			"Not Found": "Aluno não Encontrado"})
 		return
 	}
 

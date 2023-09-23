@@ -1,0 +1,193 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Estudo API Rest em Golang com Gin",
+        "title": "api-gin-rest",
+        "termsOfService": "https://github.com/jtonynet/api-gin-rest",
+        "contact": {
+            "name": "API GIN Support",
+            "url": "https://github.com/jtonynet/api-gin-rest",
+            "email": "learningingenuity@gmail.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/alunos",
+    "paths": {
+        "/aluno": {
+            "post": {
+                "description": "Cria novo aluno",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Cria novo aluno",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/aluno/cpf/{cpf}": {
+            "get": {
+                "description": "Busca aluno por CPF",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca aluno por CPF",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/aluno/{id}": {
+            "get": {
+                "description": "Busca aluno por id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca aluno por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deleta aluno por id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Deleta aluno por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Edita aluno por id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Edita aluno por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/alunos": {
+            "get": {
+                "description": "Obtém a lista completa de alunos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alunos"
+                ],
+                "summary": "Retorna todos os alunos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Aluno"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Aluno": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string",
+                    "example": "00000000000"
+                },
+                "nome": {
+                    "type": "string",
+                    "example": "Jonh Doe"
+                },
+                "rg": {
+                    "type": "string",
+                    "example": "12345678901234"
+                }
+            }
+        }
+    }
+}

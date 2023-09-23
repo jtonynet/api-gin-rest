@@ -1,0 +1,129 @@
+basePath: /alunos
+definitions:
+  models.Aluno:
+    properties:
+      cpf:
+        example: "00000000000"
+        type: string
+      nome:
+        example: Jonh Doe
+        type: string
+      rg:
+        example: "12345678901234"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: learningingenuity@gmail.com
+    name: API GIN Support
+    url: https://github.com/jtonynet/api-gin-rest
+  description: Estudo API Rest em Golang com Gin
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://github.com/jtonynet/api-gin-rest
+  title: api-gin-rest
+  version: "1.0"
+paths:
+  /aluno:
+    post:
+      consumes:
+      - application/json
+      description: Cria novo aluno
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Cria novo aluno
+      tags:
+      - Aluno
+  /aluno/{id}:
+    delete:
+      description: Deleta aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Deleta aluno por id
+      tags:
+      - Aluno
+    get:
+      description: Busca aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Busca aluno por id
+      tags:
+      - Aluno
+    patch:
+      consumes:
+      - application/json
+      description: Edita aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Edita aluno por id
+      tags:
+      - Aluno
+  /aluno/cpf/{cpf}:
+    get:
+      description: Busca aluno por CPF
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Busca aluno por CPF
+      tags:
+      - Aluno
+  /alunos:
+    get:
+      description: Obtém a lista completa de alunos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Aluno'
+            type: array
+      summary: Retorna todos os alunos
+      tags:
+      - Alunos
+schemes:
+- http
+swagger: "2.0"

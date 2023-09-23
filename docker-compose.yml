@@ -1,22 +1,34 @@
-version: '3'
+version: '3.7'
 services:
-  postgres:
-    image: "postgres"
+  postgres-gin-rest:
+    image: postgres:latest
+    container_name: postgres-gin-rest
+    restart: always
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=root      
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_pass
+      POSTGRES_DB: api_gin_rest_db
     ports:
       - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data  
+    networks:
+      - gin-rest-network
 
-  pgadmin-compose:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
-      PGADMIN_DEFAULT_PASSWORD: "123456"
+  api-gin-rest:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "54321:80"
+      - "8080:8080"
     depends_on:
-      - postgres
+      - postgres-gin-rest
+    volumes:
+      - .:/usr/src/app
+    command: go run main.go -b 0.0.0.0
+    tty: true
+    networks:
+      - gin-rest-network
+
+networks:
+  gin-rest-network:

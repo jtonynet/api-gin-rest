@@ -1,8 +1,10 @@
 package database
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -13,13 +15,26 @@ var (
 	err error
 )
 
-func ConectaComBancoDeDados() {
-	//stringDeConexao := "host=localhost user=api_user password=api_pass dbname=api_gin_rest_db port=5432 sslmode=disable"
-	stringDeConexao := "host=postgres-gin-rest user=api_user password=api_pass dbname=api_gin_rest_db port=5432 sslmode=disable"
+func ConectaComBancoDeDados(cfg config.Database) {
 
-	DB, err = gorm.Open(postgres.Open(stringDeConexao))
+	strConn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		cfg.Host,
+		cfg.User,
+		cfg.Pass,
+		cfg.DB,
+		cfg.Port)
+
+	DB, err = gorm.Open(postgres.Open(strConn))
 	if err != nil {
 		log.Panic("Erro ao conectar com o banco de dados")
 	}
+
 	DB.AutoMigrate(&models.Aluno{})
+}
+
+func CheckHeadness() error {
+	if err := DB.Raw("SELECT 1").Error; err != nil {
+		return err
+	}
+	return nil
 }

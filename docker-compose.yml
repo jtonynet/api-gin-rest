@@ -19,6 +19,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      DATABASE_HOST: postgres-gin-rest
     ports:
       - "8080:8080"
     depends_on:

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 
+
+## [0.0.3] - 2023-09-24
+### Added
+
+- Utilizando [Viper](https://github.com/spf13/viper) para a gestão de variáveis de ambiente
+- Diagrama marmeid simples adicionado ao reademe
+- Rotas `http://localhost:8080/headness` e `http://localhost:8080/liveness`
+ 
 ## [0.0.2] - 2023-09-23
 ### Added
 
@@ -20,5 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Projeto com base no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) finalizado de acordo com a trilha seguida
 - API Gin dockerizada
 
+[0.0.3]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/jtonynet/api-gin-rest/releases/tag/v0.0.1

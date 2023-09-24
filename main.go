@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+
+	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/database"
 	"github.com/jtonynet/api-gin-rest/routes"
 )
@@ -19,6 +22,11 @@ import (
 // @Schemes http
 // @query.collection.format multi
 func main() {
-	database.ConectaComBancoDeDados()
-	routes.HandleRequests()
+	cfg, err := config.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config: ", err)
+	}
+
+	database.ConectaComBancoDeDados(cfg.Database)
+	routes.HandleRequests(cfg.API)
 }

@@ -1,12 +1,44 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/database"
 	"github.com/jtonynet/api-gin-rest/models"
 )
+
+func Liveness(c *gin.Context, cfg config.API) {
+	sumaryData := fmt.Sprintf("%s%s in TagVersion: %s responds OK",
+		cfg.Name,
+		cfg.Port,
+		cfg.TagVersion)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK", "sumary": sumaryData})
+}
+
+func Headness(c *gin.Context, cfg config.API) {
+
+	if err := database.CheckHeadness(); err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message": "Service unavailable",
+		})
+		return
+	}
+
+	sumaryData := fmt.Sprintf("%s%s in TagVersion: %s responds OK with connectivity",
+		cfg.Name,
+		cfg.Port,
+		cfg.TagVersion)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+		"sumary":  sumaryData,
+	})
+}
 
 // @BasePath /alunos
 

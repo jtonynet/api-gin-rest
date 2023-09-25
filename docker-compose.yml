@@ -1,5 +1,16 @@
 version: '3.7'
 services:
+  nginx-gin-rest:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - api-gin-rest
+    networks:
+      - gin-rest-network
+
   postgres-gin-rest:
     image: postgres:latest
     container_name: postgres-gin-rest
@@ -19,10 +30,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: api-gin-rest
     environment:
       DATABASE_HOST: postgres-gin-rest
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - postgres-gin-rest
     volumes:

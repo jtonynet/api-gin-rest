@@ -1,9 +1,9 @@
 # Estudo API Rest em Golang com Gin
 <br> 
-<img src="./images/gopher_2.png">
+<img src="./images/gin_mediun.png">
 
-[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
-<!-- <img src="./images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> -->
+[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+<!-- <img src="./images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> <img src="./images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> -->
 
 
 
@@ -14,15 +14,15 @@
 <a id="indice"></a>
 ## :arrow_heading_up: Índice
 <!--ts-->
-- [Go: Go e Gin: criando API rest com simplicidade](#estudo-api-rest-em-golang-com-gin)<br>
-  :arrow_heading_up: [Índice](#arrow_heading_up-índice)<br>
-  :green_book: [Sobre](#green_book-sobre)<br>
-  :computer: [Rodando o Projeto](#computer-rodando-o-projeto)<br>
-  :newspaper: [Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)<br>
-  :camera: [Imagens do Projeto](#camera-imagens-do-projeto)<br>
-  :bar_chart: [Diagramas](#bar_chart-diagramas)<br>
-  :hammer: [Ferramentas](#hammer-ferramentas)<br>
-  :clap: [Boas Práticas](#clap-boas-práticas)<br>
+- [Go: Go e Gin: criando API rest com simplicidade](#estudo-api-rest-em-golang-com-gin)
+  :arrow_heading_up: [Índice](#arrow_heading_up-índice)
+  :green_book: [Sobre](#green_book-sobre)
+  :computer: [Rodando o Projeto](#computer-rodando-o-projeto)
+  :newspaper: [Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)
+  :camera: [Imagens do Projeto](#camera-imagens-do-projeto)
+  :bar_chart: [Diagramas](#bar_chart-diagramas)
+  :hammer: [Ferramentas](#hammer-ferramentas)
+  :clap: [Boas Práticas](#clap-boas-práticas)
   :1234: [Versões](#1234-versões)
 
 <!--te-->
@@ -64,11 +64,11 @@ $ docker compose up
 ```
 Aguarde até que as imagens sejam criadas e acesse:
 
+Rota de **headness**: `http://localhost:8080/readiness`
+Rota de **liveness**: `http://localhost:8080/liveness`
+
 Acesse para **API**: `http://localhost:8080/alunos`
 Acesse para **documentação Swagger**: `http://localhost:8080/swagger/index.html`
-
-Rota de **headness**: `http://localhost:8080/headness`
-Rota de **liveness**: `http://localhost:8080/liveness`
 
 
 
@@ -123,10 +123,14 @@ graph LR
     G["Busca aluno por CPF"]
   end
 
-  subgraph Aluno API
-    subgraph Recursos
+  subgraph Backend 
+    subgraph API
       Aluno["Aluno"]
     end
+
+    subgraph DATABASE
+      Aluno-DB[("Aluno-DB")]
+    end    
   end
 
   A --> B
@@ -142,6 +146,8 @@ graph LR
   E -->|DELETE| Aluno
   F -->|PATCH| Aluno
   G -->|GET| Aluno
+
+  Aluno --> Aluno-DB
 ```
 <br>
 

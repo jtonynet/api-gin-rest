@@ -17,8 +17,8 @@ func HandleRequests(cfg config.API) {
 		controllers.Liveness(c, cfg)
 	})
 
-	r.GET("/headness", func(c *gin.Context) {
-		controllers.Headness(c, cfg)
+	r.GET("/readiness", func(c *gin.Context) {
+		controllers.Readiness(c, cfg)
 	})
 
 	r.GET("/alunos", controllers.ExibeTodosAlunos)

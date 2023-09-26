@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Utilizando [Viper](https://github.com/spf13/viper) para a gestão de variáveis de ambiente
 - Diagrama marmeid simples adicionado ao reademe
-- Rotas `http://localhost:8080/headness` e `http://localhost:8080/liveness`
+- Rotas `http://localhost:8080/readiness` e `http://localhost:8080/liveness`
  
 ## [0.0.2] - 2023-09-23
 ### Added

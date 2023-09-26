@@ -20,7 +20,7 @@ func Liveness(c *gin.Context, cfg config.API) {
 		"message": "OK", "sumary": sumaryData})
 }
 
-func Headness(c *gin.Context, cfg config.API) {
+func Readiness(c *gin.Context, cfg config.API) {
 
 	if err := database.CheckHeadness(); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{

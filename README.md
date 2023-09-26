@@ -14,16 +14,16 @@
 <a id="indice"></a>
 ## :arrow_heading_up: Índice
 <!--ts-->
-- [Go: Go e Gin: criando API rest com simplicidade](#estudo-api-rest-em-golang-com-gin)
-  :arrow_heading_up: [Índice](#arrow_heading_up-índice)
-  :green_book: [Sobre](#green_book-sobre)
-  :computer: [Rodando o Projeto](#computer-rodando-o-projeto)
-  :newspaper: [Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)
-  :camera: [Imagens do Projeto](#camera-imagens-do-projeto)
-  :bar_chart: [Diagramas](#bar_chart-diagramas)
-  :hammer: [Ferramentas](#hammer-ferramentas)
-  :clap: [Boas Práticas](#clap-boas-práticas)
-  :1234: [Versões](#1234-versões)
+- [Estudo API Rest em Golang com Gin](#estudo-api-rest-em-golang-com-gin)
+  - [:arrow\_heading\_up: Índice](#arrow_heading_up-índice)
+  - [:green\_book: Sobre](#green_book-sobre)
+    - [:computer: Rodando o Projeto](#computer-rodando-o-projeto)
+    - [:newspaper: Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)
+    - [:camera: Imagens do Projeto](#camera-imagens-do-projeto)
+    - [:bar\_chart: Diagramas](#bar_chart-diagramas)
+  - [:hammer: Ferramentas](#hammer-ferramentas)
+  - [:clap: Boas Práticas](#clap-boas-práticas)
+  - [:1234: Versões](#1234-versões)
 
 <!--te-->
 ---

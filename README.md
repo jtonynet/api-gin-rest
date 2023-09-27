@@ -2,7 +2,7 @@
 <br> 
 <img src="./images/gin_mediun.png">
 
-[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
 <!-- <img src="./images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> <img src="./images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> -->
 
 
@@ -21,6 +21,7 @@
   :newspaper: [Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)<br/>
   :camera: [Imagens do Projeto](#camera-imagens-do-projeto)<br/>
   :bar_chart: [Diagramas](#bar_chart-diagramas)<br/>
+  :train: [Teste de Carga](#train-teste-de-carga)<br>
   :hammer: [Ferramentas](#hammer-ferramentas)<br/>
   :clap: [Boas Práticas](#clap-boas-práticas)<br/>
   :1234: [Versões](#1234-versões)<br/>
@@ -155,6 +156,14 @@ graph LR
 
 ---
 
+### :train: Teste de Carga
+**WIP**
+` ../gatling/bin/gatling.sh -sf "$(pwd)/tests/gatling" -rf "$(pwd)/tests/gatling/results" -s alunos.AlunosSimulation`
+
+[:arrow_heading_up: voltar](#indice)
+
+---
+
 <a id="ferramentas"></a>
 ## :hammer: Ferramentas
 As seguintes ferramentas foram usadas na construção do projeto:
@@ -168,6 +177,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Postgres](https://www.postgresql.org/)
 - [Docker 24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
+- [Gatling](https://gatling.io/)
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)
 
@@ -198,4 +208,4 @@ Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.m
 [:arrow_heading_up: voltar](#indice)
 
 
-
+../gatling/bin/gatling.sh -sf "$(pwd)/tests/gatling" -rf "$(pwd)/tests/gatling/results" -s APISimulation.Alunos

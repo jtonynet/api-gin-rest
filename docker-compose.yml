@@ -22,7 +22,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data  
+      - ${PWD}/postgres-data:/var/lib/postgresql/data  
     networks:
       - gin-rest-network
 
@@ -38,11 +38,25 @@ services:
     depends_on:
       - postgres-gin-rest
     volumes:
-      - ./:/usr/src/app
+      - ${PWD}:/usr/src/app
     command: go run main.go -b 0.0.0.0
     tty: true
     networks:
       - gin-rest-network
 
+  gatling-load-test:
+    build:
+      context: ./tests/gatling
+      dockerfile: Dockerfile
+    depends_on:
+      - nginx-gin-rest
+    volumes:
+      - ${PWD}/tests/gatling:/usr/src/app
+      - ${PWD}/tests/gatling/results:/usr/src/app/results
+      - ${PWD}/tests/gatling/bundle:/usr/src/app/bundle
+    networks:
+      - gin-rest-network  
+    command: nc -l -p 8080 
+      
 networks:
   gin-rest-network:

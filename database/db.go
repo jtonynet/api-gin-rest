@@ -32,7 +32,7 @@ func ConectaComBancoDeDados(cfg config.Database) {
 	DB.AutoMigrate(&models.Aluno{})
 }
 
-func CheckHeadness() error {
+func CheckReadiness() error {
 	if err := DB.Raw("SELECT 1").Error; err != nil {
 		return err
 	}

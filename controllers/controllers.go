@@ -22,7 +22,7 @@ func Liveness(c *gin.Context, cfg config.API) {
 
 func Readiness(c *gin.Context, cfg config.API) {
 
-	if err := database.CheckHeadness(); err != nil {
+	if err := database.CheckReadiness(); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"message": "Service unavailable",
 		})

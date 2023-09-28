@@ -44,19 +44,18 @@ services:
     networks:
       - gin-rest-network
 
-  gatling-load-test:
+  gatling-api-test:
     build:
       context: ./tests/gatling
       dockerfile: Dockerfile
     depends_on:
       - nginx-gin-rest
+      - api-gin-rest
+      - postgres-gin-rest
     volumes:
       - ${PWD}/tests/gatling:/usr/src/app
-      - ${PWD}/tests/gatling/results:/usr/src/app/results
-      - ${PWD}/tests/gatling/bundle:/usr/src/app/bundle
     networks:
-      - gin-rest-network  
-    command: nc -l -p 8080 
+      - gin-rest-network
       
 networks:
   gin-rest-network:

@@ -206,6 +206,3 @@ As tags de versões estao sendo criadas manualmente a medida que os estudos avan
 Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.md).
 
 [:arrow_heading_up: voltar](#indice)
-
-
-../gatling/bin/gatling.sh -sf "$(pwd)/tests/gatling" -rf "$(pwd)/tests/gatling/results" -s APISimulation.Alunos

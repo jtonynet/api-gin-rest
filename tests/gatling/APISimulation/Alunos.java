@@ -9,7 +9,6 @@ import io.gatling.javaapi.http.*;
 public class Alunos extends Simulation {
 
     HttpProtocolBuilder httpProtocol =
-        //http.baseUrl("http://localhost:8080")
         http.baseUrl("http://nginx-gin-rest:80")
             .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .acceptLanguageHeader("en-US,en;q=0.5")

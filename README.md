@@ -158,7 +158,8 @@ graph LR
 
 ### :train: Teste de Carga
 **WIP**
-` ../gatling/bin/gatling.sh -sf "$(pwd)/tests/gatling" -rf "$(pwd)/tests/gatling/results" -s alunos.AlunosSimulation`
+Com o projeto instalado e rodando apos o comando `docker compose up`, rodar o comando:
+`docker-compose run gatling-api-test run-test` e aguarde alguns segundos para o warm-up dos testes (baixar dependencias caso seja a primeira vez que roda)
 
 [:arrow_heading_up: voltar](#indice)
 

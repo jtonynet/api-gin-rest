@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/controllers"
@@ -29,5 +31,7 @@ func HandleRequests(cfg config.API) {
 	r.GET("/alunos/cpf/:cpf", controllers.BuscaAlunoPorCPF)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.Run(cfg.Port)
+
+	port := fmt.Sprintf(":%s", cfg.Port)
+	r.Run(port)
 }

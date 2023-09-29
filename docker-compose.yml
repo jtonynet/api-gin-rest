@@ -7,7 +7,7 @@ services:
     ports:
       - 8080:80
     depends_on:
-      - api-gin-rest
+      - ${API_NAME}
     networks:
       - gin-rest-network
 
@@ -30,11 +30,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: api-gin-rest
+    container_name: ${API_NAME}
     environment:
       DATABASE_HOST: postgres-gin-rest
     ports:
-      - "8081:8081"
+      - "${API_PORT}:${API_PORT}"
     depends_on:
       - postgres-gin-rest
     volumes:
@@ -48,6 +48,12 @@ services:
     build:
       context: ./tests/gatling
       dockerfile: Dockerfile
+    container_name:
+      gatling-api-test
+    env_file: 
+      - .env
+    ports:
+      - "${TEST_GATLING_PORT}:${TEST_GATLING_PORT}"
     depends_on:
       - nginx-gin-rest
       - api-gin-rest

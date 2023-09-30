@@ -157,10 +157,42 @@ graph LR
 ---
 
 ### :train: Teste de Carga
-**WIP**
-Com o projeto instalado e rodando apos o comando `docker compose up`, rodar o comando:
-`docker-compose run gatling-api-test run-test` e aguarde alguns segundos para o warm-up dos testes (baixar dependencias caso seja a primeira vez que roda)
+**Gatling**
+Com o projeto instalado e em execução após o comando `docker compose up`, acesse a rota que renderiza o resultado do teste mais recente em `http://localhost:8082`. Caso você tenha acabado de iniciar o ambiente, nenhum teste terá ocorrido até o momento.
 
+A imagem responsável por fornecer essa saída também é responsável por processar o teste. Para executar um novo teste, basta abrir um novo terminal e, estando na raiz do projeto, execute o comando:
+
+```bash
+docker exec -ti gatling-api-test /entrypoint run-test
+``` 
+Aguarde alguns segundos para o aquecimento dos testes (que inclui o download de dependências, caso não existam, e a execução dos próprios testes). Assim que os testes forem concluídos, o endpoint `http://localhost:8082` apresentará os resultados.
+
+Toda vez que desejar executar os testes novamente, basta rodar o comando a seguir: `docker exec -ti gatling-api-test /entrypoint run-test`.
+
+Estrutura da pasta de testes do Gatling:
+```shell
+  $ tree
+  api-gin-rest
+  └── tests
+  |    └── gatling
+  |        ├── APISimulation  # Pasta de roteiro de testes
+  |        |   └── Alunos.java # Roteiro de testes em Java
+  |        ├── bundle # Binarios e arquivos Gatling
+  |        |   ├── .keep
+  |        |   └── ... # Diretórios e arquivos gatling instalados após primeiro teste
+  |        └── results # Resultados dos testes
+  |        |   ├── latest # Arquivos do ultimo teste performado
+  |        |   |   ├── .keep
+  |        |   |   └── ... # Diretórios e arquivos do resultado mais recente após primeiro teste
+  |        |   └── history # Histórico com todos os testes já performados e a pagina default
+  |        |       ├── default # Dados de teste padrão, exibidos quando nenhum teste ainda foi performado
+  |        |       └── ... # Diretórios de testes já performados
+  |        ├── Dockerfile
+  |        └── entrypoin.sh # As automações do Gatling estão aqui.
+  |
+  $ tree
+  .
+```
 [:arrow_heading_up: voltar](#indice)
 
 ---

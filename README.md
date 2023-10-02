@@ -60,6 +60,7 @@ Aguarde até que as imagens sejam criadas e acesse:
 `http://localhost:8082` Rota para **ultimo resultado de teste de carga**<br/>
 
 <br>
+
 #### Recomendações para Devs:
 Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente. As versões mais recentes da linguagem já têm a instalação simplificada pelo `snap`
 ```bash

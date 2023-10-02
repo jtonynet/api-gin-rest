@@ -8,6 +8,7 @@ services:
       - 8080:80
     depends_on:
       - ${API_NAME}
+      - postgres-gin-rest
     networks:
       - gin-rest-network
 

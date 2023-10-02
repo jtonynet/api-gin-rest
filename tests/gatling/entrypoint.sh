@@ -38,9 +38,22 @@ if [ "$1" = "run-test" ]; then
     echo "Verify Test Gatling Results folder for all tests"
 fi
 
+if [ "$1" = "clean-test" ]; then
+    rm -rf ./bundle/*
+    touch ./bundle/.keep
+
+    directory="./results/history/"
+    keep_folder="default"
+    for item in "$directory"/*; do
+        if [ -d "$item" ] && [ "$(basename "$item")" != "$keep_folder" ]; then
+            rm -rf "$item"
+        fi
+    done
+fi
+
 echo "Remove last load test data"
 rm -rf ./results/latest/*
-touch ./results/latest/.touch
+touch ./results/latest/.keep
 
 echo "Add New load test data"
 new_latest=$(ls -td ./results/history/*/ | head -n 1)

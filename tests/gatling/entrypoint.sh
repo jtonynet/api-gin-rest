@@ -1,8 +1,7 @@
 #!/bin/sh
 
-ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-
 if [ ! -e /entrypoint ]; then
+    ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
     ln -s /usr/src/app/entrypoint.sh /entrypoint
 fi
 
@@ -32,7 +31,7 @@ if [ "$1" = "run-test" ]; then
 
     fi
 
-    echo "EXECUTE GatlingTest..."
+    echo "EXECUTE Gatling Test..."
     description=LoadTest::$API_NAME::v$API_TAG_VERSION::$(exec date "+%m/%d/%Y-%H:%M:%S")::America/Sao_Paulo
     $(pwd)/bundle/bin/gatling.sh -rm local -rd $description -sf $(pwd)/APISimulation -rf $(pwd)/results/history APISimulation.Alunos
     echo "Verify Test Gatling Results folder for all tests"

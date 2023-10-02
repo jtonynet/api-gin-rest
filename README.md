@@ -30,7 +30,11 @@
 ---
 <a id="sobre"></a>
 ## :green_book: Sobre
-Melhorias no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade). Esse projeto tem finalidade puramente didática. Após a conclusão do projeto do curso, continuei adicionando padrões de mercado como melhorias para estudar algumas aplicações. Inspirado pela [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3)
+Melhorias no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade). Esse projeto tem finalidade puramente didática.
+
+Após a conclusão do projeto do curso, continuei adicionando padrões de mercado como melhorias para estudar algumas aplicações. Inspirado pela [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e pelos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
+
+Busco aumentar o desempenho, corrigir alguns pontos e aplicar o conhecimento dos livros citados como estudo.
 
 
 [:arrow_heading_up: voltar](#indice)
@@ -56,7 +60,7 @@ Aguarde até que as imagens sejam criadas e acesse:
 
 <br>
 #### Recomendações para Devs:
-As versões mais recentes da linguagem já têm a instalação simplificada pelo `snap`
+Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente. As versões mais recentes da linguagem já têm a instalação simplificada pelo `snap`
 ```bash
 $ sudo snap install go --classic
 ```
@@ -236,9 +240,9 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Viper](https://github.com/spf13/viper)
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
 - [Postgres](https://www.postgresql.org/)
-- [Docker 24.0.6](https://www.docker.com/)
+- [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
-- [Gatling](https://gatling.io/)
+- [Gatling v3.9.5](https://gatling.io/)
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)
 
@@ -254,6 +258,7 @@ Seguindo boas práticas de desenvolvimento:
 - [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 - [keep a changelog](https://keepachangelog.com/en/1.0.0/)
 - [Swagger](https://swagger.io/)
+- [Load testing](https://en.wikipedia.org/wiki/Load_testing)
 
 [:arrow_heading_up: voltar](#indice)
 

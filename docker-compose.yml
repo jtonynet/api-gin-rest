@@ -7,12 +7,13 @@ services:
     ports:
       - 8080:80
     depends_on:
-      - api-gin-rest
+      - ${API_NAME}
+      - postgres-gin-rest
     networks:
       - gin-rest-network
 
   postgres-gin-rest:
-    image: postgres:latest
+    image: postgres:16.0
     container_name: postgres-gin-rest
     restart: always
     environment:
@@ -22,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data  
+      - ${PWD}/postgres-data:/var/lib/postgresql/data  
     networks:
       - gin-rest-network
 
@@ -30,19 +31,37 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: api-gin-rest
+    container_name: ${API_NAME}
     environment:
       DATABASE_HOST: postgres-gin-rest
     ports:
-      - "8081:8081"
+      - "${API_PORT}:${API_PORT}"
     depends_on:
       - postgres-gin-rest
     volumes:
-      - ./:/usr/src/app
-    command: go run main.go -b 0.0.0.0
+      - ${PWD}:/usr/src/app
     tty: true
     networks:
       - gin-rest-network
 
+  gatling-api-test:
+    build:
+      context: ./tests/gatling
+      dockerfile: Dockerfile
+    container_name:
+      gatling-api-test
+    env_file: 
+      - .env
+    ports:
+      - "${TEST_GATLING_PORT}:${TEST_GATLING_PORT}"
+    depends_on:
+      - nginx-gin-rest
+      - api-gin-rest
+      - postgres-gin-rest
+    volumes:
+      - ${PWD}/tests/gatling:/usr/src/app
+    networks:
+      - gin-rest-network
+      
 networks:
   gin-rest-network:

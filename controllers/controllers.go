@@ -22,7 +22,7 @@ func Liveness(c *gin.Context, cfg config.API) {
 
 func Readiness(c *gin.Context, cfg config.API) {
 
-	if err := database.CheckHeadness(); err != nil {
+	if err := database.CheckReadiness(); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"message": "Service unavailable",
 		})
@@ -65,6 +65,9 @@ func ExibeTodosAlunos(c *gin.Context) {
 func CriaNovoAluno(c *gin.Context) {
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
+		fmt.Println(err.Error())
+		// alunoJSON, err := json.MarshalIndent(aluno, "", "  ")
+		// fmt.Println(string(alunoJSON))
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return

@@ -49,14 +49,15 @@ $ docker compose up
 ```
 Aguarde até que as imagens sejam criadas e acesse:
 
-`http://localhost:8080/alunos` Rota para **API** 
+`http://localhost:8080/alunos` Rota para **API**<br/> 
+<br/>
 
-`http://localhost:8080/readiness` Rota de **readiness**
-`http://localhost:8080/liveness` Rota de **liveness**
+`http://localhost:8080/readiness` Rota de **readiness**<br/>
+`http://localhost:8080/liveness` Rota de **liveness**<br/>
+<br/>
 
-
-`http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**
-`http://localhost:8082` Rota para **ultimo resultado de teste de carga**
+`http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**<br/>
+`http://localhost:8082` Rota para **ultimo resultado de teste de carga**<br/>
 
 <br>
 #### Recomendações para Devs:

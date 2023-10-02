@@ -1,9 +1,9 @@
 # Estudo API Rest em Golang com Gin
 <br> 
-<img src="./images/gin_mediun.png">
+<img src="./misc/images/gin_mediun.png">
 
-[<img src="./images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
-<!-- <img src="./images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> <img src="./images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> -->
+[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+<!-- <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> -->
 
 
 
@@ -86,6 +86,8 @@ $ docker inspect container_id | grep IPAddress -->
 
 ---
 ### :newspaper: Gerando documentação com swagger
+A cada nova construção da imagem do projeto, a documentação deve ser gerada novamente de maneira automatizada.
+
 Para os desenvolvedores que irão manipular o código ou se inspirar para seus próprios desenvolvimentos, há uma particularidade na documentação Swagger. O comando padrão do [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger) (uma ferramenta que gera documentação Swagger para Go) não consegue ler `structs` que utilizam `gorm.Model`, e isso não está explicitamente mencionado em sua documentação. Pesquisando por uma solução, [encontrei o comando apropriado](https://github.com/swaggo/swag/issues/810) para a geração, que segue abaixo:
 
 ```bash
@@ -100,18 +102,24 @@ $ swag init --parseDependency --parseInternal
 ### :camera: Imagens do Projeto
 
 <details>
+  <summary>API</summary>
+    <img src="./misc/images/captures/api.png">
+</details>
+<br>
+<details>
   <summary>Swagger 1</summary>
-    <img src="images/captures/swagger_1.png">
+    <img src="./misc/images/captures/swagger_1.png">
 </details>
 <br>
 <details>
   <summary>Swagger 2</summary>
-  <img src="images/captures/swagger_2.png">
+  <img src="./misc/images/captures/swagger_2.png">
 </details>
 <br>
 <details>
-  <summary>API</summary>
-    <img src="images/captures/api.png">
+  <summary>Teste de Carga Gatling</summary>
+    <img src="./misc/images/captures/gatling_load_test_01.png">
+    <i>*Teste Inicial, ainda estamos melhorando a API para performar volumes mais elevados de requests em proximas PR`s</i>
 </details>
 <br>
 
@@ -225,6 +233,8 @@ Após a instalação do Gatling, que ocorre na primeira vez que você solicita a
 12  	<!-- uncomment and set to TRACE to log all HTTP requests -->
 13  	<logger name="io.gatling.http.engine.response" level="TRACE" />
 ``` 
+
+<!-- https://worldline.github.io/gatling-cheatsheet/#feeders -->
 [:arrow_heading_up: voltar](#indice)
 
 ---

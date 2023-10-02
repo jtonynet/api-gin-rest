@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-# RUN go install github.com/swaggo/swag/cmd/swag@latest
+COPY entrypoint.sh ./ 
 
-# RUN swag init --parseDependency --parseInternal
+RUN chmod +x entrypoint.sh
 
+ENTRYPOINT [ "./entrypoint.sh" ]

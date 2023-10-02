@@ -40,7 +40,6 @@ services:
       - postgres-gin-rest
     volumes:
       - ${PWD}:/usr/src/app
-    command: go run main.go -b 0.0.0.0
     tty: true
     networks:
       - gin-rest-network

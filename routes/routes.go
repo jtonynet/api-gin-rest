@@ -24,11 +24,12 @@ func HandleRequests(cfg config.API) {
 	})
 
 	r.GET("/alunos", controllers.ExibeTodosAlunos)
-	r.POST("/alunos", controllers.CriaNovoAluno)
-	r.GET("/alunos/:id", controllers.BuscaAlunoPorId)
-	r.DELETE("/alunos/:id", controllers.DeletaAluno)
-	r.PATCH("/alunos/:id", controllers.EditaAluno)
-	r.GET("/alunos/cpf/:cpf", controllers.BuscaAlunoPorCPF)
+
+	r.POST("/aluno", controllers.CriaNovoAluno)
+	r.GET("/aluno/:id", controllers.BuscaAlunoPorId)
+	r.DELETE("/aluno/:id", controllers.DeletaAluno)
+	r.PATCH("/aluno/:id", controllers.EditaAluno)
+	r.GET("/aluno/cpf/:cpf", controllers.BuscaAlunoPorCPF)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

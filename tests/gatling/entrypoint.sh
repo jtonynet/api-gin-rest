@@ -33,7 +33,7 @@ if [ "$1" = "run-test" ]; then
 
     echo "EXECUTE Gatling Test..."
     description=LoadTest::$API_NAME::v$API_TAG_VERSION::$(exec date "+%m/%d/%Y-%H:%M:%S")::America/Sao_Paulo
-    $(pwd)/bundle/bin/gatling.sh -rm local -rd $description -sf $(pwd)/APISimulation -rf $(pwd)/results/history APISimulation.Alunos
+    $(pwd)/bundle/bin/gatling.sh -rm local -rd $description -sf $(pwd)/user-files/simulations/$API_NAME -rsf $(pwd)/user-files/resources/$API_NAME -rf $(pwd)/results/history
     echo "Verify Test Gatling Results folder for all tests"
 fi
 

@@ -60,7 +60,7 @@ cp -r $new_latest/* ./results/latest/
 
 python3_pid=$(pgrep -f "python3 -m http.server $TEST_GATLING_PORT")
 if [ ! -n "$python3_pid" ]; then
-    echo "Run test last result server"
+    echo "Run test result server"
     python3 -m http.server $TEST_GATLING_PORT --directory ./results/latest/
 fi
 

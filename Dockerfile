@@ -1,10 +1,8 @@
-FROM golang:latest
+FROM golang:1.21.1
 
 WORKDIR /usr/src/app
 
-COPY . .
-
-COPY entrypoint.sh ./ 
+COPY . . 
 
 RUN chmod +x entrypoint.sh
 

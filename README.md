@@ -86,7 +86,7 @@ $ docker inspect container_id | grep IPAddress -->
 
 ---
 ### :newspaper: Gerando documentação com swagger
-A cada nova construção da imagem do projeto, a documentação deve ser gerada novamente de maneira automatizada.
+A cada nova construção da imagem do projeto, a documentação é gerada novamente de maneira automatizada.
 
 Para os desenvolvedores que irão manipular o código ou se inspirar para seus próprios desenvolvimentos, há uma particularidade na documentação Swagger. O comando padrão do [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger) (uma ferramenta que gera documentação Swagger para Go) não consegue ler `structs` que utilizam `gorm.Model`, e isso não está explicitamente mencionado em sua documentação. Pesquisando por uma solução, [encontrei o comando apropriado](https://github.com/swaggo/swag/issues/810) para a geração, que segue abaixo:
 
@@ -249,7 +249,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [GORM](https://gorm.io/index.html)
 - [Viper](https://github.com/spf13/viper)
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
-- [Postgres](https://www.postgresql.org/)
+- [Postgres v16.0](https://www.postgresql.org/)
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
 - [Gatling v3.9.5](https://gatling.io/)

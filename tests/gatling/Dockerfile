@@ -1,12 +1,14 @@
-FROM ubuntu:latest
+FROM openjdk:8
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && \
-    apt-get install -y tzdata wget openjdk-8-jdk scala unzip && \
-    rm -rf /var/lib/apt/lists/*
+COPY . .
 
-COPY entrypoint.sh ./ 
+RUN apt-get update && apt-get install -y \
+    python3 \
+    tzdata \
+    wget \
+ && apt-get clean
 
 RUN chmod +x entrypoint.sh
 

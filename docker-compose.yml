@@ -13,7 +13,7 @@ services:
       - gin-rest-network
 
   postgres-gin-rest:
-    image: postgres:latest
+    image: postgres:16.0
     container_name: postgres-gin-rest
     restart: always
     environment:

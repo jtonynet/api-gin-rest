@@ -20,7 +20,7 @@ class Alunos extends Simulation {
       session
     })
     .exec(http("Requisição para /alunos")
-      .post("/alunos")
+      .post("/aluno")
       .body(StringBody("#{payload}"))
       .header("Content-Type", "application/json")
       .check(status.is(200))

@@ -2,8 +2,8 @@
 <br> 
 <img src="./misc/images/gin_mediun.png">
 
-[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
-<!-- <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
+[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+<!--  <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
 
 
 
@@ -146,8 +146,8 @@ Para os desenvolvedores que irão manipular o código ou se inspirar para seus p
 graph LR
   subgraph Ações Admin Alunos
     A[[ADMIN User]]
-    B["Obtém a lista completa de alunos"]
-    C["Cria novo aluno"]
+    B["Cria novo aluno"]
+    C["Obtém a lista completa de alunos"]
     D["Busca aluno por id"]
     E["Deleta aluno por id"]
     F["Edita aluno por id"]
@@ -155,13 +155,33 @@ graph LR
   end
 
   subgraph Backend 
+    subgraph Messaging
+        RabbitMQ(["Aluno-RabbitMQ"])
+    end
+
     subgraph API
-      Aluno["Aluno"]
+      subgraph Command
+        Worker["Aluno-Worker"]
+      end
+
+      subgraph Controlers
+        CriaNovoAluno["CriaNovoAluno"]
+        ExibeTodosAlunos["ExibeTodosAlunos"]
+        BuscaAlunoPorId["BuscaAlunoPorId"]
+        DeletaAluno["DeletaAluno"]
+        EditaAluno["EditaAluno"]
+        BuscaAlunoPorCPF["BuscaAlunoPorCPF"]
+      end
+
+      subgraph Models
+        Aluno["Aluno"]
+      end
     end
 
     subgraph DATABASE
       Aluno-DB[("Aluno-DB")]
-    end    
+    end 
+   
   end
 
   A --> B
@@ -171,14 +191,26 @@ graph LR
   A --> F
   A --> G
 
-  B -->|GET| Aluno
-  C -->|POST| Aluno
-  D -->|GET| Aluno
-  E -->|DELETE| Aluno
-  F -->|PATCH| Aluno
-  G -->|GET| Aluno
+  C -->|GET| ExibeTodosAlunos
+  D -->|GET| BuscaAlunoPorId
+  E -->|DELETE| DeletaAluno
+  F -->|PATCH| EditaAluno
+  G -->|GET| BuscaAlunoPorCPF
 
-  Aluno --> Aluno-DB
+  ExibeTodosAlunos --> Aluno
+  BuscaAlunoPorId --> Aluno
+  BuscaAlunoPorCPF --> Aluno
+  DeletaAluno --> Aluno
+  EditaAluno --> Aluno
+
+  Aluno -->|Queries| Aluno-DB
+  B -->|POST| CriaNovoAluno
+
+  CriaNovoAluno -.->|Produz| RabbitMQ
+  RabbitMQ -.->|consome| Worker
+
+  Worker --> Aluno
+
 ```
 
 <br/>

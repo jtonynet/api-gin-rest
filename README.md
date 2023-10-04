@@ -3,7 +3,7 @@
 <img src="./misc/images/gin_mediun.png">
 
 [<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
-<!-- <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> -->
+<!-- <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
 
 
 
@@ -30,11 +30,11 @@
 ---
 <a id="sobre"></a>
 ## :green_book: Sobre
-Melhorias no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade). Esse projeto tem finalidade puramente didática.
+Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa.
 
-Após a conclusão do projeto do curso, continuei adicionando padrões de mercado como melhorias para estudar algumas aplicações. Inspirado pela [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e pelos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
+Após a conclusão do curso, continuo incorporando padrões de mercado e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
 
-Busco aumentar o desempenho, corrigir alguns pontos e aplicar o conhecimento dos livros citados como estudo.
+O objetivo é aprimorar o desempenho, corrigir questões identificadas e aplicar os conceitos aprendidos nos livros mencionados como parte do meu processo de estudo.
 
 
 [:arrow_heading_up: voltar](#indice)
@@ -43,10 +43,18 @@ Busco aumentar o desempenho, corrigir alguns pontos e aplicar o conhecimento dos
 
 ### :computer: Rodando o Projeto
 
-Crie uma copia do arquivo `sample.env` com o nome `.env` e rode o comando docker-compose (de acordo com sua versao do `docker compose`) no diretorio raiz do projeto:
+Crie uma copia do arquivo `sample.env` com o nome `.env` e rode o comando docker-compose (de acordo com sua versão do `docker compose`) no diretorio raiz do projeto:
 ```bash
 $ docker compose up
 ```
+
+> :writing_hand: **Observação**:
+>
+> :window: Troubleshooting com [Windows](https://stackoverflow.com/questions/53165471/building-docker-images-on-windows-entrypoint-script-no-such-file-or-directory)
+> Por algum motivo, as configurações de atributos do Git que podem afetar o caractere de fim de linha não estão funcionando como esperado, e ainda não identificamos o motivo. Portanto, para executar o projeto no Windows, será necessário fazer uma alteração manual no arquivo `./tests/gatling/entrypoint.sh`. Em vez disso, converta o arquivos de `LF` para `CRLF` no seu editor de texto de preferência.
+
+
+
 Aguarde até que as imagens sejam criadas e acesse:
 
 `http://localhost:8080/alunos` Rota para **API**<br/> 
@@ -88,13 +96,16 @@ $ docker inspect container_id | grep IPAddress -->
 
 ---
 ### :newspaper: Gerando documentação com swagger
-A cada nova construção da imagem do projeto, a documentação é gerada novamente de maneira automatizada.
 
-Para os desenvolvedores que irão manipular o código ou se inspirar para seus próprios desenvolvimentos, há uma particularidade na documentação Swagger. O comando padrão do [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger) (uma ferramenta que gera documentação Swagger para Go) não consegue ler `structs` que utilizam `gorm.Model`, e isso não está explicitamente mencionado em sua documentação. Pesquisando por uma solução, [encontrei o comando apropriado](https://github.com/swaggo/swag/issues/810) para a geração, que segue abaixo:
+Como a imagem `api-gin-rest` rodando, digite:
 
 ```bash
-$ swag init --parseDependency --parseInternal
+$ docker exec -ti api-gin-rest swag init --parseDependency --parseInternal
 ```
+
+Para os desenvolvedores que irão manipular o código ou se inspirar para seus próprios desenvolvimentos, há uma particularidade na documentação Swagger. O comando padrão do [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger) (uma ferramenta que gera documentação Swagger para Go) não consegue ler `structs` que utilizam `gorm.Model`, e isso não está explicitamente mencionado em sua documentação. Pesquisando por uma solução, [encontrei o comando apropriado](https://github.com/swaggo/swag/issues/810) para a geração.
+
+
 
 [:arrow_heading_up: voltar](#indice)
 
@@ -169,7 +180,8 @@ graph LR
 
   Aluno --> Aluno-DB
 ```
-<br>
+
+<br/>
 
 [:arrow_heading_up: voltar](#indice)
 
@@ -219,6 +231,7 @@ Estrutura da pasta de testes do Gatling:
 ```
 
 <br/>
+
 #### Limpando a instalação do Gatling e removendo históricos de testes:
  Importante: Isso não limpa as inserções feitas no banco de dados.
 ```shell
@@ -226,6 +239,7 @@ docker exec -ti gatling-api-test /entrypoint clean-test
 ```
 
 <br/>
+
 #### Debbuging do Gatling:
 Visualização de logs de requisições do Gatling (apenas em ambiente local para fins de depuração):
 
@@ -269,6 +283,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 Seguindo boas práticas de desenvolvimento:
 - [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 - [keep a changelog](https://keepachangelog.com/en/1.0.0/)
+- [Mermaid Diagrams](https://mermaid.js.org)
 - [Swagger](https://swagger.io/)
 - [Load testing](https://en.wikipedia.org/wiki/Load_testing)
 

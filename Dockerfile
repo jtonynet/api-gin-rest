@@ -1,9 +1,9 @@
-FROM golang:1.21.1
+FROM golang:1.21.1-alpine
 
 WORKDIR /usr/src/app
 
 COPY . . 
 
-RUN chmod +x entrypoint.sh
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
-ENTRYPOINT [ "./entrypoint.sh" ]
+CMD ["go", "run", "main.go", "-b", "0.0.0.0"]

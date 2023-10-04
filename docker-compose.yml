@@ -13,7 +13,7 @@ services:
       - gin-rest-network
 
   postgres-gin-rest:
-    image: postgres:16.0
+    image: postgres:16.0-alpine
     container_name: postgres-gin-rest
     restart: always
     environment:
@@ -23,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ${PWD}/postgres-data:/var/lib/postgresql/data  
+      - ./postgres-data:/var/lib/postgresql/data  
     networks:
       - gin-rest-network
 
@@ -39,7 +39,7 @@ services:
     depends_on:
       - postgres-gin-rest
     volumes:
-      - ${PWD}:/usr/src/app
+      - .:/usr/src/app
     tty: true
     networks:
       - gin-rest-network
@@ -59,7 +59,8 @@ services:
       - api-gin-rest
       - postgres-gin-rest
     volumes:
-      - ${PWD}/tests/gatling:/usr/src/app
+      - ./tests/gatling:/usr/src/app
+    command: go run main.go -b 0.0.0.0
     networks:
       - gin-rest-network
       

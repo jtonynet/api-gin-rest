@@ -1,14 +1,14 @@
-FROM openjdk:8
+FROM openjdk:8-jdk-alpine
 
 WORKDIR /usr/src/app
 
 COPY . .
 
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
     python3 \
     tzdata \
     wget \
- && apt-get clean
+ && rm -rf /var/cache/apk/*
 
 RUN chmod +x entrypoint.sh
 

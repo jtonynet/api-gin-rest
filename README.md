@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" crossorigin="anonymous">
 # Estudo API Rest em Golang com Gin
 <br> 
 <img src="./misc/images/gin_mediun.png">
@@ -160,7 +161,7 @@ graph LR
     end
 
     subgraph DATABASE
-      Aluno-DB[("Aluno-DB")]
+      Aluno-DB[("fa:fa-database Aluno-DB")]
     end    
   end
 

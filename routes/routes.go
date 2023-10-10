@@ -3,10 +3,12 @@ package routes
 import (
 	"fmt"
 
+	pprof "github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/controllers"
 	docs "github.com/jtonynet/api-gin-rest/docs"
+	"github.com/jtonynet/api-gin-rest/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -15,21 +17,25 @@ func HandleRequests(cfg config.API) {
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/"
 
-	r.GET("/liveness", func(c *gin.Context) {
-		controllers.Liveness(c, cfg)
-	})
+	if cfg.PprofCPUFeatureFlagEnabled {
+		pprof.Register(r, "/debug/pprof")
+	}
 
-	r.GET("/readiness", func(c *gin.Context) {
-		controllers.Readiness(c, cfg)
-	})
+	apiGroup := r.Group("/")
 
-	r.GET("/alunos", controllers.ExibeTodosAlunos)
+	apiGroup.Use(middlewares.ConfigInjectHandler(cfg))
+	apiGroup.Use(middlewares.ConfigManagerHandler())
 
-	r.POST("/aluno", controllers.CriaNovoAluno)
-	r.GET("/aluno/:id", controllers.BuscaAlunoPorId)
-	r.DELETE("/aluno/:id", controllers.DeletaAluno)
-	r.PATCH("/aluno/:id", controllers.EditaAluno)
-	r.GET("/aluno/cpf/:cpf", controllers.BuscaAlunoPorCPF)
+	apiGroup.GET("/liveness", controllers.Liveness)
+	apiGroup.GET("/readiness", controllers.Readiness)
+
+	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
+
+	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
+	apiGroup.GET("/aluno/:id", controllers.BuscaAlunoPorId)
+	apiGroup.DELETE("/aluno/:id", controllers.DeletaAluno)
+	apiGroup.PATCH("/aluno/:id", controllers.EditaAluno)
+	apiGroup.GET("/aluno/cpf/:cpf", controllers.BuscaAlunoPorCPF)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

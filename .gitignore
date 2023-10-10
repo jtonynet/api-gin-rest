@@ -38,3 +38,6 @@
 # Ignora volume do postgres
 /postgres-data
 /postgres-data/*
+
+# Ignora profilling
+/pprof/*

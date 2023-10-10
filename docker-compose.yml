@@ -27,6 +27,25 @@ services:
     networks:
       - gin-rest-network
 
+  gatling-api-test:
+    build:
+      context: ./tests/gatling
+      dockerfile: Dockerfile
+    container_name:
+      gatling-api-test
+    env_file: 
+      - .env
+    ports:
+      - "${GATLING_TEST_PORT}:${GATLING_TEST_PORT}"
+    depends_on:
+      - nginx-gin-rest
+      - api-gin-rest
+      - postgres-gin-rest
+    volumes:
+      - ./tests/gatling:/usr/src/app
+    networks:
+      - gin-rest-network
+
   api-gin-rest:
     build:
       context: .
@@ -41,26 +60,7 @@ services:
     volumes:
       - .:/usr/src/app
     tty: true
-    networks:
-      - gin-rest-network
-
-  gatling-api-test:
-    build:
-      context: ./tests/gatling
-      dockerfile: Dockerfile
-    container_name:
-      gatling-api-test
-    env_file: 
-      - .env
-    ports:
-      - "${TEST_GATLING_PORT}:${TEST_GATLING_PORT}"
-    depends_on:
-      - nginx-gin-rest
-      - api-gin-rest
-      - postgres-gin-rest
-    volumes:
-      - ./tests/gatling:/usr/src/app
-    command: go run main.go -b 0.0.0.0
+    command: go run cmd/api/main.go -b 0.0.0.0
     networks:
       - gin-rest-network
       

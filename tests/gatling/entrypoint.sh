@@ -33,7 +33,8 @@ if [ "$1" = "run-test" ]; then
 
     echo "EXECUTE Gatling Test..."
     description=LoadTest::$API_NAME::v$API_TAG_VERSION::$(exec date "+%m/%d/%Y-%H:%M:%S")::America/Sao_Paulo
-    $(pwd)/bundle/bin/gatling.sh -rm local -rd $description -sf $(pwd)/user-files/simulations/$API_NAME -rsf $(pwd)/user-files/resources/$API_NAME -rf $(pwd)/results/history
+    sh $(pwd)/bundle/bin/gatling.sh -rm local -rd $description -sf $(pwd)/user-files/simulations/$API_NAME -rsf $(pwd)/user-files/resources/$API_NAME -rf $(pwd)/results/history
+
     echo "Verify Test Gatling Results folder for all tests"
 fi
 
@@ -58,10 +59,8 @@ echo "Add New load test data"
 new_latest=$(ls -td ./results/history/*/ | head -n 1)
 cp -r $new_latest/* ./results/latest/
 
-python3_pid=$(pgrep -f "python3 -m http.server $TEST_GATLING_PORT")
+python3_pid=$(pgrep -f "python3 -m http.server $GATLING_TEST_PORT")
 if [ ! -n "$python3_pid" ]; then
     echo "Run test result server"
-    python3 -m http.server $TEST_GATLING_PORT --directory ./results/latest/
+    python3 -m http.server $GATLING_TEST_PORT --directory ./results/latest/
 fi
-
-

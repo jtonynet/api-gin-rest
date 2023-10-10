@@ -6,6 +6,10 @@ type API struct {
 	Name       string `mapstructure:"API_NAME"`
 	Port       string `mapstructure:"API_PORT"`
 	TagVersion string `mapstructure:"API_TAG_VERSION"`
+	Env        string `mapstructure:"API_ENV"`
+
+	// API Feature Flags
+	PprofCPUFeatureFlagEnabled bool `mapstructure:"PPROF_CPU_FEATURE_FLAG_ENABLED"`
 }
 
 type Database struct {

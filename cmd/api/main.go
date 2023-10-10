@@ -9,7 +9,7 @@ import (
 )
 
 // @title api-gin-rest
-// @version 1.0
+// @version 0.0.3
 // @description Estudo API Rest em Golang com Gin
 // @contact.name API GIN Support
 // @termsOfService https://github.com/jtonynet/api-gin-rest

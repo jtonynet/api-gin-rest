@@ -1,8 +1,14 @@
 # Estudo API Rest em Golang com Gin
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" crossorigin="anonymous">
+<!-- 
+https://fontawesome.com/search
+https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-markdown 
+-->
+
 <br> 
 <img src="./misc/images/gin_mediun.png">
 
-[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq">](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
 <!--  <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
 
 
@@ -22,9 +28,12 @@
   :camera: [Imagens do Projeto](#camera-imagens-do-projeto)<br/>
   :bar_chart: [Diagramas](#bar_chart-diagramas)<br/>
   :train: [Teste de Carga](#train-teste-de-carga)<br>
+  :mag: [Profilling](#mag-profilling)<br/>
   :hammer: [Ferramentas](#hammer-ferramentas)<br/>
   :clap: [Boas Práticas](#clap-boas-práticas)<br/>
   :1234: [Versões](#1234-versões)<br/>
+
+  <!--:female_detective: [Debugging](#female_detective-debugging)<br/>-->
 
 <!--te-->
 ---
@@ -36,6 +45,19 @@ Após a conclusão do curso, continuo incorporando padrões de mercado e melhori
 
 O objetivo é aprimorar o desempenho, corrigir questões identificadas e aplicar os conceitos aprendidos nos livros mencionados como parte do meu processo de estudo.
 
+Não estou considerando colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas educacionais nacionais, eventos promocionais, Black Friday, etc...).
+
+Para alcançar essas melhorias, adotei as seguintes medidas que não estavam presentes no curso original:
+- Teste de carga com Gatling
+- Técnicas de debbuging
+- Profiling da aplicação para identificar os pontos de "stress".
+  - Profiling acionados por feature flag
+  - Profiling em middleware
+- Criação de novos alunos em filas/workers concorrentes usando goroutines.
+- (A ser implementado) Uso de Cache Redis como uma feature flag.
+
+O projeto foi desenvolvido no sistema operacional Ubuntu e testado tanto no Ubuntu quanto no Windows, porém as informações de desenvolvimento estão voltadas para o sistema operacional Linux.
+
 
 [:arrow_heading_up: voltar](#indice)
 
@@ -43,7 +65,7 @@ O objetivo é aprimorar o desempenho, corrigir questões identificadas e aplicar
 
 ### :computer: Rodando o Projeto
 
-Crie uma copia do arquivo `sample.env` com o nome `.env` e rode o comando docker-compose (de acordo com sua versão do `docker compose`) no diretorio raiz do projeto:
+Crie uma copia do arquivo `sample.env` com o nome `.env` e rode o comando `docker compose up` (de acordo com sua versão do `docker compose`) no diretorio raiz do projeto:
 ```bash
 $ docker compose up
 ```
@@ -100,7 +122,7 @@ $ docker inspect container_id | grep IPAddress -->
 Como a imagem `api-gin-rest` rodando, digite:
 
 ```bash
-$ docker exec -ti api-gin-rest swag init --parseDependency --parseInternal
+$ docker exec -ti api-gin-rest swag init --parseDependency --parseInternal  --generalInfo cmd/api/main.go
 ```
 
 Para os desenvolvedores que irão manipular o código ou se inspirar para seus próprios desenvolvimentos, há uma particularidade na documentação Swagger. O comando padrão do [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger) (uma ferramenta que gera documentação Swagger para Go) não consegue ler `structs` que utilizam `gorm.Model`, e isso não está explicitamente mencionado em sua documentação. Pesquisando por uma solução, [encontrei o comando apropriado](https://github.com/swaggo/swag/issues/810) para a geração.
@@ -136,50 +158,55 @@ Para os desenvolvedores que irão manipular o código ou se inspirar para seus p
 </details>
 <br>
 
+
 [:arrow_heading_up: voltar](#indice)
 
 ---
 
  ### :bar_chart: Diagramas
 
+<br/>
+
+**Fluxo do Serviço Alunos:**
+
 ```mermaid
 graph LR
   subgraph Ações Admin Alunos
-    A[[ADMIN User]]
-    B["Cria novo aluno"]
-    C["Obtém a lista completa de alunos"]
-    D["Busca aluno por id"]
-    E["Deleta aluno por id"]
-    F["Edita aluno por id"]
-    G["Busca aluno por CPF"]
+    A(fa:fa-user ADMIN User)
+    B["fa:fa-globe Cria novo aluno"]
+    C["fa:fa-globe Obtém a lista completa de alunos"]
+    D["fa:fa-globe Busca aluno por id"]
+    E["fa:fa-globe Deleta aluno por id"]
+    F["fa:fa-globe Edita aluno por id"]
+    G["fa:fa-globe Busca aluno por CPF"]
   end
 
   subgraph Backend 
-    subgraph Messaging
-        RabbitMQ(["Aluno-RabbitMQ"])
+    subgraph Message Broker
+        RabbitMQ(["fa:fa-envelope Aluno-RabbitMQ"])
     end
 
     subgraph API
       subgraph Command
-        Worker["Aluno-Worker"]
+        Worker["fa:fa-gears Aluno-Worker"]
       end
 
       subgraph Controlers
-        CriaNovoAluno["CriaNovoAluno"]
-        ExibeTodosAlunos["ExibeTodosAlunos"]
-        BuscaAlunoPorId["BuscaAlunoPorId"]
-        DeletaAluno["DeletaAluno"]
-        EditaAluno["EditaAluno"]
-        BuscaAlunoPorCPF["BuscaAlunoPorCPF"]
+        CriaNovoAluno["fa:fa-code CriaNovoAluno"]
+        ExibeTodosAlunos["fa:fa-code ExibeTodosAlunos"]
+        BuscaAlunoPorId["fa:fa-code BuscaAlunoPorId"]
+        DeletaAluno["fa:fa-code DeletaAluno"]
+        EditaAluno["fa:fa-code EditaAluno"]
+        BuscaAlunoPorCPF["fa:fa-code BuscaAlunoPorCPF"]
       end
 
       subgraph Models
-        Aluno["Aluno"]
+        Aluno["fa:fa-cube Aluno"]
       end
     end
 
     subgraph DATABASE
-      Aluno-DB[("Aluno-DB")]
+      Aluno-DB[("fa:fa-database Aluno-DB")]
     end 
    
   end
@@ -215,15 +242,33 @@ graph LR
 
 <br/>
 
+**Sequência de criação de aluno:**
+
+```mermaid
+sequenceDiagram
+    participant A as ADMIN User
+    participant B as "Cria novo aluno"
+    participant CriaNovoAluno as CriaNovoAluno
+    participant RabbitMQ as Aluno-RabbitMQ
+    participant Worker as Aluno-Worker
+
+    A ->> B: Inicia a criação de um novo aluno
+    B ->> CriaNovoAluno: Envia a solicitação de criação
+    CriaNovoAluno -->> RabbitMQ: Produz mensagem
+    RabbitMQ -->> Worker: Consome mensagem
+
+```
+
+<br/>
+
 [:arrow_heading_up: voltar](#indice)
 
 ---
 
 ### :train: Teste de Carga
-Usamos uma imagem com o **Gatling** instalado para performar testes de carga de maneira automatizada.
-Com o projeto instalado e em execução após o comando `docker compose up`, acesse a rota que renderiza o resultado do teste mais recente em `http://localhost:8082`. Caso você tenha acabado de iniciar o ambiente, nenhum teste terá ocorrido até o momento.
 
-A imagem responsável por fornecer essa saída também é responsável por processar o teste. Para executar um novo teste, basta abrir um novo terminal e, estando na raiz do projeto, execute o comando:
+Com o projeto instalado e em execução após o comando `docker compose up`, acesse a rota que renderiza o resultado do teste mais recente em `http://localhost:8082`. Caso você tenha acabado de iniciar o ambiente, nenhum teste terá ocorrido até o momento. Em um novo terminal e, estando na raiz do projeto, execute o comando:
+
 
 ```bash
 docker exec -ti gatling-api-test /entrypoint run-test
@@ -262,6 +307,9 @@ Estrutura da pasta de testes do Gatling:
   .
 ```
 
+Usamos uma imagem com o **Gatling** instalado para performar testes de carga de maneira automatizada.
+A imagem responsável por fornecer essa saída também é responsável por processar o teste.
+
 <br/>
 
 #### Limpando a instalação do Gatling e removendo históricos de testes:
@@ -271,6 +319,16 @@ docker exec -ti gatling-api-test /entrypoint clean-test
 ```
 
 <br/>
+
+#### Configurando o Teste
+Caso deseje alterar as configuracoes padrao do teste, altere o arquivo `tests/gatling/user-files/simulations/AlunosSimulation.scala`. O metodo `setUp` te da flexibilidade de cenarios de simulacao
+```kotlin
+  setUp(
+    testAlunos.inject(rampUsers(1000).during(20.seconds))
+  ).protocols(httpProtocol)
+```
+
+<br>
 
 #### Debbuging do Gatling:
 Visualização de logs de requisições do Gatling (apenas em ambiente local para fins de depuração):
@@ -287,20 +345,102 @@ Após a instalação do Gatling, que ocorre na primeira vez que você solicita a
 
 ---
 
+
+<!-- ### :female_detective: Debugging
+
+
+<br/>
+
+[:arrow_heading_up: voltar](#indice)
+
+---
+-->
+
+### :mag: Profilling
+
+O profiling da aplicação para fins de testes e validação está vinculado às rotas. O processo não é executado de maneira dockerizada, necessitando ter o [Go](#recomendações-para-devs) e o Graphviz instalados na sua máquina.
+
+```shell
+$ sudo apt-get install graphviz
+```
+
+Para ativar o profiling de rotas, basta alterar o valor da variável de ambiente `PPROF_FEATURE_FLAG_ENABLED` para `1` no arquivo `.env`:
+
+
+```shell
+PPROF_FEATURE_FLAG_ENABLED=1
+```
+
+Com isso, a seguinte rota fica ativa e apresenta resultados dos profiles disponíveis:
+
+ ```shell
+ http://localhost:8080/debug/pprof
+ ```
+
+Podemos agora, com `Go` e `Graphviz` na máquina hospedeira, ligar a coleta de métricas. Observe a imagem com dois terminais, no terminal 1 foi inserido o comando:
+```shell
+$ go tool pprof http://localhost:8080/debug/pprof/profile
+```
+Isso fará com que, durante os próximos trinta segundos, as requests feitas na API gerem massa de dados para o profiler. 
+
+<img src="./misc/images/captures/pprof_and_gattling_1.png"/>
+
+Assim que o comando `go tool pprof` for iniciado, em outro terminal ja tenha o comando do [Teste de Carga](#train-teste-de-carga) preparado para rodar e gerar insumos para o pprof. Comando no terminal 2:
+
+```shell
+$ docker exec -ti gatling-api-test /entrypoint run-test
+```
+
+<br/>
+
+Após o [Teste de Carga](#train-teste-de-carga) rodar sua saida sera similar a seguinte:
+<img src="./misc/images/captures/pprof_and_gattling_2.png"/>
+
+No terminal do `pprof` o cursor deve estar aguardando o proximo comando para continuar o profiling, digite `web` no cursor e de `enter`, aguarde seu navegador o exibir a árvore de processamento de sua aplicação.
+```bash
+Fetching profile over HTTP from http://localhost:8080/debug/pprof/profile
+Saved profile in /home/jtony/pprof/pprof.main.samples.cpu.003.pb.gz
+File: main
+Type: cpu
+Time: Oct 10, 2023 at 5:27pm (-03)
+Duration: 30.01s, Total samples = 410ms ( 1.37%)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) web
+```
+
+<br/>
+
+A saida deve ser similar a:
+<img src="./misc/images/captures/pprof002.png">
+
+*Bibliografia: [Profiling gin with pprof](https://dizzy.zone/2018/08/23/Profiling-gin-with-pprof/)*
+<!--
+https://github.com/gin-contrib/pprof
+https://github.com/gin-contrib/pprof/blob/v1.4.0/_example/custom/server.go
+https://github.com/gin-contrib/pprof/blob/v1.4.0/_example/default/server.go
+ -->
+<br/>
+
+[:arrow_heading_up: voltar](#indice)
+
+---
+
 <a id="ferramentas"></a>
 ## :hammer: Ferramentas
 As seguintes ferramentas foram usadas na construção do projeto:
 
-- [GVM v1.0.22](https://github.com/moovweb/gvm)
 - [Go v1.21.1](https://go.dev/)
+- [GVM v1.0.22](https://github.com/moovweb/gvm)
 - [Gin](https://gin-gonic.com/)
 - [GORM](https://gorm.io/index.html)
 - [Viper](https://github.com/spf13/viper)
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
+- [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
 - [Postgres v16.0](https://www.postgresql.org/)
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
 - [Gatling v3.9.5](https://gatling.io/)
+- [RabbitMQ](https://www.rabbitmq.com/)
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)
 
@@ -318,6 +458,8 @@ Seguindo boas práticas de desenvolvimento:
 - [Mermaid Diagrams](https://mermaid.js.org)
 - [Swagger](https://swagger.io/)
 - [Load testing](https://en.wikipedia.org/wiki/Load_testing)
+- [Go pprof](https://go.dev/blog/pprof)
+- [Event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture)
 
 [:arrow_heading_up: voltar](#indice)
 
@@ -331,3 +473,8 @@ As tags de versões estao sendo criadas manualmente a medida que os estudos avan
 Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.md).
 
 [:arrow_heading_up: voltar](#indice)
+
+<!-- 
+https://tutorialedge.net/golang/go-decorator-function-pattern-tutorial/
+https://srinjoysantra.medium.com/decorator-pattern-in-golang-a831ecae0d38
+-->

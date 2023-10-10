@@ -10,17 +10,19 @@ import (
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
-func Liveness(c *gin.Context, cfg config.API) {
+func Liveness(c *gin.Context) {
+	cfg := c.MustGet("cfg").(config.API)
+
 	sumaryData := fmt.Sprintf("%s%s in TagVersion: %s responds OK",
 		cfg.Name,
 		cfg.Port,
 		cfg.TagVersion)
-
 	c.JSON(http.StatusOK, gin.H{
 		"message": "OK", "sumary": sumaryData})
 }
 
-func Readiness(c *gin.Context, cfg config.API) {
+func Readiness(c *gin.Context) {
+	cfg := c.MustGet("cfg").(config.API)
 
 	if err := database.CheckReadiness(); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{

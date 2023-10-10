@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Utilizando [gin-contrib/pprof](https://github.com/gin-contrib/pprof) para performar [Profiling gin with pprof](https://dizzy.zone/2018/08/23/Profiling-gin-with-pprof/)
 - Feature Flag `PPROF_CPU_FEATURE_FLAG_ENABLED` para habilitar o profilling
 - Acertos das imagens Dockerfile, utilizando Alpine
-- Alteracao na estrutura da API, diretorio `cmd/api`
+- Alteração na estrutura da API, diretório `cmd/api`
 - Melhorias no Readme.
 
 ## [0.0.4] - 2023-10-02

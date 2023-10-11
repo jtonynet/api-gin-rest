@@ -78,16 +78,19 @@ $ docker compose up
 
 
 Aguarde até que as imagens sejam criadas e acesse:
-
+#### Rotas REST:
 `http://localhost:8080/alunos` Rota para **API**<br/> 
 <br/>
 
+#### Rotas de uso de infra:
 `http://localhost:8080/readiness` Rota de **readiness**<br/>
 `http://localhost:8080/liveness` Rota de **liveness**<br/>
 <br/>
 
+#### Rotas de uso de desenvolvimento:
 `http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**<br/>
 `http://localhost:8082` Rota para **ultimo resultado de teste de carga**<br/>
+`http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1` <br/>
 
 <br>
 
@@ -321,7 +324,7 @@ docker exec -ti gatling-api-test /entrypoint clean-test
 <br/>
 
 #### Configurando o Teste
-Caso deseje alterar as configuracoes padrao do teste, altere o arquivo `tests/gatling/user-files/simulations/AlunosSimulation.scala`. O metodo `setUp` te da flexibilidade de cenarios de simulacao
+Caso deseje alterar as configurações padrão do teste, modifique o arquivo `tests/gatling/user-files/simulations/AlunosSimulation.scala`. O método `setUp` lhe proporciona flexibilidade na criação de cenários de simulação.
 ```kotlin
   setUp(
     testAlunos.inject(rampUsers(1000).during(20.seconds))

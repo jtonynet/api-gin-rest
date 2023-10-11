@@ -23,7 +23,19 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data  
+      - ./docker_conf/postgres-data:/var/lib/postgresql/data  
+    networks:
+      - gin-rest-network
+
+  rabbitmq-gin-rest:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq-gin-rest'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./docker_conf/rabbitmq/data/:/var/lib/rabbitmq
+      - ./docker_conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
       - gin-rest-network
 
@@ -40,7 +52,6 @@ services:
     depends_on:
       - nginx-gin-rest
       - api-gin-rest
-      - postgres-gin-rest
     volumes:
       - ./tests/gatling:/usr/src/app
     networks:
@@ -57,6 +68,7 @@ services:
       - "${API_PORT}:${API_PORT}"
     depends_on:
       - postgres-gin-rest
+      - rabbitmq-gin-rest
     volumes:
       - .:/usr/src/app
     tty: true

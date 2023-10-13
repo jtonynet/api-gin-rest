@@ -51,11 +51,22 @@ if [ "$1" = "clean-test" ]; then
     done
 fi
 
-echo "Remove last load test data"
+if [ "$1" = "clean-db" ]; then
+    read -p "Do you really want to clean the database? This will reset your DB to zero records [y/n]: " answer
+    if [ "$answer" = "y" ]; then
+        export PGPASSWORD=$DATABASE_PASSWORD
+        psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_DB -p $DATABASE_PORT -c "TRUNCATE TABLE alunos RESTART IDENTITY;"
+        unset PGPASSWORD
+        echo "Database Cleaned"
+    else
+        echo "Database cleaning canceled."
+    fi
+fi
+
+
 rm -rf ./results/latest/*
 touch ./results/latest/.keep
 
-echo "Add New load test data"
 new_latest=$(ls -td ./results/history/*/ | head -n 1)
 cp -r $new_latest/* ./results/latest/
 

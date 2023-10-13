@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Adicionado [rabbitmq](https://www.rabbitmq.com/) ao docker-compose seguindo o [artigo](https://x-team.com/blog/set-up-rabbitmq-with-docker-compose/)
+- Adicionado `UUID` por aluno
+- Adicionado [RabbitMQ](https://www.rabbitmq.com/) ao docker-compose seguindo o [artigo](https://x-team.com/blog/set-up-rabbitmq-with-docker-compose/)
 - Criação do `Worker` de processamento de alunos por mensageria
-- Adicionado `UUID` por aluno, com sua criação sendo responsabilidade do `evento` de `post alunos` antes do envio da mensagem
+- Feature Flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` para criar aluno "event driven"
 - Volumes de `Postgres` e `RabbitMQ` movidos para o diretório `docker_conf`
+
+### Fixed
+- Adicionada a biblioteca [Exponential Backoff](https://github.com/cenkalti/backoff) para corrigir um bug no ambiente. O `RabbitMQ` demora mais do que o esperado para responder às requisições. Ele informa ao `Docker` que está pronto, mas na verdade, não está, o que ocasiona uma interrupção na API, sem conectividade com esse recurso de infraestrutura. A biblioteca `Backoff` fica responsável por gerenciar as tentativas de conexão pelo período máximo definido na variável de ambiente `API_RETRY_MAX_ELAPSED_TIME_IN_MS`
 
 
 ## [0.0.5] - 2023-10-10
 ### Added
 
-- Utilizando [gin-contrib/pprof](https://github.com/gin-contrib/pprof) para performar [Profiling gin with pprof](https://dizzy.zone/2018/08/23/Profiling-gin-with-pprof/)
+- Utilizando [gin-contrib/pprof](https://github.com/gin-contrib/pprof) para performar '[Profiling gin with pprof](https://dizzy.zone/2018/08/23/Profiling-gin-with-pprof/)'
 - Feature Flag `PPROF_CPU_FEATURE_FLAG_ENABLED` para habilitar o profilling
 - Acertos das imagens `Dockerfile`, utilizando `Alpine`
 - Alteração na estrutura da `API`, diretório `cmd/api`

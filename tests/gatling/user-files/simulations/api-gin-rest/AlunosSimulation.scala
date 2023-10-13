@@ -23,13 +23,13 @@ class Alunos extends Simulation {
       .post("/aluno")
       .body(StringBody("#{payload}"))
       .header("Content-Type", "application/json")
-      .check(status.is(200))
+      .check(status.in(200,202))
     )
 
 
   val testAlunos = scenario("Teste Alunos").exec(alunos)
 
   setUp(
-    testAlunos.inject(rampUsers(1000).during(10.seconds))
+    testAlunos.inject(rampUsers(10000).during(10.seconds))
   ).protocols(httpProtocol)
 }

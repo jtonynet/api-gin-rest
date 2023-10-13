@@ -8,7 +8,7 @@ import (
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/controllers"
 	docs "github.com/jtonynet/api-gin-rest/docs"
-	"github.com/jtonynet/api-gin-rest/middlewares"
+	"github.com/jtonynet/api-gin-rest/internal/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -17,7 +17,7 @@ func HandleRequests(cfg config.API) {
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/"
 
-	if cfg.PprofCPUFeatureFlagEnabled {
+	if cfg.FeatureFlags.PprofCPUEnabled {
 		pprof.Register(r, "/debug/pprof")
 	}
 
@@ -30,6 +30,8 @@ func HandleRequests(cfg config.API) {
 	apiGroup.GET("/readiness", controllers.Readiness)
 
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
+
+	apiGroup.GET("/aluno/uuid/:uuid", controllers.BuscaAlunoPorUUID)
 
 	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
 	apiGroup.GET("/aluno/:id", controllers.BuscaAlunoPorId)

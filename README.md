@@ -79,18 +79,22 @@ $ docker compose up
 
 Aguarde até que as imagens sejam criadas e acesse:
 #### Rotas REST:
-`http://localhost:8080/alunos` Rota para **API**<br/> 
+- `http://localhost:8080/alunos` Rota para **API** 
+- `http://localhost:8080/aluno/{id}` Rota para **API**
+- `http://localhost:8080/aluno/cpf/{cpf}` Rota para **API**
+*_maiores detalhes na rota [swagger](#rotas-de-uso-de-desenvolvimento)_
 <br/>
 
-#### Rotas de uso de infra:
-`http://localhost:8080/readiness` Rota de **readiness**<br/>
-`http://localhost:8080/liveness` Rota de **liveness**<br/>
+#### Rotas de uso de infra/suporte:
+- `http://localhost:8080/readiness` Rota de **readiness**
+- `http://localhost:8080/liveness` Rota de **liveness**
+- `http://localhost:15672` Rota de **RabbitMQ** (verificar `.env` para senha)
 <br/>
 
 #### Rotas de uso de desenvolvimento:
-`http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**<br/>
-`http://localhost:8082` Rota para **ultimo resultado de teste de carga**<br/>
-`http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1` <br/>
+- `http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**
+- `http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1` 
+- `http://localhost:8082` Rota para **ultimo resultado de teste de carga**
 
 <br>
 
@@ -189,8 +193,8 @@ graph LR
         RabbitMQ(["fa:fa-envelope Aluno-RabbitMQ"])
     end
 
-    subgraph API
-      subgraph Command
+    subgraph cmd/api
+      subgraph cmd/worker
         Worker["fa:fa-gears Aluno-Worker"]
       end
 
@@ -236,7 +240,7 @@ graph LR
   Aluno -->|Queries| Aluno-DB
   B -->|POST| CriaNovoAluno
 
-  CriaNovoAluno -.->|Produz| RabbitMQ
+  CriaNovoAluno -.->|Publica| RabbitMQ
   RabbitMQ -.->|consome| Worker
 
   Worker --> Aluno
@@ -319,6 +323,14 @@ A imagem responsável por fornecer essa saída também é responsável por proce
  Importante: Isso não limpa as inserções feitas no banco de dados.
 ```shell
 docker exec -ti gatling-api-test /entrypoint clean-test
+```
+
+<br/>
+
+#### Limpando o Banco de Dados:
+ Isso limpa as inserções feitas no banco de dados.
+```shell
+docker exec -ti gatling-api-test /entrypoint clean-db
 ```
 
 <br/>
@@ -439,11 +451,12 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Viper](https://github.com/spf13/viper)
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
 - [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
+- [Exponential Backoff](https://github.com/cenkalti/backoff)
 - [Postgres v16.0](https://www.postgresql.org/)
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
 - [Gatling v3.9.5](https://gatling.io/)
-- [RabbitMQ](https://www.rabbitmq.com/)
+- [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)
 
@@ -480,4 +493,6 @@ Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.m
 <!-- 
 https://tutorialedge.net/golang/go-decorator-function-pattern-tutorial/
 https://srinjoysantra.medium.com/decorator-pattern-in-golang-a831ecae0d38
+
+https://www.omgubuntu.co.uk/2017/02/peek-animated-gif-screen-capture-linux-update
 -->

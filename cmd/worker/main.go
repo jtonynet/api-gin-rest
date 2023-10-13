@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -8,7 +10,7 @@ import (
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
 	"github.com/jtonynet/api-gin-rest/internal/message"
-	"github.com/jtonynet/api-gin-rest/routes"
+	"github.com/jtonynet/api-gin-rest/models"
 )
 
 // @title api-gin-rest
@@ -20,10 +22,7 @@ import (
 // @contact.email learningingenuity@gmail.com
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
-// @host localhost:8080
-// @BasePath /alunos
-// @Schemes http
-// @query.collection.format multi
+// @host localhost:8083
 func main() {
 	cfg, err := config.LoadConfig(".")
 	if err != nil {
@@ -57,5 +56,32 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	routes.HandleRequests(cfg.API)
+	go func() {
+		for {
+			err := message.Broker.Consume(message.Broker.QueueAluno, func(body []byte) {
+				//log.Printf("Mensagem recebida: %s", string(body))
+
+				msg := string(body)
+
+				var aluno models.Aluno
+				err := json.Unmarshal([]byte(msg), &aluno)
+				if err != nil {
+					fmt.Println("Erro na análise JSON:", err)
+					return
+				}
+
+				// fmt.Printf("Aluno: %+v\n", aluno)
+				err = database.DB.Create(&aluno).Error
+				if err != nil {
+					fmt.Println("REQUEUE!")
+				}
+
+			})
+			if err != nil {
+				log.Printf("Erro ao consumir mensagens: %v", err)
+			}
+		}
+	}()
+
+	select {}
 }

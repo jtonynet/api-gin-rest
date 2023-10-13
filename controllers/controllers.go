@@ -1,19 +1,22 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/jtonynet/api-gin-rest/database"
+	"github.com/jtonynet/api-gin-rest/internal/database"
+	"github.com/jtonynet/api-gin-rest/internal/message"
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
 func Liveness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
 
-	sumaryData := fmt.Sprintf("%s%s in TagVersion: %s responds OK",
+	sumaryData := fmt.Sprintf("%s:%s in TagVersion: %s responds OK",
 		cfg.Name,
 		cfg.Port,
 		cfg.TagVersion)
@@ -24,14 +27,23 @@ func Liveness(c *gin.Context) {
 func Readiness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
 
-	if err := database.CheckReadiness(); err != nil {
+	var err error
+
+	if err = database.CheckReadiness(); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"message": "Service unavailable",
+			"message": "Database Service unavailable",
 		})
 		return
 	}
 
-	sumaryData := fmt.Sprintf("%s%s in TagVersion: %s responds OK with connectivity",
+	if err = message.Broker.CheckReadiness(); err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message": "MessageBroker Service unavailable",
+		})
+		return
+	}
+
+	sumaryData := fmt.Sprintf("%s:%s in TagVersion: %s responds: {Database: OK, MessageBroker: OK}",
 		cfg.Name,
 		cfg.Port,
 		cfg.TagVersion)
@@ -62,20 +74,53 @@ func ExibeTodosAlunos(c *gin.Context) {
 // @Produce json
 // @Accept json
 // @Success 200 {object} models.Aluno
+// @Success 202 {uuid} uuid
 // @Failure 400 {string} Error
 // @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
+	cfg := c.MustGet("cfg").(config.API)
+
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
 		fmt.Println(err.Error())
-		// alunoJSON, err := json.MarshalIndent(aluno, "", "  ")
-		// fmt.Println(string(alunoJSON))
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
 	}
-	database.DB.Create(&aluno)
-	c.JSON(http.StatusOK, aluno)
+	aluno.UUID = uuid.New().String()
+
+	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
+		fmt.Println("Messageria")
+
+		alunoJSON, err := json.Marshal(aluno)
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erro ao serializar Aluno em JSON",
+			})
+			return
+		}
+
+		err = message.Broker.Publish(
+			message.Broker.ExchangeAluno,
+			message.Broker.RoutingKeyAluno,
+			string(alunoJSON))
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Enviou caramba!")
+		}
+
+		c.JSON(http.StatusAccepted, gin.H{
+			"uuid": aluno.UUID})
+		return
+	} else {
+		fmt.Println("Http Post")
+
+		database.DB.Create(&aluno)
+		c.JSON(http.StatusOK, aluno)
+	}
 }
 
 // @Summary Busca aluno por id
@@ -89,6 +134,28 @@ func BuscaAlunoPorId(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
 	database.DB.First(&aluno, id)
+
+	if aluno.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not Found": "Aluno Nao Encontrado",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, aluno)
+}
+
+// @Summary Busca aluno por id
+// @Description Busca aluno por id
+// @Tags Aluno
+// @Produce json
+// @Success 200 {object} models.Aluno
+// @Failure 404 {string} Not Found
+// @Router /aluno/uuid/{uuid} [get]
+func BuscaAlunoPorUUID(c *gin.Context) {
+	var aluno models.Aluno
+	uuid := c.Params.ByName("uuid")
+	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
 
 	if aluno.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{

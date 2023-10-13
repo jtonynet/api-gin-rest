@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/models"
@@ -15,7 +14,7 @@ var (
 	err error
 )
 
-func ConectaComBancoDeDados(cfg config.Database) {
+func Init(cfg config.Database) error {
 
 	strConn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		cfg.Host,
@@ -26,10 +25,12 @@ func ConectaComBancoDeDados(cfg config.Database) {
 
 	DB, err = gorm.Open(postgres.Open(strConn))
 	if err != nil {
-		log.Panic("Erro ao conectar com o banco de dados")
+		return err
 	}
 
 	DB.AutoMigrate(&models.Aluno{})
+
+	return nil
 }
 
 func CheckReadiness() error {

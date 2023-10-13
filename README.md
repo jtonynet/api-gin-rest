@@ -41,11 +41,10 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 ## :green_book: Sobre
 Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa.
 
-Após a conclusão do curso, continuo incorporando padrões de mercado e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
+Continuo incorporando padrões e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
 
-O objetivo é aprimorar o desempenho, corrigir questões identificadas e aplicar os conceitos aprendidos nos livros mencionados como parte do meu processo de estudo.
 
-Não estou considerando colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas educacionais nacionais, eventos promocionais, Black Friday, etc...).
+Não estou considerando colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas nacionais, eventos promocionais, Black Friday, etc...).
 
 Para alcançar essas melhorias, adotei as seguintes medidas que não estavam presentes no curso original:
 - Teste de carga com Gatling
@@ -73,7 +72,7 @@ $ docker compose up
 > :writing_hand: **Observação**:
 >
 > :window: Troubleshooting com [Windows](https://stackoverflow.com/questions/53165471/building-docker-images-on-windows-entrypoint-script-no-such-file-or-directory)
-> Por algum motivo, as configurações de atributos do Git que podem afetar o caractere de fim de linha não estão funcionando como esperado, e ainda não identificamos o motivo. Portanto, para executar o projeto no Windows, será necessário fazer uma alteração manual no arquivo `./tests/gatling/entrypoint.sh`. Em vez disso, converta o arquivos de `LF` para `CRLF` no seu editor de texto de preferência.
+> Configurações de atributos do Git que podem afetar o caractere de fim de linha não estão funcionando como esperado. Portanto, para executar o projeto no Windows, será necessário fazer a alteração no arquivo `./tests/gatling/entrypoint.sh`. Converta o arquivos de `LF` para `CRLF` no seu editor de texto de preferência.
 
 
 

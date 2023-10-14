@@ -225,3 +225,18 @@ func BuscaAlunoPorCPF(c *gin.Context) {
 
 	c.JSON(http.StatusOK, aluno)
 }
+
+// Importe as bibliotecas e pacotes necessários aqui
+
+// @Summary Busca o número de alunos no banco de dados
+// @Description Busca o número de alunos no banco de dados
+// @Tags Aluno
+// @Produce json
+// @Success 200 {object} int
+// @Router /alunos/count [get]
+func ContaAlunos(c *gin.Context) {
+	var totalAlunos int64
+	database.DB.Model(&models.Aluno{}).Count(&totalAlunos)
+
+	c.JSON(http.StatusOK, totalAlunos)
+}

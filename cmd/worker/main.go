@@ -80,6 +80,9 @@ func main() {
 			if err != nil {
 				log.Printf("Erro ao consumir mensagens: %v", err)
 			}
+
+			duracao := 10 * time.Millisecond
+			time.Sleep(duracao)
 		}
 	}()
 

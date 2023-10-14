@@ -30,6 +30,7 @@ func HandleRequests(cfg config.API) {
 	apiGroup.GET("/readiness", controllers.Readiness)
 
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
+	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
 	apiGroup.GET("/aluno/uuid/:uuid", controllers.BuscaAlunoPorUUID)
 

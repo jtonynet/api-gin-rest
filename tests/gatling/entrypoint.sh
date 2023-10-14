@@ -5,11 +5,14 @@ if [ ! -e /entrypoint ]; then
     ln -s /usr/src/app/entrypoint.sh /entrypoint
 fi
 
+
 if [ "$1" = "run-test" ]; then
 
     if [ ! -d "bundle/bin" ]; then
 
         cd bundle
+
+        sleep 1
 
         echo "Downloading Gatling bundle..."
         wget  https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/3.9.5/gatling-charts-highcharts-bundle-3.9.5-bundle.zip

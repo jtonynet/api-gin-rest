@@ -41,10 +41,10 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 ## :green_book: Sobre
 Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa.
 
-Continuo incorporando padrões e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
+Continuo incorporando padrões e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1) e [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0).
 
 
-Não estou considerando colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas nacionais, eventos promocionais, Black Friday, etc...).
+Não considero colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas nacionais, eventos promocionais, Black Friday, etc...).
 
 Para alcançar essas melhorias, adotei as seguintes medidas que não estavam presentes no curso original:
 - Teste de carga com Gatling
@@ -55,7 +55,7 @@ Para alcançar essas melhorias, adotei as seguintes medidas que não estavam pre
 - Criação de novos alunos em filas/workers concorrentes usando goroutines.
 - (A ser implementado) Uso de Cache Redis como uma feature flag.
 
-O projeto foi desenvolvido no sistema operacional Ubuntu e testado tanto no Ubuntu quanto no Windows, porém as informações de desenvolvimento estão voltadas para o sistema operacional Linux.
+O projeto foi desenvolvido no SO Ubuntu e testado tanto no Ubuntu quanto no Windows, informações de desenvolvimento estão voltadas para o sistema operacional Linux.
 
 
 [:arrow_heading_up: voltar](#indice)
@@ -192,12 +192,12 @@ graph LR
         RabbitMQ(["fa:fa-envelope Aluno-RabbitMQ"])
     end
 
-    subgraph cmd/api
-      subgraph cmd/worker
+    subgraph CMD
+      subgraph WORKER
         Worker["fa:fa-gears Aluno-Worker"]
       end
 
-      subgraph Controlers
+      subgraph API
         CriaNovoAluno["fa:fa-code CriaNovoAluno"]
         ExibeTodosAlunos["fa:fa-code ExibeTodosAlunos"]
         BuscaAlunoPorId["fa:fa-code BuscaAlunoPorId"]
@@ -240,7 +240,7 @@ graph LR
   B -->|POST| CriaNovoAluno
 
   CriaNovoAluno -.->|Publica| RabbitMQ
-  RabbitMQ -.->|consome| Worker
+  RabbitMQ -.->|Consome| Worker
 
   Worker --> Aluno
 

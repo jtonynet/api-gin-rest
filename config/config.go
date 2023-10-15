@@ -29,9 +29,13 @@ type MessageBroker struct {
 	Pass            string `mapstructure:"RABBITMQ_PASS"`
 	Port            string `mapstructure:"RABBITMQ_PORT"`
 	Host            string `mapstructure:"RABBITMQ_HOST"`
-	ExchangeAluno   string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO"`
-	QueueAluno      string `mapstructure:"RABBITMQ_QUEUE_ALUNO"`
-	RoutingKeyAluno string `mapstructure:"RABBITMQ_ROUTINGKEY_ALUNO"`
+
+	Exchange            string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO"`
+	ExchangeType        string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO_TYPE"` //direct|fanout|topic|x-custom
+	Queue               string `mapstructure:"RABBITMQ_QUEUE_ALUNO"`
+	RoutingKey          string `mapstructure:"RABBITMQ_ROUTINGKEY_ALUNO"`
+	ConsumerTag         string `mapstructure:"RABBITMQ_CONSUMER_TAG"`
+	ReliableMessages    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES"` //Wait for the publisher confirmation before exiting
 }
 
 type Config struct {

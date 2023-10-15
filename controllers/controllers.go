@@ -90,8 +90,6 @@ func CriaNovoAluno(c *gin.Context) {
 	aluno.UUID = uuid.New().String()
 
 	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
-		fmt.Println("Messageria")
-
 		alunoJSON, err := json.Marshal(aluno)
 		if err != nil {
 			fmt.Println(err)
@@ -101,10 +99,7 @@ func CriaNovoAluno(c *gin.Context) {
 			return
 		}
 
-		err = message.Broker.Publish(
-			message.Broker.ExchangeAluno,
-			message.Broker.RoutingKeyAluno,
-			string(alunoJSON))
+		err = message.Broker.Publish(string(alunoJSON))
 
 		if err != nil {
 			fmt.Println(err)
@@ -116,8 +111,6 @@ func CriaNovoAluno(c *gin.Context) {
 			"uuid": aluno.UUID})
 		return
 	} else {
-		fmt.Println("Http Post")
-
 		database.DB.Create(&aluno)
 		c.JSON(http.StatusOK, aluno)
 	}

@@ -56,35 +56,25 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	go func() {
-		for {
-			err := message.Broker.Consume(message.Broker.QueueAluno, func(body []byte) {
-				//log.Printf("Mensagem recebida: %s", string(body))
 
-				msg := string(body)
 
-				var aluno models.Aluno
-				err := json.Unmarshal([]byte(msg), &aluno)
-				if err != nil {
-					fmt.Println("Erro na análise JSON:", err)
-					return
-				}
+	message.Broker.Consume()
 
-				// fmt.Printf("Aluno: %+v\n", aluno)
-				err = database.DB.Create(&aluno).Error
-				if err != nil {
-					fmt.Println("REQUEUE!")
-				}
-
-			})
+    go func() {
+        for msg := range message.ConsumerChannel {
+			var aluno models.Aluno
+			err := json.Unmarshal([]byte(msg), &aluno)
 			if err != nil {
-				log.Printf("Erro ao consumir mensagens: %v", err)
+				fmt.Println("Erro na análise JSON:", err)
+				return
 			}
 
-			duracao := 10 * time.Millisecond
-			time.Sleep(duracao)
-		}
-	}()
+			err = database.DB.Create(&aluno).Error
+			if err != nil {
+				fmt.Println("REQUEUE!")
+			}
+        }
+    }()
 
 	select {}
 }

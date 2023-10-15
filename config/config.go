@@ -30,12 +30,12 @@ type MessageBroker struct {
 	Port            string `mapstructure:"RABBITMQ_PORT"`
 	Host            string `mapstructure:"RABBITMQ_HOST"`
 
-	Exchange            string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO"`
-	ExchangeType        string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO_TYPE"` //direct|fanout|topic|x-custom
-	Queue               string `mapstructure:"RABBITMQ_QUEUE_ALUNO"`
-	RoutingKey          string `mapstructure:"RABBITMQ_ROUTINGKEY_ALUNO"`
-	ConsumerTag         string `mapstructure:"RABBITMQ_CONSUMER_TAG"`
-	ReliableMessages    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES"` //Wait for the publisher confirmation before exiting
+	Exchange            	  string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO"`
+	ExchangeType        	  string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO_TYPE"` //direct|fanout|topic|x-custom
+	Queue               	  string `mapstructure:"RABBITMQ_QUEUE_ALUNO"`
+	RoutingKey          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_ALUNO"`
+	ConsumerTag         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG"`
+	ReliableMessagesEnable    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES_ENABLED"` //Wait for the publisher confirmation before exiting
 }
 
 type Config struct {

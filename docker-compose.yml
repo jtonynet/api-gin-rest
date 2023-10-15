@@ -4,6 +4,8 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    container_name:
+     nginx-gin-rest
     ports:
       - 8080:80
     depends_on:
@@ -80,16 +82,15 @@ services:
       - gin-rest-network
 
   worker-gin:
+    deploy:
+      replicas: 2
     build:
       context: .
       dockerfile: Dockerfile
       target: worker
-    container_name: ${WORKER_NAME}
     environment:
       DATABASE_HOST: postgres-gin-rest
       RABBITMQ_HOST: rabbitmq-gin-rest
-    ports:
-      - "${WORKER_PORT}:${WORKER_PORT}"
     depends_on:
       - postgres-gin-rest
       - rabbitmq-gin-rest
@@ -99,6 +100,6 @@ services:
     command: go run cmd/worker/main.go -b 0.0.0.0
     networks:
       - gin-rest-network
-      
+
 networks:
   gin-rest-network:

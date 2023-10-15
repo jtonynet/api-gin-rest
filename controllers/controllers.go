@@ -103,8 +103,6 @@ func CriaNovoAluno(c *gin.Context) {
 
 		if err != nil {
 			fmt.Println(err)
-		} else {
-			fmt.Println("Enviou caramba!")
 		}
 
 		c.JSON(http.StatusAccepted, gin.H{

@@ -52,6 +52,7 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 			d.Body,
 		)
 
+		fmt.Println(string(d.Body))
 		ConsumerChannel <- string(d.Body)
 
 		d.Ack(false)

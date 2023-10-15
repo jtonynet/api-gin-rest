@@ -56,9 +56,10 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-
-
-	message.Broker.Consume()
+	err = message.Broker.Consume()
+	if err != nil {
+		log.Fatal("cannot consume messages from Broker: ", msgBrokerErr)
+	}
 
     go func() {
         for msg := range message.ConsumerChannel {

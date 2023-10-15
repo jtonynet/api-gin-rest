@@ -78,7 +78,7 @@ func InitBroker(cfg config.MessageBroker) error {
     }
 
 	// Reliable publisher confirms require confirm.select support from the connection.
-	if cfg.ReliableMessages {
+	if cfg.ReliableMessagesEnable {
 		fmt.Printf("enabling publishing confirms.")
 		if err := channel.Confirm(false); err != nil {
 			return fmt.Errorf("Channel could not be put into confirm mode: %s", err)

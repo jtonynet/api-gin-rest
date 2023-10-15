@@ -92,10 +92,21 @@ Aguarde até que as imagens sejam criadas e acesse:
 
 #### Rotas de uso de desenvolvimento:
 - `http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**
-- `http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1` 
+- `http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1`. Consulte [Profiling](#mag-profilling) para maiores informações.
 - `http://localhost:8082` Rota para **ultimo resultado de teste de carga**
 
 <br>
+
+#### Escalando Workers:
+A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `2`, para aumentar a capacidade de inserção de dados no banco de dados.
+
+```docker-compose
+84  worker-gin:
+85    deploy:
+86      replicas: 2
+```
+
+<br/>
 
 #### Recomendações para Devs:
 Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente. As versões mais recentes da linguagem já têm a instalação simplificada pelo `snap`

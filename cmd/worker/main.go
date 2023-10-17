@@ -11,6 +11,8 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/database"
 	"github.com/jtonynet/api-gin-rest/internal/message"
 	"github.com/jtonynet/api-gin-rest/models"
+
+	handlers "github.com/jtonynet/api-gin-rest/worker/handlers"
 )
 
 // @title api-gin-rest
@@ -56,27 +58,9 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	err = message.Broker.Consume(insertAlunoHandler)
+	err = message.Broker.Consume(handlers.insertAlunoHandler)
 	if err != nil {
 		log.Fatal("cannot consume messages from Broker: ", msgBrokerErr)
 	}
 	select {}
 }
-
-func insertAlunoHandler(msg string) error {
-    var aluno models.Aluno
-    err := json.Unmarshal([]byte(msg), &aluno)
-    if err != nil {
-        fmt.Println("REQUEUE: Erro na análise JSON: ", err)
-        return err
-    }
-
-    err = database.DB.Create(&aluno).Error
-    if err != nil {
-        fmt.Println("REQUEUE: Erro no insert do BD: ", err)
-        return err
-    }
-
-    return nil
-}
-

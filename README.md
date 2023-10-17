@@ -98,12 +98,12 @@ Aguarde até que as imagens sejam criadas e acesse:
 <br>
 
 #### Escalando Workers:
-A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `2`, para aumentar a capacidade de inserção de dados no banco de dados.
+A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `1`, para aumentar a capacidade de inserção de dados no banco de dados.
 
 ```docker-compose
 84  worker-gin:
 85    deploy:
-86      replicas: 2
+86      replicas: 1
 ```
 
 <br/>

@@ -7,13 +7,13 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-// type iBroker interface {
-// 	InitBroker(cfg config.MessageBroker) error
-// 	Publish(body string) error
-// 	Consume(customHandler func(string) error) error
-// 	Shutdown() error
-// 	CheckReadiness() error
-// }
+type iBroker interface {
+	InitBroker(cfg config.MessageBroker) error
+	Publish(body string) error
+	Consume(customHandler func(string) error) error
+	Shutdown() error
+	CheckReadiness() error
+}
 
 type BrokerData struct {
 	conn    *amqp.Connection

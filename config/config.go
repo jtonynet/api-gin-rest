@@ -43,7 +43,7 @@ type MessageBroker struct {
 	RoutingKeyDL          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_DEAD_LETTER"`
 	ConsumerTagDL         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG_DEAD_LETTER"`
 
-	MaxAttempts 		  int32   `mapstructure:"RABBITMQ_MAX_ATTEMPTS_CONSUME_INT"`
+	MaxAttempts 			  int32   `mapstructure:"RABBITMQ_MAX_ATTEMPTS_CONSUME_INT"`
 	ReliableMessagesEnable    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES_ENABLED"` //Wait for the publisher confirmation before exiting
 }
 

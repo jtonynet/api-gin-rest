@@ -7,10 +7,10 @@ import (
 
 func (b *BrokerData) Publish(body string) error {
 	initialAttempt := int32(0)
-    return b.publish(body, b.cfg.Exchange, b.cfg.RoutingKey, initialAttempt)
+    return b.publish(body, initialAttempt, b.cfg.Exchange, b.cfg.RoutingKey)
 }
 
-func (b *BrokerData) publish(body string, exchange string, routingKey string, attempt int32) error {
+func (b *BrokerData) publish(body string, attempt int32, exchange string, routingKey string) error {
 	headers := amqp.Table{
 		"X-Attempt": attempt,
 	}

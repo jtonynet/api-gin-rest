@@ -41,26 +41,25 @@ func (b *BrokerData) Shutdown() error {
 	return <-b.done
 }
 
-func (b *BrokerData) handle(customHandler func(string) error, deliveries <-chan amqp.Delivery, done chan error) {
+func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan amqp.Delivery, done chan error) {
 	var attempt int32
 	requeue := true
 
 	for d := range deliveries {
-		fmt.Printf(
-			"got %dB delivery: [%v] %q",
-			len(d.Body),
-			d.DeliveryTag,
-			d.Body,
-		)
+		
+		if err := userHandler(string(d.Body)); err != nil {
 
-		if err := customHandler(string(d.Body)); err != nil { //--> CUSTOM HANDLER
+			// TODO:
+			// No mundo ideal fariamos um Nack incrementando Headers["X-Attempt"] Mas infelizmente a lib do
+			// rabbitMQ não me permitiu essa abordagem e fiz manualmente. Estou adicionando e requeue na mão
+			// incrementando X-Attempt. Pesquisar possiveis melhorias para essa gestão
+			
 			if d.Headers["X-Attempt"] == nil {
 				attempt = 1
-			} else if attemptTemp, ok := d.Headers["X-Attempt"].(int32); ok && attemptTemp < b.cfg.MaxAttempts {				
+			} else if attemptTemp, ok := d.Headers["X-Attempt"].(int32); ok && attemptTemp < b.cfg.MaxAttempts {
 				attempt = d.Headers["X-Attempt"].(int32) + 1
 			} else {
-				// Limite de tentativas atingido, mova para a dead message queue.
-					if err := b.moveToDeadQueue(string(d.Body)); err != nil {
+				if err := b.moveToDeadQueue(string(d.Body)); err != nil {
 					fmt.Println("Erro ao mover para a dead message queue:", err)
 				} else {
 					d.Ack(false)
@@ -69,15 +68,8 @@ func (b *BrokerData) handle(customHandler func(string) error, deliveries <-chan 
 			}
 
 			if requeue {
-				// No mundo ideal fariamos um Nack incrementando Headers["X-Attempt"]
-				// Mas infelizmente a lib do rabbitMQ não me permitiu essa abordagem e fiz manualmente
-				// err = d.Nack(false, true)
-				// if err != nil {
-				// 	fmt.Println("Erro ao reenfileirar a mensagem:", err)
-				// }
-
 				d.Ack(false)
-				b.publish(string(d.Body), b.cfg.Exchange, b.cfg.RoutingKey, attempt)
+				b.publish(string(d.Body), attempt, b.cfg.Exchange, b.cfg.RoutingKey)
 			}
 
 			requeue = true
@@ -91,6 +83,7 @@ func (b *BrokerData) handle(customHandler func(string) error, deliveries <-chan 
 }
 
 func (b *BrokerData) moveToDeadQueue(message string) error {
+	//fmt.Println("Movi para dead queue:", message)
 	initialAttempt := int32(0)
-	return b.publish(message, b.cfg.ExchangeDL, b.cfg.RoutingKeyDL, initialAttempt)
+	return b.publish(message, initialAttempt, b.cfg.ExchangeDL, b.cfg.RoutingKeyDL)
 }

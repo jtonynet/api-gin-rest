@@ -2,17 +2,26 @@ package message
 
 import (
 	"fmt"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (b *BrokerData) Publish(body string) error {
+	initialAttempt := int32(0)
+    return b.publish(body, b.cfg.Exchange, b.cfg.RoutingKey, initialAttempt)
+}
+
+func (b *BrokerData) publish(body string, exchange string, routingKey string, attempt int32) error {
+    headers := amqp.Table{
+        "X-Attempt": attempt,
+    }
+
 	if err := b.channel.Publish(
-		b.Exchange,   // publish to an exchange
-		b.RoutingKey, // routing to 0 or more queues
+		exchange,   // publish to an exchange
+		routingKey, // routing to 0 or more queues
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{
-			Headers:         amqp.Table{},
+			Headers:         headers,
 			ContentType:     "text/plain",
 			ContentEncoding: "",
 			Body:            []byte(body),

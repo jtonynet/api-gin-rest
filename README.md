@@ -462,6 +462,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
 - [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
 - [Exponential Backoff](https://github.com/cenkalti/backoff)
+- [amqp091-go]([amqp091-go](https://github.com/rabbitmq/amqp091-go))
 - [Postgres v16.0](https://www.postgresql.org/)
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
@@ -485,7 +486,6 @@ Seguindo boas práticas de desenvolvimento:
 - [Swagger](https://swagger.io/)
 - [Load testing](https://en.wikipedia.org/wiki/Load_testing)
 - [Go pprof](https://go.dev/blog/pprof)
-- [Event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture)
 
 [:arrow_heading_up: voltar](#indice)
 

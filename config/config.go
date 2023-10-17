@@ -35,6 +35,15 @@ type MessageBroker struct {
 	Queue               	  string `mapstructure:"RABBITMQ_QUEUE_ALUNO"`
 	RoutingKey          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_ALUNO"`
 	ConsumerTag         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG"`
+
+	// DeadLetter
+	ExchangeDL            	  string `mapstructure:"RABBITMQ_EXCHANGE_DEAD_LETTER"`
+	ExchangeTypeDL        	  string `mapstructure:"RABBITMQ_EXCHANGE_DEAD_LETTER_TYPE"` //direct|fanout|topic|x-custom
+	QueueDL               	  string `mapstructure:"RABBITMQ_QUEUE_DEAD_LETTER"`
+	RoutingKeyDL          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_DEAD_LETTER"`
+	ConsumerTagDL         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG_DEAD_LETTER"`
+
+	MaxAttempts 		  int32   `mapstructure:"RABBITMQ_MAX_ATTEMPTS_CONSUME_INT"`
 	ReliableMessagesEnable    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES_ENABLED"` //Wait for the publisher confirmation before exiting
 }
 

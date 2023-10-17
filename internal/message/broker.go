@@ -4,18 +4,14 @@ import (
 	"fmt"
 
 	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type BrokerData struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
 
-	Exchange      string
-	ExchangeType  string
-	RoutingKey    string
-	Queue         string
-	ConsumerTag   string
+	cfg config.MessageBroker
 
 	done    chan error
 }
@@ -42,40 +38,14 @@ func InitBroker(cfg config.MessageBroker) error {
 		return err
 	}
 
-	fmt.Printf("got Channel, declaring %q Exchange (%q)", cfg.Exchange, cfg.ExchangeType)
-	if err := channel.ExchangeDeclare(
-		cfg.Exchange,     // name
-		cfg.ExchangeType, // type
-		true,             // durable
-		false,            // auto-deleted
-		false,            // internal
-		false,            // noWait
-		nil,              // arguments
-	); err != nil {
-		return err
-	}
+	createExchange(channel, cfg.Exchange, cfg.ExchangeType)
+	createExchange(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
 
-	_, err = channel.QueueDeclare(
-		cfg.Queue,
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		return err
-	}
+	createQueue(channel, cfg.Queue)
+	createQueue(channel, cfg.QueueDL)
 
-    if err := channel.QueueBind(
-        cfg.Queue,
-        cfg.RoutingKey,
-        cfg.Exchange,
-        false,
-        nil,
-    ); err != nil {
-        return err
-    }
+	createQueueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
+	createQueueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
 
 	// Reliable publisher confirms require confirm.select support from the connection.
 	if cfg.ReliableMessagesEnable {
@@ -92,14 +62,55 @@ func InitBroker(cfg config.MessageBroker) error {
 	Broker = &BrokerData{
 		conn:    conn,
 		channel: channel,
-
-		Exchange:     cfg.Exchange,
-		ExchangeType: cfg.ExchangeType,
-		RoutingKey:   cfg.RoutingKey,
-		Queue:        cfg.Queue,
-		ConsumerTag:  cfg.ConsumerTag,
-
+		cfg: cfg,
 		done:    make(chan error),
+	}
+
+	return nil
+}
+
+func createExchange(channel *amqp.Channel, exchange string, exchangeType string) error {
+	fmt.Printf("got Channel, declaring %q Exchange (%q)", exchange, exchangeType)
+	if err := channel.ExchangeDeclare(
+		exchange,     // name
+		exchangeType, // type
+		true,             // durable
+		false,            // auto-deleted
+		false,            // internal
+		false,            // noWait
+		nil,              // arguments
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createQueue(channel *amqp.Channel, queue string) error {
+	_, err := channel.QueueDeclare(
+		queue,
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createQueueBind(channel *amqp.Channel, queue string, routingKey string, exchange string) error {
+	if err := channel.QueueBind(
+		queue,
+		routingKey,
+		exchange,
+		false,
+		nil,
+	); err != nil {
+		return err
 	}
 
 	return nil

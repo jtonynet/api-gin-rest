@@ -56,26 +56,27 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	err = message.Broker.Consume()
+	err = message.Broker.Consume(insertAlunoHandler)
 	if err != nil {
 		log.Fatal("cannot consume messages from Broker: ", msgBrokerErr)
 	}
-
-    go func() {
-        for msg := range message.ConsumerChannel {
-			var aluno models.Aluno
-			err := json.Unmarshal([]byte(msg), &aluno)
-			if err != nil {
-				fmt.Println("Erro na análise JSON:", err)
-				return
-			}
-
-			err = database.DB.Create(&aluno).Error
-			if err != nil {
-				fmt.Println("REQUEUE!")
-			}
-        }
-    }()
-
 	select {}
 }
+
+func insertAlunoHandler(msg string) error {
+    var aluno models.Aluno
+    err := json.Unmarshal([]byte(msg), &aluno)
+    if err != nil {
+        fmt.Println("REQUEUE: Erro na análise JSON: ", err)
+        return err
+    }
+
+    err = database.DB.Create(&aluno).Error
+    if err != nil {
+        fmt.Println("REQUEUE: Erro no insert do BD: ", err)
+        return err
+    }
+
+    return nil
+}
+

@@ -66,7 +66,6 @@ if [ "$1" = "clean-db" ]; then
     fi
 fi
 
-
 rm -rf ./results/latest/*
 touch ./results/latest/.keep
 

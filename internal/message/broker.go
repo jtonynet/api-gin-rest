@@ -7,17 +7,23 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// type iBroker interface {
+// 	InitBroker(cfg config.MessageBroker) error
+// 	Publish(body string) error
+// 	Consume(customHandler func(string) error) error
+// 	Shutdown() error
+// 	CheckReadiness() error
+// }
+
 type BrokerData struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
-
-	cfg config.MessageBroker
-
+	cfg		config.MessageBroker
 	done    chan error
 }
 
 var (
-	Broker          *BrokerData
+	Broker	*BrokerData
 )
 
 func InitBroker(cfg config.MessageBroker) error {
@@ -38,14 +44,14 @@ func InitBroker(cfg config.MessageBroker) error {
 		return err
 	}
 
-	createExchange(channel, cfg.Exchange, cfg.ExchangeType)
-	createExchange(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
+	exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
+	exchangeDeclare(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
 
-	createQueue(channel, cfg.Queue)
-	createQueue(channel, cfg.QueueDL)
+	queueDeclare(channel, cfg.Queue)
+	queueDeclare(channel, cfg.QueueDL)
 
-	createQueueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
-	createQueueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
+	queueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
+	queueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
 
 	// Reliable publisher confirms require confirm.select support from the connection.
 	if cfg.ReliableMessagesEnable {
@@ -69,16 +75,16 @@ func InitBroker(cfg config.MessageBroker) error {
 	return nil
 }
 
-func createExchange(channel *amqp.Channel, exchange string, exchangeType string) error {
+func exchangeDeclare(channel *amqp.Channel, exchange string, exchangeType string) error {
 	fmt.Printf("got Channel, declaring %q Exchange (%q)", exchange, exchangeType)
 	if err := channel.ExchangeDeclare(
-		exchange,     // name
-		exchangeType, // type
-		true,             // durable
-		false,            // auto-deleted
-		false,            // internal
-		false,            // noWait
-		nil,              // arguments
+		exchange,		// name
+		exchangeType,	// type
+		true,			// durable
+		false,			// auto-deleted
+		false,			// internal
+		false,			// noWait
+		nil,			// arguments
 	); err != nil {
 		return err
 	}
@@ -86,7 +92,7 @@ func createExchange(channel *amqp.Channel, exchange string, exchangeType string)
 	return nil
 }
 
-func createQueue(channel *amqp.Channel, queue string) error {
+func queueDeclare(channel *amqp.Channel, queue string) error {
 	_, err := channel.QueueDeclare(
 		queue,
 		false,
@@ -102,7 +108,7 @@ func createQueue(channel *amqp.Channel, queue string) error {
 	return nil
 }
 
-func createQueueBind(channel *amqp.Channel, queue string, routingKey string, exchange string) error {
+func queueBind(channel *amqp.Channel, queue string, routingKey string, exchange string) error {
 	if err := channel.QueueBind(
 		queue,
 		routingKey,

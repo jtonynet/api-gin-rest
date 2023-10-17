@@ -8,13 +8,13 @@ import (
 func (b *BrokerData) Consume(customHandler func(string) error) error {
 	fmt.Printf("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
-		b.cfg.Queue,            // name
-		b.cfg.ConsumerTag,      // consumerTag,
-		false,      		// noAck
-		false,      		// exclusive
-		false,      		// noLocal
-		false,      		// noWait
-		nil,        		// arguments
+		b.cfg.Queue,		// name
+		b.cfg.ConsumerTag,	// consumerTag,
+		false,				// noAck
+		false,				// exclusive
+		false,				// noLocal
+		false,				// noWait
+		nil,				// arguments
 	)
 	if err != nil {
 		fmt.Printf("Queue Consume: %s", err)
@@ -52,21 +52,21 @@ func (b *BrokerData) handle(customHandler func(string) error, deliveries <-chan 
 			d.DeliveryTag,
 			d.Body,
 		)
-		
+
 		if err := customHandler(string(d.Body)); err != nil { //--> CUSTOM HANDLER
 			if d.Headers["X-Attempt"] == nil {
 				attempt = 1
 			} else if attemptTemp, ok := d.Headers["X-Attempt"].(int32); ok && attemptTemp < b.cfg.MaxAttempts {				
 				attempt = d.Headers["X-Attempt"].(int32) + 1
 			} else {
-                // Limite de tentativas atingido, mova para a dead message queue.
-                if err := b.moveToDeadQueue(string(d.Body)); err != nil {
-                    fmt.Println("Erro ao mover para a dead message queue:", err)
-                } else {
+				// Limite de tentativas atingido, mova para a dead message queue.
+					if err := b.moveToDeadQueue(string(d.Body)); err != nil {
+					fmt.Println("Erro ao mover para a dead message queue:", err)
+				} else {
 					d.Ack(false)
 					requeue = false
 				}
-            }
+			}
 
 			if requeue {
 				// No mundo ideal fariamos um Nack incrementando Headers["X-Attempt"]
@@ -78,10 +78,10 @@ func (b *BrokerData) handle(customHandler func(string) error, deliveries <-chan 
 
 				d.Ack(false)
 				b.publish(string(d.Body), b.cfg.Exchange, b.cfg.RoutingKey, attempt)
-		    }
+			}
 
 			requeue = true
-        } else {
+		} else {
 			d.Ack(false)
 		}
 	}

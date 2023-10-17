@@ -83,7 +83,7 @@ services:
 
   worker-gin:
     deploy:
-      replicas: 2
+      replicas: 1
     build:
       context: .
       dockerfile: Dockerfile

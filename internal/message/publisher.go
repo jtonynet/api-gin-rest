@@ -11,22 +11,22 @@ func (b *BrokerData) Publish(body string) error {
 }
 
 func (b *BrokerData) publish(body string, exchange string, routingKey string, attempt int32) error {
-    headers := amqp.Table{
-        "X-Attempt": attempt,
-    }
+	headers := amqp.Table{
+		"X-Attempt": attempt,
+	}
 
 	if err := b.channel.Publish(
-		exchange,   // publish to an exchange
-		routingKey, // routing to 0 or more queues
-		false,        // mandatory
-		false,        // immediate
+		exchange,		// publish to an exchange
+		routingKey,		// routing to 0 or more queues
+		false,			// mandatory
+		false,			// immediate
 		amqp.Publishing{
 			Headers:         headers,
 			ContentType:     "text/plain",
 			ContentEncoding: "",
 			Body:            []byte(body),
-			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
-			Priority:        0,              // 0-9
+			DeliveryMode:    amqp.Transient,	// 1=non-persistent, 2=persistent
+			Priority:        0,					// 0-9
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {

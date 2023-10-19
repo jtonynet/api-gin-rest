@@ -1,11 +1,11 @@
-package message
+package rabbitMQ
 
 import (
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (b *BrokerData) Consume(customHandler func(string) error) error {
+func (b *BrokerData) Consume(userHandler func(string) error) error {
 	fmt.Printf("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
 		b.cfg.Queue,		// name
@@ -21,7 +21,7 @@ func (b *BrokerData) Consume(customHandler func(string) error) error {
 		return err
 	}
 
-	go b.handle(customHandler, deliveries, b.done)
+	go b.handle(userHandler, deliveries, b.done)
 	return nil
 }
 
@@ -83,7 +83,6 @@ func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan am
 }
 
 func (b *BrokerData) moveToDeadQueue(message string) error {
-	//fmt.Println("Movi para dead queue:", message)
 	initialAttempt := int32(0)
 	return b.publish(message, initialAttempt, b.cfg.ExchangeDL, b.cfg.RoutingKeyDL)
 }

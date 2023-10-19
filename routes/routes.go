@@ -11,9 +11,11 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 )
 
-func HandleRequests(cfg config.API) {
+func HandleRequests(cfg config.API, messageBroker interfaces.Broker) {
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/"
 
@@ -24,7 +26,7 @@ func HandleRequests(cfg config.API) {
 	apiGroup := r.Group("/")
 
 	apiGroup.Use(middlewares.ConfigInjectHandler(cfg))
-	apiGroup.Use(middlewares.ConfigManagerHandler())
+	apiGroup.Use(middlewares.MessageBrokerInjectHandler(messageBroker))
 
 	apiGroup.GET("/liveness", controllers.Liveness)
 	apiGroup.GET("/readiness", controllers.Readiness)

@@ -2,13 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/jtonynet/api-gin-rest/internal/database"
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
-func insertAlunoHandler(msg string) error {
+func InsertAlunoHandler(msg string) error {
     var aluno models.Aluno
     err := json.Unmarshal([]byte(msg), &aluno)
     if err != nil {

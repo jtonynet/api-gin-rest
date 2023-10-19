@@ -7,7 +7,10 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
+
 	"github.com/jtonynet/api-gin-rest/internal/message"
+	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
+
 	"github.com/jtonynet/api-gin-rest/routes"
 )
 
@@ -46,8 +49,9 @@ func main() {
 		log.Fatal("cannot initialize Database: ", dbErr)
 	}
 
+	var messageBroker interfaces.Broker
 	err = backoff.RetryNotify(func() error {
-		msgBrokerErr = message.InitBroker(cfg.MessageBroker)
+		msgBrokerErr, messageBroker = message.InitBroker(cfg.MessageBroker)
 		return msgBrokerErr
 	}, retryCfg, func(err error, t time.Duration) {
 		log.Printf("Retrying connect to MessageBroker after error: %v", err)
@@ -57,5 +61,5 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	routes.HandleRequests(cfg.API)
+	routes.HandleRequests(cfg.API, messageBroker)
 }

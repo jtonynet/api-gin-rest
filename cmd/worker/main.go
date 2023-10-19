@@ -1,18 +1,17 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/cenkalti/backoff"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
-	"github.com/jtonynet/api-gin-rest/internal/message"
-	"github.com/jtonynet/api-gin-rest/models"
 
-	handlers "github.com/jtonynet/api-gin-rest/worker/handlers"
+	"github.com/jtonynet/api-gin-rest/internal/message"
+	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
+
+	"github.com/jtonynet/api-gin-rest/cmd/worker/handlers"
 )
 
 // @title api-gin-rest
@@ -24,7 +23,6 @@ import (
 // @contact.email learningingenuity@gmail.com
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
-// @host localhost:8083
 func main() {
 	cfg, err := config.LoadConfig(".")
 	if err != nil {
@@ -47,8 +45,9 @@ func main() {
 		log.Fatal("cannot initialize Database: ", dbErr)
 	}
 
+	var messageBroker interfaces.Broker
 	err = backoff.RetryNotify(func() error {
-		msgBrokerErr = message.InitBroker(cfg.MessageBroker)
+		msgBrokerErr, messageBroker = message.InitBroker(cfg.MessageBroker)
 		return msgBrokerErr
 	}, retryCfg, func(err error, t time.Duration) {
 		log.Printf("Retrying connect to MessageBroker after error: %v", err)
@@ -58,9 +57,17 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	err = message.Broker.Consume(handlers.insertAlunoHandler)
+	err = messageBroker.Consume(handlers.InsertAlunoHandler)
 	if err != nil {
 		log.Fatal("cannot consume messages from Broker: ", msgBrokerErr)
 	}
+	
 	select {}
 }
+
+
+
+
+
+
+

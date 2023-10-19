@@ -1,4 +1,4 @@
-package message
+package rabbitMQ
 
 import (
 	"fmt"
@@ -7,14 +7,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type iBroker interface {
-	InitBroker(cfg config.MessageBroker) error
-	Publish(body string) error
-	Consume(customHandler func(string) error) error
-	Shutdown() error
-	CheckReadiness() error
-}
-
 type BrokerData struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
@@ -22,11 +14,9 @@ type BrokerData struct {
 	done    chan error
 }
 
-var (
-	Broker	*BrokerData
-)
+var Broker *BrokerData
 
-func InitBroker(cfg config.MessageBroker) error {
+func InitBroker(cfg config.MessageBroker) (error, *BrokerData) {
 	strConn := fmt.Sprintf("amqp://%s:%s@%s:%s/",
 		cfg.User,
 		cfg.Pass,
@@ -35,13 +25,13 @@ func InitBroker(cfg config.MessageBroker) error {
 
 	conn, err := amqp.Dial(strConn)
 	if err != nil {
-		return err
+		return err, nil
 	}
 
 	channel, err := conn.Channel()
 	if err != nil {
 		conn.Close()
-		return err
+		return err,nil
 	}
 
 	exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
@@ -57,7 +47,7 @@ func InitBroker(cfg config.MessageBroker) error {
 	if cfg.ReliableMessagesEnable {
 		fmt.Printf("enabling publishing confirms.")
 		if err := channel.Confirm(false); err != nil {
-			return fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+			return fmt.Errorf("Channel could not be put into confirm mode: %s", err), nil
 		}
 
 		confirms := channel.NotifyPublish(make(chan amqp.Confirmation, 1))
@@ -72,7 +62,7 @@ func InitBroker(cfg config.MessageBroker) error {
 		done:    make(chan error),
 	}
 
-	return nil
+	return nil, Broker
 }
 
 func exchangeDeclare(channel *amqp.Channel, exchange string, exchangeType string) error {

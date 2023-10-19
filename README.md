@@ -119,18 +119,6 @@ Recomendo a instalação do [GVM](https://github.com/moovweb/gvm) para controle 
 Recomendo a instalação da extensão [Golang do VsCode](https://marketplace.visualstudio.com/items?itemName=golang.go)
 
 
-<!-- Descobrindo o host do banco postgres para configurar o pgadmin, apos subir o docker-compose:
-
-bash
-$ docker-compose exec postgres sh
-# hostname -i
-
-ou
-bash
-$ docker inspect container_id | grep IPAddress -->
-
-
-
 [:arrow_heading_up: voltar](#indice)
 
 ---
@@ -323,6 +311,7 @@ Estrutura da pasta de testes do Gatling:
   $ tree
   .
 ```
+
 
 Usamos uma imagem com o **Gatling** instalado para performar testes de carga de maneira automatizada.
 A imagem responsável por fornecer essa saída também é responsável por processar o teste.

@@ -25,6 +25,8 @@ type Database struct {
 }
 
 type MessageBroker struct {
+	Strategy string `mapstructure:"MESSAGE_BROKER_STRATEGY"`
+
 	User            string `mapstructure:"RABBITMQ_USER"`
 	Pass            string `mapstructure:"RABBITMQ_PASS"`
 	Port            string `mapstructure:"RABBITMQ_PORT"`

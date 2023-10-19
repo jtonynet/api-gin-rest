@@ -9,8 +9,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
-	"github.com/jtonynet/api-gin-rest/internal/message"
+
 	"github.com/jtonynet/api-gin-rest/models"
+	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 )
 
 func Liveness(c *gin.Context) {
@@ -26,6 +27,7 @@ func Liveness(c *gin.Context) {
 
 func Readiness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
+	messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
 
 	var err error
 
@@ -36,7 +38,7 @@ func Readiness(c *gin.Context) {
 		return
 	}
 
-	if err = message.Broker.CheckReadiness(); err != nil {
+	if err = messageBroker.CheckReadiness(); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"message": "MessageBroker Service unavailable",
 		})
@@ -79,6 +81,7 @@ func ExibeTodosAlunos(c *gin.Context) {
 // @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
+	messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
 
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
@@ -99,7 +102,7 @@ func CriaNovoAluno(c *gin.Context) {
 			return
 		}
 
-		err = message.Broker.Publish(string(alunoJSON))
+		err = messageBroker.Publish(string(alunoJSON))
 
 		if err != nil {
 			fmt.Println(err)

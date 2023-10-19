@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+## [0.0.6] - 2023-10-17
+### Added
 - Adicionado `UUID` por aluno
 - Adicionado [RabbitMQ](https://www.rabbitmq.com/) ao docker-compose seguindo o [artigo](https://x-team.com/blog/set-up-rabbitmq-with-docker-compose/)
 - Criação do `Worker` de processamento de alunos por mensageria
-- Feature Flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` para criar aluno "event driven"
+- Feature Flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` para criar aluno de maneira assincrona
 - Volumes de `Postgres` e `RabbitMQ` movidos para o diretório `docker_conf`
+- `Strategy Pattern` para resolver multiplos message broker
 
 ### Fixed
 - Adicionada a biblioteca [Exponential Backoff](https://github.com/cenkalti/backoff) para corrigir um bug no ambiente. O `RabbitMQ` demora mais do que o esperado para responder às requisições. Ele informa ao `Docker` que está pronto, mas na verdade, não está, o que ocasiona uma interrupção na API, sem conectividade com esse recurso de infraestrutura. A biblioteca `Backoff` fica responsável por gerenciar as tentativas de conexão pelo período máximo definido na variável de ambiente `API_RETRY_MAX_ELAPSED_TIME_IN_MS`
@@ -52,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Projeto com base no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) finalizado de acordo com a trilha seguida
 - API Gin `dockerizada`
 
+[0.0.6]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.2...v0.0.3

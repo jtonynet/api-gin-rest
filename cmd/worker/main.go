@@ -4,70 +4,32 @@ import (
 	"log"
 	"time"
 
-	"github.com/cenkalti/backoff"
-	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/jtonynet/api-gin-rest/internal/database"
-
-	"github.com/jtonynet/api-gin-rest/internal/message"
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
-
+	"github.com/jtonynet/api-gin-rest/cmd/common"
 	"github.com/jtonynet/api-gin-rest/cmd/worker/handlers"
 )
 
-// @title api-gin-rest
-// @version 0.0.3
-// @description Estudo API Rest em Golang com Gin
-// @contact.name API GIN Support
-// @termsOfService https://github.com/jtonynet/api-gin-rest
-// @contact.url https://github.com/jtonynet/api-gin-rest
-// @contact.email learningingenuity@gmail.com
-// @license.name MIT
-// @license.url https://opensource.org/licenses/MIT
 func main() {
-	cfg, err := config.LoadConfig(".")
+	cfg, err := common.InitConfig()
 	if err != nil {
 		log.Fatal("cannot load config: ", err)
 	}
 
-	retryCfg := backoff.NewExponentialBackOff()
-	retryCfg.MaxElapsedTime = time.Duration(cfg.API.RetryMaxElapsedTimeInMs) * time.Millisecond
+	RetryMaxElapsedTime := time.Duration(cfg.API.RetryMaxElapsedTimeInMs) * time.Millisecond
 
-	var dbErr, msgBrokerErr error
-
-	err = backoff.RetryNotify(func() error {
-		dbErr = database.Init(cfg.Database)
-		return dbErr
-	}, retryCfg, func(err error, t time.Duration) {
-		log.Printf("Retrying connect to Database after error: %v", err)
-	})
-
+	err = common.InitDatabase(cfg.Database, RetryMaxElapsedTime)
 	if err != nil {
-		log.Fatal("cannot initialize Database: ", dbErr)
+		log.Fatal("cannot initialize Database: ", err)
 	}
 
-	var messageBroker interfaces.Broker
-	err = backoff.RetryNotify(func() error {
-		msgBrokerErr, messageBroker = message.InitBroker(cfg.MessageBroker)
-		return msgBrokerErr
-	}, retryCfg, func(err error, t time.Duration) {
-		log.Printf("Retrying connect to MessageBroker after error: %v", err)
-	})
-
+	messageBroker, err := common.InitMessageBroker(cfg.MessageBroker, RetryMaxElapsedTime)
 	if err != nil {
-		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
+		log.Fatal("cannot initialize MessageBroker: ", err)
 	}
 
-	err = messageBroker.Consume(handlers.InsertAlunoHandler)
+	err = messageBroker.RunConsumer(handlers.InsertAluno)
 	if err != nil {
-		log.Fatal("cannot consume messages from Broker: ", msgBrokerErr)
+		log.Fatal("cannot consume messages from Broker: ", err)
 	}
-	
+
 	select {}
 }
-
-
-
-
-
-
-

@@ -39,12 +39,9 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 ---
 <a id="sobre"></a>
 ## :green_book: Sobre
-Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa.
+Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa. Continuo incorporando padrões e melhorias para estudar aplicações práticas.
 
-Continuo incorporando padrões e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1) e [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0).
-
-
-Não considero colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas nacionais, eventos promocionais, Black Friday, etc...).
+Não considero colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas)
 
 Para alcançar essas melhorias, adotei as seguintes medidas que não estavam presentes no curso original:
 - Teste de carga com Gatling

@@ -5,7 +5,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (b *BrokerData) Consume(userHandler func(string) error) error {
+func (b *BrokerData) RunConsumer(userHandler func(string) error) error {
 	fmt.Printf("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
 		b.cfg.Queue,		// name
@@ -76,6 +76,8 @@ func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan am
 		} else {
 			d.Ack(false)
 		}
+
+		
 	}
 
 	fmt.Printf("handle: deliveries channel closed")

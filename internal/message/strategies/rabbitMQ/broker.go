@@ -16,7 +16,7 @@ type BrokerData struct {
 
 var Broker *BrokerData
 
-func InitBroker(cfg config.MessageBroker) (error, *BrokerData) {
+func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
 	strConn := fmt.Sprintf("amqp://%s:%s@%s:%s/",
 		cfg.User,
 		cfg.Pass,
@@ -25,13 +25,13 @@ func InitBroker(cfg config.MessageBroker) (error, *BrokerData) {
 
 	conn, err := amqp.Dial(strConn)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	channel, err := conn.Channel()
 	if err != nil {
 		conn.Close()
-		return err,nil
+		return nil, err
 	}
 
 	exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
@@ -47,7 +47,7 @@ func InitBroker(cfg config.MessageBroker) (error, *BrokerData) {
 	if cfg.ReliableMessagesEnable {
 		fmt.Printf("enabling publishing confirms.")
 		if err := channel.Confirm(false); err != nil {
-			return fmt.Errorf("Channel could not be put into confirm mode: %s", err), nil
+			return nil, fmt.Errorf("Channel could not be put into confirm mode: %s", err)
 		}
 
 		confirms := channel.NotifyPublish(make(chan amqp.Confirmation, 1))
@@ -62,7 +62,7 @@ func InitBroker(cfg config.MessageBroker) (error, *BrokerData) {
 		done:    make(chan error),
 	}
 
-	return nil, Broker
+	return Broker, nil
 }
 
 func exchangeDeclare(channel *amqp.Channel, exchange string, exchangeType string) error {
@@ -113,8 +113,12 @@ func queueBind(channel *amqp.Channel, queue string, routingKey string, exchange 
 }
 
 func (b *BrokerData) CheckReadiness() error {
-	if b.conn == nil || b.channel == nil {
-		return fmt.Errorf("MessageBroker is not ready")
-	}
+	if b.conn != nil || b.channel != nil {
+		err := exchangeDeclare(b.channel, b.cfg.Exchange, b.cfg.ExchangeType)
+		if err != nil {
+			return fmt.Errorf("MessageBroker is not ready")
+		}
+	} 
+
 	return nil
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 )
 
-func InitBroker(cfg config.MessageBroker) (error, interfaces.Broker) {
+func InitBroker(cfg config.MessageBroker) (interfaces.Broker, error) {
     switch cfg.Strategy {
     case "rabbitmq":
         return rabbitMQ.InitBroker(cfg)

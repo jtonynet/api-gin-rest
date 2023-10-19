@@ -5,11 +5,14 @@ if [ ! -e /entrypoint ]; then
     ln -s /usr/src/app/entrypoint.sh /entrypoint
 fi
 
+
 if [ "$1" = "run-test" ]; then
 
     if [ ! -d "bundle/bin" ]; then
 
         cd bundle
+
+        sleep 1
 
         echo "Downloading Gatling bundle..."
         wget  https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/3.9.5/gatling-charts-highcharts-bundle-3.9.5-bundle.zip
@@ -51,11 +54,21 @@ if [ "$1" = "clean-test" ]; then
     done
 fi
 
-echo "Remove last load test data"
+if [ "$1" = "clean-db" ]; then
+    read -p "Do you really want to clean the database? This will reset your DB to zero records [y/n]: " answer
+    if [ "$answer" = "y" ]; then
+        export PGPASSWORD=$DATABASE_PASSWORD
+        psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_DB -p $DATABASE_PORT -c "TRUNCATE TABLE alunos RESTART IDENTITY;"
+        unset PGPASSWORD
+        echo "Database Cleaned"
+    else
+        echo "Database cleaning canceled."
+    fi
+fi
+
 rm -rf ./results/latest/*
 touch ./results/latest/.keep
 
-echo "Add New load test data"
 new_latest=$(ls -td ./results/history/*/ | head -n 1)
 cp -r $new_latest/* ./results/latest/
 

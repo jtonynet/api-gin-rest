@@ -1,6 +1,8 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type API struct {
 	Name       string `mapstructure:"API_NAME"`
@@ -8,8 +10,9 @@ type API struct {
 	TagVersion string `mapstructure:"API_TAG_VERSION"`
 	Env        string `mapstructure:"API_ENV"`
 
-	// API Feature Flags
-	PprofCPUFeatureFlagEnabled bool `mapstructure:"PPROF_CPU_FEATURE_FLAG_ENABLED"`
+	RetryMaxElapsedTimeInMs int `mapstructure:"API_RETRY_MAX_ELAPSED_TIME_IN_MS"`
+
+	FeatureFlags FeatureFlags `mapstructure:",squash"`
 }
 
 type Database struct {
@@ -21,9 +24,35 @@ type Database struct {
 	DB     string `mapstructure:"DATABASE_DB"`
 }
 
+type MessageBroker struct {
+	Strategy string `mapstructure:"MESSAGE_BROKER_STRATEGY"`
+
+	User            string `mapstructure:"RABBITMQ_USER"`
+	Pass            string `mapstructure:"RABBITMQ_PASS"`
+	Port            string `mapstructure:"RABBITMQ_PORT"`
+	Host            string `mapstructure:"RABBITMQ_HOST"`
+
+	Exchange            	  string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO"`
+	ExchangeType        	  string `mapstructure:"RABBITMQ_EXCHANGE_ALUNO_TYPE"` //direct|fanout|topic|x-custom
+	Queue               	  string `mapstructure:"RABBITMQ_QUEUE_ALUNO"`
+	RoutingKey          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_ALUNO"`
+	ConsumerTag         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG"`
+
+	// DeadLetter
+	ExchangeDL            	  string `mapstructure:"RABBITMQ_EXCHANGE_DEAD_LETTER"`
+	ExchangeTypeDL        	  string `mapstructure:"RABBITMQ_EXCHANGE_DEAD_LETTER_TYPE"` //direct|fanout|topic|x-custom
+	QueueDL               	  string `mapstructure:"RABBITMQ_QUEUE_DEAD_LETTER"`
+	RoutingKeyDL          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_DEAD_LETTER"`
+	ConsumerTagDL         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG_DEAD_LETTER"`
+
+	MaxAttempts 			  int32   `mapstructure:"RABBITMQ_MAX_ATTEMPTS_CONSUME_INT"`
+	ReliableMessagesEnable    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES_ENABLED"` //Wait for the publisher confirmation before exiting
+}
+
 type Config struct {
-	API      API      `mapstructure:",squash"`
-	Database Database `mapstructure:",squash"`
+	API           API           `mapstructure:",squash"`
+	Database      Database      `mapstructure:",squash"`
+	MessageBroker MessageBroker `mapstructure:",squash"`
 }
 
 func LoadConfig(path string) (*Config, error) {

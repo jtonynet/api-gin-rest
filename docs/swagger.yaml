@@ -11,6 +11,9 @@ definitions:
       rg:
         example: "12345678901234"
         type: string
+      uuid:
+        example: 00000000-a0a0-0aa0-0aa0-a0aa0000a000
+        type: string
     type: object
 host: localhost:8080
 info:
@@ -24,7 +27,7 @@ info:
     url: https://opensource.org/licenses/MIT
   termsOfService: https://github.com/jtonynet/api-gin-rest
   title: api-gin-rest
-  version: "1.0"
+  version: 0.0.3
 paths:
   /aluno:
     post:
@@ -38,6 +41,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Aluno'
+        "202":
+          description: Accepted
+          schema:
+            type: uuid
         "400":
           description: Bad Request
           schema:
@@ -109,6 +116,23 @@ paths:
       summary: Busca aluno por CPF
       tags:
       - Aluno
+  /aluno/uuid/{uuid}:
+    get:
+      description: Busca aluno por id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aluno'
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Busca aluno por id
+      tags:
+      - Aluno
   /alunos:
     get:
       description: Obtém a lista completa de alunos
@@ -124,6 +148,19 @@ paths:
       summary: Retorna todos os alunos
       tags:
       - Alunos
+  /alunos/count:
+    get:
+      description: Busca o número de alunos no banco de dados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Busca o número de alunos no banco de dados
+      tags:
+      - Aluno
 schemes:
 - http
 swagger: "2.0"

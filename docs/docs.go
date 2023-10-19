@@ -44,6 +44,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Aluno"
                         }
                     },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "uuid"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -63,6 +69,32 @@ const docTemplate = `{
                     "Aluno"
                 ],
                 "summary": "Busca aluno por CPF",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aluno"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/aluno/uuid/{uuid}": {
+            "get": {
+                "description": "Busca aluno por id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca aluno por id",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -172,6 +204,26 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/alunos/count": {
+            "get": {
+                "description": "Busca o número de alunos no banco de dados",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aluno"
+                ],
+                "summary": "Busca o número de alunos no banco de dados",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -189,6 +241,10 @@ const docTemplate = `{
                 "rg": {
                     "type": "string",
                     "example": "12345678901234"
+                },
+                "uuid": {
+                    "type": "string",
+                    "example": "00000000-a0a0-0aa0-0aa0-a0aa0000a000"
                 }
             }
         }
@@ -197,7 +253,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "0.0.3",
 	Host:             "localhost:8080",
 	BasePath:         "/alunos",
 	Schemes:          []string{"http"},

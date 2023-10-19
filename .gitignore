@@ -34,10 +34,3 @@
 # Ignorar resultados e bundle de teste de carga
 /tests/gatling/results/*
 /tests/gatling/bundle/*
-
-# Ignora volume do postgres
-/postgres-data
-/postgres-data/*
-
-# Ignora profilling
-/pprof/*

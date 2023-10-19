@@ -11,7 +11,7 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/message"
 	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 
-	"github.com/jtonynet/api-gin-rest/routes"
+	"github.com/jtonynet/api-gin-rest/cmd/worker/handlers"
 )
 
 // @title api-gin-rest
@@ -23,10 +23,6 @@ import (
 // @contact.email learningingenuity@gmail.com
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
-// @host localhost:8080
-// @BasePath /alunos
-// @Schemes http
-// @query.collection.format multi
 func main() {
 	cfg, err := config.LoadConfig(".")
 	if err != nil {
@@ -61,5 +57,17 @@ func main() {
 		log.Fatal("cannot initialize MessageBroker: ", msgBrokerErr)
 	}
 
-	routes.HandleRequests(cfg.API, messageBroker)
+	err = messageBroker.Consume(handlers.InsertAlunoHandler)
+	if err != nil {
+		log.Fatal("cannot consume messages from Broker: ", msgBrokerErr)
+	}
+	
+	select {}
 }
+
+
+
+
+
+
+

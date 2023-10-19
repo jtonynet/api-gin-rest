@@ -4,11 +4,12 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    container_name:
+     nginx-gin-rest
     ports:
       - 8080:80
     depends_on:
       - ${API_NAME}
-      - postgres-gin-rest
     networks:
       - gin-rest-network
 
@@ -23,7 +24,22 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data  
+      - ./docker_conf/postgres-data:/var/lib/postgresql/data  
+    networks:
+      - gin-rest-network
+
+  rabbitmq-gin-rest:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq-gin-rest'
+    ports:
+      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
+      - 15672:15672
+    volumes:
+      - ./docker_conf/rabbitmq/data/:/var/lib/rabbitmq
+      - ./docker_conf/rabbitmq/log/:/var/log/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     networks:
       - gin-rest-network
 
@@ -38,9 +54,7 @@ services:
     ports:
       - "${GATLING_TEST_PORT}:${GATLING_TEST_PORT}"
     depends_on:
-      - nginx-gin-rest
-      - api-gin-rest
-      - postgres-gin-rest
+      - ${API_NAME}
     volumes:
       - ./tests/gatling:/usr/src/app
     networks:
@@ -50,19 +64,42 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: api
     container_name: ${API_NAME}
     environment:
       DATABASE_HOST: postgres-gin-rest
+      RABBITMQ_HOST: rabbitmq-gin-rest
     ports:
       - "${API_PORT}:${API_PORT}"
     depends_on:
       - postgres-gin-rest
+      - rabbitmq-gin-rest
     volumes:
       - .:/usr/src/app
     tty: true
     command: go run cmd/api/main.go -b 0.0.0.0
     networks:
       - gin-rest-network
-      
+
+  worker-gin:
+    deploy:
+      replicas: 1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    environment:
+      DATABASE_HOST: postgres-gin-rest
+      RABBITMQ_HOST: rabbitmq-gin-rest
+    depends_on:
+      - postgres-gin-rest
+      - rabbitmq-gin-rest
+    volumes:
+      - .:/usr/src/app
+    tty: true
+    command: go run cmd/worker/main.go -b 0.0.0.0
+    networks:
+      - gin-rest-network
+
 networks:
   gin-rest-network:

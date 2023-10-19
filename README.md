@@ -41,11 +41,10 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 ## :green_book: Sobre
 Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa.
 
-Após a conclusão do curso, continuo incorporando padrões de mercado e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1), [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0) e [Microsserviços Prontos Para a Produção](https://www.amazon.com.br/Microsservi%C3%A7os-Prontos-Para-Produ%C3%A7%C3%A3o-Padronizados/dp/8575226215).
+Continuo incorporando padrões e melhorias para estudar aplicações práticas. Minha inspiração vem da [Rinha de Backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) e dos livros [Test-Driven Development in Go](https://www.amazon.com.br/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878/ref=sr_1_1) e [Criando Microsserviços – 2ª Edição](https://www.amazon.com.br/gp/product/B09WF2MVT8/ref=dbs_a_def_rwt_bibl_vppi_i0).
 
-O objetivo é aprimorar o desempenho, corrigir questões identificadas e aplicar os conceitos aprendidos nos livros mencionados como parte do meu processo de estudo.
 
-Não estou considerando colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas educacionais nacionais, eventos promocionais, Black Friday, etc...).
+Não considero colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas, como o dia de matrícula em sistemas nacionais, eventos promocionais, Black Friday, etc...).
 
 Para alcançar essas melhorias, adotei as seguintes medidas que não estavam presentes no curso original:
 - Teste de carga com Gatling
@@ -56,7 +55,7 @@ Para alcançar essas melhorias, adotei as seguintes medidas que não estavam pre
 - Criação de novos alunos em filas/workers concorrentes usando goroutines.
 - (A ser implementado) Uso de Cache Redis como uma feature flag.
 
-O projeto foi desenvolvido no sistema operacional Ubuntu e testado tanto no Ubuntu quanto no Windows, porém as informações de desenvolvimento estão voltadas para o sistema operacional Linux.
+O projeto foi desenvolvido no SO Ubuntu e testado tanto no Ubuntu quanto no Windows, informações de desenvolvimento estão voltadas para o sistema operacional Linux.
 
 
 [:arrow_heading_up: voltar](#indice)
@@ -73,23 +72,41 @@ $ docker compose up
 > :writing_hand: **Observação**:
 >
 > :window: Troubleshooting com [Windows](https://stackoverflow.com/questions/53165471/building-docker-images-on-windows-entrypoint-script-no-such-file-or-directory)
-> Por algum motivo, as configurações de atributos do Git que podem afetar o caractere de fim de linha não estão funcionando como esperado, e ainda não identificamos o motivo. Portanto, para executar o projeto no Windows, será necessário fazer uma alteração manual no arquivo `./tests/gatling/entrypoint.sh`. Em vez disso, converta o arquivos de `LF` para `CRLF` no seu editor de texto de preferência.
+> Configurações de atributos do Git que podem afetar o caractere de fim de linha não estão funcionando como esperado. Portanto, para executar o projeto no Windows, será necessário fazer a alteração no arquivo `./tests/gatling/entrypoint.sh`. Converta o arquivos de `LF` para `CRLF` no seu editor de texto de preferência.
 
 
 
 Aguarde até que as imagens sejam criadas e acesse:
-
-`http://localhost:8080/alunos` Rota para **API**<br/> 
+#### Rotas REST:
+- `http://localhost:8080/alunos` Rota para **API** 
+- `http://localhost:8080/aluno/{id}` Rota para **API**
+- `http://localhost:8080/aluno/cpf/{cpf}` Rota para **API**
+*_maiores detalhes na rota [swagger](#rotas-de-uso-de-desenvolvimento)_
 <br/>
 
-`http://localhost:8080/readiness` Rota de **readiness**<br/>
-`http://localhost:8080/liveness` Rota de **liveness**<br/>
+#### Rotas de uso de infra/suporte:
+- `http://localhost:8080/readiness` Rota de **readiness**
+- `http://localhost:8080/liveness` Rota de **liveness**
+- `http://localhost:15672` Rota de **RabbitMQ** (verificar `.env` para senha)
 <br/>
 
-`http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**<br/>
-`http://localhost:8082` Rota para **ultimo resultado de teste de carga**<br/>
+#### Rotas de uso de desenvolvimento:
+- `http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**
+- `http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1`. Consulte [Profiling](#mag-profilling) para maiores informações.
+- `http://localhost:8082` Rota para **ultimo resultado de teste de carga**
 
 <br>
+
+#### Escalando Workers:
+A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `1`, para aumentar a capacidade de inserção de dados no banco de dados.
+
+```docker-compose
+84  worker-gin:
+85    deploy:
+86      replicas: 1
+```
+
+<br/>
 
 #### Recomendações para Devs:
 Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente. As versões mais recentes da linguagem já têm a instalação simplificada pelo `snap`
@@ -100,18 +117,6 @@ $ sudo snap install go --classic
 Recomendo a instalação do [GVM](https://github.com/moovweb/gvm) para controle de versões da linguagem
 
 Recomendo a instalação da extensão [Golang do VsCode](https://marketplace.visualstudio.com/items?itemName=golang.go)
-
-
-<!-- Descobrindo o host do banco postgres para configurar o pgadmin, apos subir o docker-compose:
-
-bash
-$ docker-compose exec postgres sh
-# hostname -i
-
-ou
-bash
-$ docker inspect container_id | grep IPAddress -->
-
 
 
 [:arrow_heading_up: voltar](#indice)
@@ -186,12 +191,12 @@ graph LR
         RabbitMQ(["fa:fa-envelope Aluno-RabbitMQ"])
     end
 
-    subgraph API
-      subgraph Command
+    subgraph CMD
+      subgraph WORKER
         Worker["fa:fa-gears Aluno-Worker"]
       end
 
-      subgraph Controlers
+      subgraph API
         CriaNovoAluno["fa:fa-code CriaNovoAluno"]
         ExibeTodosAlunos["fa:fa-code ExibeTodosAlunos"]
         BuscaAlunoPorId["fa:fa-code BuscaAlunoPorId"]
@@ -233,8 +238,8 @@ graph LR
   Aluno -->|Queries| Aluno-DB
   B -->|POST| CriaNovoAluno
 
-  CriaNovoAluno -.->|Produz| RabbitMQ
-  RabbitMQ -.->|consome| Worker
+  CriaNovoAluno -.->|Publica| RabbitMQ
+  RabbitMQ -.->|Consome| Worker
 
   Worker --> Aluno
 
@@ -307,6 +312,7 @@ Estrutura da pasta de testes do Gatling:
   .
 ```
 
+
 Usamos uma imagem com o **Gatling** instalado para performar testes de carga de maneira automatizada.
 A imagem responsável por fornecer essa saída também é responsável por processar o teste.
 
@@ -320,8 +326,16 @@ docker exec -ti gatling-api-test /entrypoint clean-test
 
 <br/>
 
+#### Limpando o Banco de Dados:
+ Isso limpa as inserções feitas no banco de dados.
+```shell
+docker exec -ti gatling-api-test /entrypoint clean-db
+```
+
+<br/>
+
 #### Configurando o Teste
-Caso deseje alterar as configuracoes padrao do teste, altere o arquivo `tests/gatling/user-files/simulations/AlunosSimulation.scala`. O metodo `setUp` te da flexibilidade de cenarios de simulacao
+Caso deseje alterar as configurações padrão do teste, modifique o arquivo `tests/gatling/user-files/simulations/AlunosSimulation.scala`. O método `setUp` lhe proporciona flexibilidade na criação de cenários de simulação.
 ```kotlin
   setUp(
     testAlunos.inject(rampUsers(1000).during(20.seconds))
@@ -436,11 +450,13 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Viper](https://github.com/spf13/viper)
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
 - [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
+- [Exponential Backoff](https://github.com/cenkalti/backoff)
+- [amqp091-go]([amqp091-go](https://github.com/rabbitmq/amqp091-go))
 - [Postgres v16.0](https://www.postgresql.org/)
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
 - [Gatling v3.9.5](https://gatling.io/)
-- [RabbitMQ](https://www.rabbitmq.com/)
+- [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)
 
@@ -459,7 +475,6 @@ Seguindo boas práticas de desenvolvimento:
 - [Swagger](https://swagger.io/)
 - [Load testing](https://en.wikipedia.org/wiki/Load_testing)
 - [Go pprof](https://go.dev/blog/pprof)
-- [Event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture)
 
 [:arrow_heading_up: voltar](#indice)
 
@@ -477,4 +492,6 @@ Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.m
 <!-- 
 https://tutorialedge.net/golang/go-decorator-function-pattern-tutorial/
 https://srinjoysantra.medium.com/decorator-pattern-in-golang-a831ecae0d38
+
+https://www.omgubuntu.co.uk/2017/02/peek-animated-gif-screen-capture-linux-update
 -->

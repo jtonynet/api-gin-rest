@@ -18,31 +18,11 @@ var Broker *BrokerData
 var strConn string
 
 func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
-	strConn = fmt.Sprintf("amqp://%s:%s@%s:%s/",
-		cfg.User,
-		cfg.Pass,
-		cfg.Host,
-		cfg.Port)
 
-	conn, err := amqp.Dial(strConn)
+	conn, channel, err := connect(cfg)
 	if err != nil {
 		return nil, err
 	}
-
-	channel, err := conn.Channel()
-	if err != nil {
-		conn.Close()
-		return nil, err
-	}
-
-	exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
-	exchangeDeclare(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
-
-	queueDeclare(channel, cfg.Queue)
-	queueDeclare(channel, cfg.QueueDL)
-
-	queueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
-	queueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
 
 	// Reliable publisher confirms require confirm.select support from the connection.
 	if cfg.ReliableMessagesEnable {
@@ -64,6 +44,36 @@ func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
 	}
 
 	return Broker, nil
+}
+
+func connect(cfg config.MessageBroker) (*amqp.Connection, *amqp.Channel, error) {
+	strConn = fmt.Sprintf("amqp://%s:%s@%s:%s/",
+		cfg.User,
+		cfg.Pass,
+		cfg.Host,
+		cfg.Port)
+
+	conn, err := amqp.Dial(strConn)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	channel, err := conn.Channel()
+	if err != nil {
+		conn.Close()
+		return nil, nil, err
+	}
+
+	exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
+	exchangeDeclare(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
+
+	queueDeclare(channel, cfg.Queue)
+	queueDeclare(channel, cfg.QueueDL)
+
+	queueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
+	queueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
+
+	return conn, channel, nil
 }
 
 func exchangeDeclare(channel *amqp.Channel, exchange string, exchangeType string) error {
@@ -113,13 +123,22 @@ func queueBind(channel *amqp.Channel, queue string, routingKey string, exchange 
 	return nil
 }
 
-func (b *BrokerData) CheckReadiness() error {
-	if b.conn != nil || b.channel != nil {
-		err := exchangeDeclare(b.channel, b.cfg.Exchange, b.cfg.ExchangeType)
-		if err != nil {
-			return fmt.Errorf("MessageBroker is not ready")
-		}
-	} 
+func (b *BrokerData) IsConnected() bool {
+    if b.conn == nil || b.channel == nil {
+        fmt.Println("tudo nil")
+        return false
+    }
 
-	return nil
+    if b.conn.IsClosed() {
+        fmt.Println("conn closed")
+        return false
+    }
+
+    if b.channel.IsClosed() {
+        fmt.Println("channel closed")
+		return false
+    }
+
+    fmt.Println("TUDO CERTO!")
+    return true
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
     "time"
 
-	amqp "github.com/rabbitmq/amqp091-go"
+	//amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (b *BrokerData) MonitorConnection() {
@@ -14,13 +14,10 @@ func (b *BrokerData) MonitorConnection() {
         select {
         case <-ticker.C:
             if !b.IsConnected() {
-                ok := b.reconnect()
+                ok := b.Reconnect()
                 if !ok {
                    fmt.Println("Nao conseguiu reconectar")
-                } else {
-                    fmt.Println("RECONECTOU")
                 }
-
             }
         case <-b.done:
             return
@@ -28,37 +25,17 @@ func (b *BrokerData) MonitorConnection() {
     }
 }
 
-func (b *BrokerData) IsConnected() bool {
-    if b.conn == nil || b.channel == nil {
-        return false
-    }
 
-    if b.conn.IsClosed() {
-        return false
-    }
-
-    if b.channel.IsClosed() {
-		return false
-    }
-
-    return true
-}
-
-func (b *BrokerData) reconnect() bool {
-	conn, err := amqp.Dial(strConn)
+func (b *BrokerData) Reconnect() bool {
+	conn, channel, err := connect(b.cfg)
 	if err != nil {
-		fmt.Println(strConn)
 		return false
 	}
 
-	channel, err := conn.Channel()
-	if err != nil {
-		conn.Close()
-		return false
-	}
-	
+    fmt.Println("RECONECTOU")
 	b.conn = conn
 	b.channel = channel
+    b.done = make(chan error)
 
 	return true
 }

@@ -22,6 +22,7 @@ func (b *BrokerData) RunConsumer(userHandler func(string) error) error {
 	}
 
 	go b.handle(userHandler, deliveries, b.done)
+
 	return nil
 }
 
@@ -50,9 +51,11 @@ func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan am
 		if err := userHandler(string(d.Body)); err != nil {
 
 			// TODO:
+			// Ajustar para o descrito em https://www.rabbitmq.com/dlx.html de maneira automatizada. ADOTAR!
 			// No mundo ideal fariamos um Nack incrementando Headers["X-Attempt"] Mas infelizmente a lib do
 			// rabbitMQ não me permitiu essa abordagem e fiz manualmente. Estou adicionando e requeue na mão
 			// incrementando X-Attempt. Pesquisar possiveis melhorias para essa gestão
+			// https://www.inanzzz.com/index.php/post/1p7m/creating-a-rabbitmq-dlx-dead-letter-exchange-example-with-golang
 			
 			if d.Headers["X-Attempt"] == nil {
 				attempt = 1
@@ -76,7 +79,6 @@ func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan am
 		} else {
 			d.Ack(false)
 		}
-
 		
 	}
 

@@ -5,4 +5,7 @@ type Broker interface {
 	RunConsumer(customHandler func(string) error) error
 	Shutdown() error
 	CheckReadiness() error
+
+	IsConnected() bool
+	MonitorConnection()
 }

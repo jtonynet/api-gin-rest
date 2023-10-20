@@ -15,9 +15,10 @@ type BrokerData struct {
 }
 
 var Broker *BrokerData
+var strConn string
 
 func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
-	strConn := fmt.Sprintf("amqp://%s:%s@%s:%s/",
+	strConn = fmt.Sprintf("amqp://%s:%s@%s:%s/",
 		cfg.User,
 		cfg.Pass,
 		cfg.Host,

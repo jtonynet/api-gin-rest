@@ -25,7 +25,8 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot initialize MessageBroker: ", err)
 	}
-
+	go messageBroker.MonitorConnection()
+	
 	err = messageBroker.RunConsumer(handlers.InsertAluno)
 	if err != nil {
 		log.Fatal("cannot consume messages from Broker: ", err)

@@ -25,6 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot initialize MessageBroker: ", err)
 	}
+	go messageBroker.MonitorConnection()
 
 	routes.HandleRequests(cfg.API, messageBroker)
 }

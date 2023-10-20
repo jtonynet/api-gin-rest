@@ -102,6 +102,7 @@ A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz 
 85    deploy:
 86      replicas: 1
 ```
+<!-- https://www.rabbitmq.com/dlx.html -->
 
 <br/>
 

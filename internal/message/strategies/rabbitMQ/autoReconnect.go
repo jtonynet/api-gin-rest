@@ -8,7 +8,7 @@ import (
     "github.com/cenkalti/backoff"
 )
 
-func (b *BrokerData) AutoReconnect() {
+func (b *BrokerData) autoReconnect() {
     tickInterval := 100 * time.Millisecond
     ticker := time.NewTicker(tickInterval)
     defer ticker.Stop()
@@ -18,7 +18,7 @@ func (b *BrokerData) AutoReconnect() {
         case <-ticker.C:
             if !b.IsConnected() {
                 var err error
-                RetryMaxElapsedTime := time.Duration(b.cfg.RetryMaxElapsedReconnectInMs) * time.Millisecond
+                RetryMaxElapsedTime := time.Duration(b.cfg.AutoReconnectRetryMaxElapsedInMs) * time.Millisecond
 
                 retryCfg := backoff.NewExponentialBackOff()
                 retryCfg.MaxElapsedTime = RetryMaxElapsedTime

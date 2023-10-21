@@ -25,7 +25,7 @@ type Database struct {
 }
 
 type MessageBroker struct {
-    Strategy string `mapstructure:"MESSAGE_BROKER_STRATEGY"`
+    Strategy string `mapstructure:"MESSAGE_BROKER_STRATEGY"` // rabbitMQ|kafka in future
 
     User            string `mapstructure:"RABBITMQ_USER"`
     Pass            string `mapstructure:"RABBITMQ_PASS"`
@@ -45,7 +45,8 @@ type MessageBroker struct {
     RoutingKeyDL          	  string `mapstructure:"RABBITMQ_ROUTINGKEY_DEAD_LETTER"`
     ConsumerTagDL         	  string `mapstructure:"RABBITMQ_CONSUMER_TAG_DEAD_LETTER"`
 
-    RetryMaxElapsedReconnectInMs int `mapstructure:"RABBITMQ_RETRY_MAX_ELAPSED_RECONNECT_IN_MS"`
+    AutoReconnectEnable              bool  `mapstructure:"RABBITMQ_AUTO_RECONNECT_ENABLED"`
+    AutoReconnectRetryMaxElapsedInMs int   `mapstructure:"RABBITMQ_AUTO_RECONNECT_RETRY_MAX_ELAPSED_IN_MS"`
 
     MaxAttempts 			  int32   `mapstructure:"RABBITMQ_MAX_ATTEMPTS_CONSUME_INT"`
     ReliableMessagesEnable    bool   `mapstructure:"RABBITMQ_RELIABLE_MESSAGES_ENABLED"` //Wait for the publisher confirmation before exiting

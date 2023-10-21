@@ -51,6 +51,10 @@ func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
         done:    make(chan error),
     }
 
+    if cfg.AutoReconnectEnable {
+        go Broker.autoReconnect() 
+    }
+
     return Broker, nil
 }
 

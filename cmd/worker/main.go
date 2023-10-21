@@ -30,8 +30,6 @@ func main() {
     if err != nil {
         log.Fatal("cannot consume messages from Broker: ", err)
     }
-    //Monitora quedas de conexão e tenta reconectar
-    go messageBroker.AutoReconnect()
 
     select {}
 }

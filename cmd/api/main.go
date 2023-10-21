@@ -25,8 +25,6 @@ func main() {
     if err != nil {
         log.Fatal("cannot initialize MessageBroker: ", err)
     }
-    //Monitora quedas de conexão e tenta reconectar
-    go messageBroker.AutoReconnect() 
 
     routes.HandleRequests(cfg.API, messageBroker)
 }

@@ -8,8 +8,8 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 <br> 
 <img src="./misc/images/gin_mediun.png">
 
-[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
-<!--  <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
+[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+<!--   <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
 
 
 
@@ -95,12 +95,13 @@ Aguarde até que as imagens sejam criadas e acesse:
 <br>
 
 #### Escalando Workers:
-A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `1`, para aumentar a capacidade de inserção de dados no banco de dados.
+A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `1`, para aumentar a capacidade de inserção de dados no banco de dados. Para que essa abordagem surta efeito comente a linha `container_name: worker-gin`,  nomear containers conflita com a funcionalidade `replicas` do docker
 
 ```docker-compose
-84  worker-gin:
-85    deploy:
-86      replicas: 1
+84    worker-gin:
+85        deploy:
+86          replicas: 1
+87 #       container_name: worker-gin
 ```
 <!-- https://www.rabbitmq.com/dlx.html -->
 
@@ -186,12 +187,12 @@ graph LR
 
   subgraph Backend 
     subgraph Message Broker
-        RabbitMQ(["fa:fa-envelope Aluno-RabbitMQ"])
+        RabbitMQ(["fa:fa-envelope  Aluno-RabbitMQ"])
     end
 
     subgraph CMD
       subgraph WORKER
-        Worker["fa:fa-gears Aluno-Worker"]
+        Worker["fa:fa-gears  Aluno-Worker"]
       end
 
       subgraph API
@@ -202,6 +203,10 @@ graph LR
         EditaAluno["fa:fa-code EditaAluno"]
         BuscaAlunoPorCPF["fa:fa-code BuscaAlunoPorCPF"]
       end
+
+      subgraph CACHE
+        Aluno-Redis(["fa:fa-memory Aluno-Redis"])
+      end 
 
       subgraph Models
         Aluno["fa:fa-cube Aluno"]
@@ -227,9 +232,10 @@ graph LR
   F -->|PATCH| EditaAluno
   G -->|GET| BuscaAlunoPorCPF
 
-  ExibeTodosAlunos --> Aluno
-  BuscaAlunoPorId --> Aluno
-  BuscaAlunoPorCPF --> Aluno
+  ExibeTodosAlunos --> Aluno-Redis
+  BuscaAlunoPorId --> Aluno-Redis
+  BuscaAlunoPorCPF --> Aluno-Redis
+  Aluno-Redis ---|cached| Aluno
   DeletaAluno --> Aluno
   EditaAluno --> Aluno
 
@@ -240,7 +246,6 @@ graph LR
   RabbitMQ -.->|Consome| Worker
 
   Worker --> Aluno
-
 ```
 
 <br/>
@@ -454,6 +459,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
 - [Gatling v3.9.5](https://gatling.io/)
+- [go-redis](https://github.com/redis/go-redis)
 - [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)

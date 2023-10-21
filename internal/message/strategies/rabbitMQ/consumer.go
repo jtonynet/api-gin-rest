@@ -64,6 +64,8 @@ func (b *BrokerData) handle(userConsumerHandler func(string) error, deliveries <
             // No mundo ideal fariamos um Nack incrementando Headers["X-Attempt"] Mas infelizmente a lib do
             // rabbitMQ não me permitiu essa abordagem e fiz manualmente. Estou adicionando e requeue na mão
             // incrementando X-Attempt. Pesquisar possiveis melhorias para essa gestão
+            // https://www.rabbitmq.com/dlx.html
+            // https://www.rabbitmq.com/quorum-queues.html#poison-message-handling
             // https://www.inanzzz.com/index.php/post/1p7m/creating-a-rabbitmq-dlx-dead-letter-exchange-example-with-golang
             
             if d.Headers["X-Attempt"] == nil {

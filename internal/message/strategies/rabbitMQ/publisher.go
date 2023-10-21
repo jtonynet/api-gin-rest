@@ -2,6 +2,8 @@ package rabbitMQ
 
 import (
 	"fmt"
+	"log"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -40,11 +42,11 @@ func (b *BrokerData) publish(body string, attempt int32, exchange string, routin
 // set of unacknowledged sequence numbers and loop until the publishing channel
 // is closed.
 func confirmOne(confirms <-chan amqp.Confirmation) {
-	fmt.Printf("waiting for confirmation of one publishing")
+	log.Printf("waiting for confirmation of one publishing")
 
 	if confirmed := <-confirms; confirmed.Ack {
-		fmt.Printf("confirmed delivery with delivery tag: %d", confirmed.DeliveryTag)
+		log.Printf("confirmed delivery with delivery tag: %d", confirmed.DeliveryTag)
 	} else {
-		fmt.Printf("failed delivery of delivery tag: %d", confirmed.DeliveryTag)
+		log.Printf("failed delivery of delivery tag: %d", confirmed.DeliveryTag)
 	}
 }

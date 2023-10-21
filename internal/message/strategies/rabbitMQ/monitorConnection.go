@@ -1,41 +1,45 @@
 package rabbitMQ
 
 import (
-	"fmt"
+    "log"
     "time"
 
-	//amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/cenkalti/backoff"
 )
 
 func (b *BrokerData) MonitorConnection() {
-    ticker := time.NewTicker(1 * time.Second)
 
     for {
-        select {
-        case <-ticker.C:
-            if !b.IsConnected() {
-                ok := b.Reconnect()
-                if !ok {
-                   fmt.Println("Nao conseguiu reconectar")
-                }
+        if !b.IsConnected() {
+            var err error
+            RetryMaxElapsedTime := 3 * time.Minute
+
+            retryCfg := backoff.NewExponentialBackOff()
+            retryCfg.MaxElapsedTime = RetryMaxElapsedTime
+
+            if b.userHandler != nil { 
+                var msgConsumerAgainErr error
+                err = backoff.RetryNotify(func() error {
+                    msgConsumerAgainErr = b.reconnectAndConsume()
+                    return msgConsumerAgainErr
+                }, retryCfg, func(err error, t time.Duration) {
+                    log.Printf("Tentando voltar a consumir: %v", err)
+                })
+            } else {
+                var msgReconnectErr error
+                err = backoff.RetryNotify(func() error {
+                    msgReconnectErr = b.reconnect()
+                    return msgReconnectErr
+                }, retryCfg, func(err error, t time.Duration) {
+                    log.Printf("Tentando voltar a publicar: %v", err)
+                })
             }
-        case <-b.done:
-            return
+
+            if err != nil {
+                log.Printf("Nao deu para voltar a consumir error: %v", err)
+            }
         }
+        time.Sleep(1 * time.Second)
     }
 }
 
-
-func (b *BrokerData) Reconnect() bool {
-	conn, channel, err := connect(b.cfg)
-	if err != nil {
-		return false
-	}
-
-    fmt.Println("RECONECTOU")
-	b.conn = conn
-	b.channel = channel
-    b.done = make(chan error)
-
-	return true
-}

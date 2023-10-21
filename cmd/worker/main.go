@@ -6,8 +6,6 @@ import (
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
 	"github.com/jtonynet/api-gin-rest/cmd/worker/handlers"
-
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 )
 
 func main() {
@@ -27,40 +25,13 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot initialize MessageBroker: ", err)
 	}
-	// go messageBroker.MonitorConnection()
 	
 	err = messageBroker.RunConsumer(handlers.InsertAluno)
 	if err != nil {
 		log.Fatal("cannot consume messages from Broker: ", err)
 	}
-
-	
-    go func (mb interfaces.Broker,  userHandler func(string) error) {
-		for {
-			// Verificar a conexão do messageBroker continuamente
-			if !mb.IsConnected() {
-				log.Println("Ta DESconnectada")
-
-				log.Println("Connection is down. Attempting to reestablish...")
-				ok := mb.Reconnect()
-				if ok {
-					log.Println("Reconnectei")
-				} else {
-					log.Println("NAO Reconnectei")
-				}
-
-				err = mb.RunConsumer(userHandler)
-				if err == nil {
-				    log.Println("COMSUMINDO")
-				} else {
-				    log.Println("NAO TO TINTINDO NADA!")
-				}
-			} else {
-				log.Println("Ta connectada")
-			}
-			time.Sleep(1 * time.Second)
-		}
-	}(messageBroker, handlers.InsertAluno)
+	//Monitora quedas de conexão e tenta reconectar
+	go messageBroker.MonitorConnection()
 
 	select {}
 }

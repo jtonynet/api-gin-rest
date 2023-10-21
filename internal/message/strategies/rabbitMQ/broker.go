@@ -2,6 +2,7 @@ package rabbitMQ
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/jtonynet/api-gin-rest/config"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -12,6 +13,8 @@ type BrokerData struct {
 	channel *amqp.Channel
 	cfg		config.MessageBroker
 	done    chan error
+
+	userHandler func(string) error
 }
 
 var Broker *BrokerData
@@ -26,7 +29,7 @@ func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
 
 	// Reliable publisher confirms require confirm.select support from the connection.
 	if cfg.ReliableMessagesEnable {
-		fmt.Printf("enabling publishing confirms.")
+		log.Printf("enabling publishing confirms.")
 		if err := channel.Confirm(false); err != nil {
 			return nil, fmt.Errorf("Channel could not be put into confirm mode: %s", err)
 		}
@@ -44,6 +47,25 @@ func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
 	}
 
 	return Broker, nil
+}
+
+func (b *BrokerData) IsConnected() bool {
+    if b.conn == nil || b.channel == nil {
+        log.Println("tudo nil")
+        return false
+    }
+
+    if b.conn.IsClosed() {
+        log.Println("conn closed")
+        return false
+    }
+
+    if b.channel.IsClosed() {
+        log.Println("channel closed")
+		return false
+    }
+
+    return true
 }
 
 func connect(cfg config.MessageBroker) (*amqp.Connection, *amqp.Channel, error) {
@@ -77,7 +99,7 @@ func connect(cfg config.MessageBroker) (*amqp.Connection, *amqp.Channel, error) 
 }
 
 func exchangeDeclare(channel *amqp.Channel, exchange string, exchangeType string) error {
-	fmt.Printf("got Channel, declaring %q Exchange (%q)", exchange, exchangeType)
+	log.Printf("got Channel, declaring %q Exchange (%q)", exchange, exchangeType)
 	if err := channel.ExchangeDeclare(
 		exchange,		// name
 		exchangeType,	// type
@@ -123,22 +145,15 @@ func queueBind(channel *amqp.Channel, queue string, routingKey string, exchange 
 	return nil
 }
 
-func (b *BrokerData) IsConnected() bool {
-    if b.conn == nil || b.channel == nil {
-        fmt.Println("tudo nil")
-        return false
-    }
+func (b *BrokerData) reconnect() error {
+	conn, channel, err := connect(b.cfg)
+	if err != nil {
+		return err
+	}
 
-    if b.conn.IsClosed() {
-        fmt.Println("conn closed")
-        return false
-    }
+	b.conn = conn
+	b.channel = channel
+    b.done = make(chan error)
 
-    if b.channel.IsClosed() {
-        fmt.Println("channel closed")
-		return false
-    }
-
-    fmt.Println("TUDO CERTO!")
-    return true
+	return nil
 }

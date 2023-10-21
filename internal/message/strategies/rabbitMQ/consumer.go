@@ -2,11 +2,13 @@ package rabbitMQ
 
 import (
 	"fmt"
+	"log"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (b *BrokerData) RunConsumer(userHandler func(string) error) error {
-	fmt.Printf("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
+	log.Printf("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
 		b.cfg.Queue,		// name
 		b.cfg.ConsumerTag,	// consumerTag,
@@ -17,7 +19,7 @@ func (b *BrokerData) RunConsumer(userHandler func(string) error) error {
 		nil,				// arguments
 	)
 	if err != nil {
-		fmt.Printf("Queue Consume: %s", err)
+		log.Printf("Queue Consume: %s", err)
 		return err
 	}
 
@@ -36,7 +38,7 @@ func (b *BrokerData) Shutdown() error {
 		return fmt.Errorf("AMQP connection close error: %s", err)
 	}
 
-	defer fmt.Printf("AMQP shutdown OK")
+	defer log.Printf("AMQP shutdown OK")
 
 	// wait for handle() to exit
 	return <-b.done
@@ -45,6 +47,8 @@ func (b *BrokerData) Shutdown() error {
 func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan amqp.Delivery, done chan error) {
 	var attempt int32
 	requeue := true
+
+	b.userHandler = userHandler
 
 	for d := range deliveries {
 		
@@ -63,7 +67,7 @@ func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan am
 				attempt = d.Headers["X-Attempt"].(int32) + 1
 			} else {
 				if err := b.moveToDeadQueue(string(d.Body)); err != nil {
-					fmt.Println("Erro ao mover para a dead message queue:", err)
+					log.Println("Erro ao mover para a dead message queue:", err)
 				} else {
 					d.Ack(false)
 					requeue = false
@@ -82,11 +86,21 @@ func (b *BrokerData) handle(userHandler func(string) error, deliveries <-chan am
 		
 	}
 
-	fmt.Printf("handle: deliveries channel closed")
+	log.Printf("handle: deliveries channel closed")
 	done <- nil
 }
 
 func (b *BrokerData) moveToDeadQueue(message string) error {
 	initialAttempt := int32(0)
 	return b.publish(message, initialAttempt, b.cfg.ExchangeDL, b.cfg.RoutingKeyDL)
+}
+
+func (b *BrokerData) reconnectAndConsume() error {
+	err := b.reconnect()
+	if err != nil {
+		return err
+	}
+
+	go b.RunConsumer(b.userHandler)
+	return nil
 }

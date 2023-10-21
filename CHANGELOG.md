@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [0.0.7] - 2023-10-21
+### Added
+- Refactor visando melhoria na legibilidade do codigo
+- Implementada Reconexão no Message Broker AutoReconnect
+
 ## [0.0.6] - 2023-10-17
 ### Added
 - Adicionado `UUID` por aluno
@@ -56,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Projeto com base no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) finalizado de acordo com a trilha seguida
 - API Gin `dockerizada`
 
+[0.0.7]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.3...v0.0.4

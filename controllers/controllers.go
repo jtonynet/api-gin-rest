@@ -38,7 +38,7 @@ func Readiness(c *gin.Context) {
 		return
 	}
 
-	if err = messageBroker.CheckReadiness(); err != nil {
+	if !messageBroker.IsConnected() {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"message": "MessageBroker Service unavailable",
 		})

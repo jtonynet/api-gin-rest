@@ -1,120 +1,164 @@
 package rabbitMQ
 
 import (
-	"fmt"
+    "fmt"
+    "log"
 
-	"github.com/jtonynet/api-gin-rest/config"
-	amqp "github.com/rabbitmq/amqp091-go"
+    "github.com/jtonynet/api-gin-rest/config"
+    amqp "github.com/rabbitmq/amqp091-go"
 )
 
+/*
+Fortemente baseado nos exemplos da lib streadway
+https://github.com/streadway/amqp/tree/master/_examples
+*/
+
 type BrokerData struct {
-	conn    *amqp.Connection
-	channel *amqp.Channel
-	cfg		config.MessageBroker
-	done    chan error
+    conn    *amqp.Connection
+    channel *amqp.Channel
+    cfg		config.MessageBroker
+    done    chan error
+
+    userConsumerHandler func(string) error
 }
 
 var Broker *BrokerData
+var strConn string
 
-func InitBroker(cfg config.MessageBroker) (error, *BrokerData) {
-	strConn := fmt.Sprintf("amqp://%s:%s@%s:%s/",
-		cfg.User,
-		cfg.Pass,
-		cfg.Host,
-		cfg.Port)
+func InitBroker(cfg config.MessageBroker) (*BrokerData, error) {
 
-	conn, err := amqp.Dial(strConn)
-	if err != nil {
-		return err, nil
-	}
+    conn, channel, err := connect(cfg)
+    if err != nil {
+        return nil, err
+    }
 
-	channel, err := conn.Channel()
-	if err != nil {
-		conn.Close()
-		return err,nil
-	}
+    // Reliable publisher confirms require confirm.select support from the connection.
+    if cfg.ReliableMessagesEnable {
+        log.Printf("enabling publishing confirms.")
+        if err := channel.Confirm(false); err != nil {
+            return nil, fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+        }
 
-	exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
-	exchangeDeclare(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
+        confirms := channel.NotifyPublish(make(chan amqp.Confirmation, 1))
 
-	queueDeclare(channel, cfg.Queue)
-	queueDeclare(channel, cfg.QueueDL)
+        defer confirmOne(confirms)
+    }
 
-	queueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
-	queueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
+    Broker = &BrokerData{
+        conn:    conn,
+        channel: channel,
+        cfg: cfg,
+        done:    make(chan error),
+    }
 
-	// Reliable publisher confirms require confirm.select support from the connection.
-	if cfg.ReliableMessagesEnable {
-		fmt.Printf("enabling publishing confirms.")
-		if err := channel.Confirm(false); err != nil {
-			return fmt.Errorf("Channel could not be put into confirm mode: %s", err), nil
-		}
+    return Broker, nil
+}
 
-		confirms := channel.NotifyPublish(make(chan amqp.Confirmation, 1))
+func (b *BrokerData) IsConnected() bool {
+    if b.conn == nil || b.channel == nil {
+        log.Println("conn and channel nil values")
+        return false
+    }
 
-		defer confirmOne(confirms)
-	}
+    if b.conn.IsClosed() {
+        log.Println("conn closed")
+        return false
+    }
 
-	Broker = &BrokerData{
-		conn:    conn,
-		channel: channel,
-		cfg: cfg,
-		done:    make(chan error),
-	}
+    if b.channel.IsClosed() {
+        log.Println("channel closed")
+        return false
+    }
 
-	return nil, Broker
+    return true
+}
+
+func connect(cfg config.MessageBroker) (*amqp.Connection, *amqp.Channel, error) {
+    strConn = fmt.Sprintf("amqp://%s:%s@%s:%s/",
+        cfg.User,
+        cfg.Pass,
+        cfg.Host,
+        cfg.Port)
+
+    conn, err := amqp.Dial(strConn)
+    if err != nil {
+        return nil, nil, err
+    }
+
+    channel, err := conn.Channel()
+    if err != nil {
+        conn.Close()
+        return nil, nil, err
+    }
+
+    exchangeDeclare(channel, cfg.Exchange, cfg.ExchangeType)
+    exchangeDeclare(channel, cfg.ExchangeDL, cfg.ExchangeTypeDL)
+
+    queueDeclare(channel, cfg.Queue)
+    queueDeclare(channel, cfg.QueueDL)
+
+    queueBind(channel, cfg.Queue, cfg.RoutingKey, cfg.Exchange)
+    queueBind(channel, cfg.QueueDL, cfg.RoutingKeyDL, cfg.ExchangeDL)
+
+    return conn, channel, nil
 }
 
 func exchangeDeclare(channel *amqp.Channel, exchange string, exchangeType string) error {
-	fmt.Printf("got Channel, declaring %q Exchange (%q)", exchange, exchangeType)
-	if err := channel.ExchangeDeclare(
-		exchange,		// name
-		exchangeType,	// type
-		true,			// durable
-		false,			// auto-deleted
-		false,			// internal
-		false,			// noWait
-		nil,			// arguments
-	); err != nil {
-		return err
-	}
+    log.Printf("got Channel, declaring %q Exchange (%q)", exchange, exchangeType)
+    if err := channel.ExchangeDeclare(
+        exchange,		// name
+        exchangeType,	// type
+        true,			// durable
+        false,			// auto-deleted
+        false,			// internal
+        false,			// noWait
+        nil,			// arguments
+    ); err != nil {
+        return err
+    }
 
-	return nil
+    return nil
 }
 
 func queueDeclare(channel *amqp.Channel, queue string) error {
-	_, err := channel.QueueDeclare(
-		queue,
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		return err
-	}
+    _, err := channel.QueueDeclare(
+        queue,
+        false,
+        false,
+        false,
+        false,
+        nil,
+    )
+    if err != nil {
+        return err
+    }
 
-	return nil
+    return nil
 }
 
 func queueBind(channel *amqp.Channel, queue string, routingKey string, exchange string) error {
-	if err := channel.QueueBind(
-		queue,
-		routingKey,
-		exchange,
-		false,
-		nil,
-	); err != nil {
-		return err
-	}
+    if err := channel.QueueBind(
+        queue,
+        routingKey,
+        exchange,
+        false,
+        nil,
+    ); err != nil {
+        return err
+    }
 
-	return nil
+    return nil
 }
 
-func (b *BrokerData) CheckReadiness() error {
-	if b.conn == nil || b.channel == nil {
-		return fmt.Errorf("MessageBroker is not ready")
-	}
-	return nil
+func (b *BrokerData) reconnect() error {
+    conn, channel, err := connect(b.cfg)
+    if err != nil {
+        return err
+    }
+
+    b.conn = conn
+    b.channel = channel
+    b.done = make(chan error)
+
+    return nil
 }

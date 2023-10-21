@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
-## [0.0.6] - 2023-10-17
+## [0.0.7] - 2023-10-21
 ### Added
 - Refactor visando melhoria na legibilidade do codigo
-- Implementada Reconexão no Message Broker
+- Implementada Reconexão no Message Broker AutoReconnect
 
 ## [0.0.6] - 2023-10-17
 ### Added

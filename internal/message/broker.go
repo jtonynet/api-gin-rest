@@ -4,7 +4,7 @@ import (
     "github.com/jtonynet/api-gin-rest/config"
     "github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 
-	"github.com/jtonynet/api-gin-rest/internal/message/strategies/rabbitMQ"
+    "github.com/jtonynet/api-gin-rest/internal/message/strategies/rabbitMQ"
 )
 
 func InitBroker(cfg config.MessageBroker) (interfaces.Broker, error) {

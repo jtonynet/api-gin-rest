@@ -40,13 +40,12 @@ func HandleRequests(
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
-	apiGroup.GET("/aluno/uuid/:uuid", middlewares.CachedRequest(), controllers.BuscaAlunoPorUUID)
+	apiGroup.GET("/aluno/:uuid", middlewares.CachedRequest(), controllers.BuscaAlunoPorUUID)
+	apiGroup.GET("/aluno/cpf/:cpf", middlewares.CachedRequest(), controllers.BuscaAlunoPorCPF)
 
 	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
-	apiGroup.GET("/aluno/:id", controllers.BuscaAlunoPorId)
 	apiGroup.DELETE("/aluno/:id", controllers.DeletaAluno)
 	apiGroup.PATCH("/aluno/:id", controllers.EditaAluno)
-	apiGroup.GET("/aluno/cpf/:cpf", controllers.BuscaAlunoPorCPF)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

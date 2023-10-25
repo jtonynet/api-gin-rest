@@ -180,28 +180,6 @@ func CriaNovoAluno(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} models.Aluno
 // @Failure 404 {string} Not Found
-// @Router /aluno/{id} [get]
-func BuscaAlunoPorId(c *gin.Context) {
-	var aluno models.Aluno
-	id := c.Params.ByName("id")
-	database.DB.First(&aluno, id)
-
-	if aluno.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"Not Found": "Aluno Nao Encontrado",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, aluno)
-}
-
-// @Summary Busca aluno por id
-// @Description Busca aluno por id
-// @Tags Aluno
-// @Produce json
-// @Success 200 {object} models.Aluno
-// @Failure 404 {string} Not Found
 // @Router /aluno/uuid/{uuid} [get]
 func BuscaAlunoPorUUID(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
@@ -221,27 +199,9 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 
 	currentTime := time.Now()
 	timeFormatted := currentTime.Format("15:04:05.000000")
-	fmt.Println("2 - RETORNANDO DA ROTA CONTROLLER (HH:MM:SS.mmmuuu):", timeFormatted)
+	fmt.Println("CONTROLLER BuscaAlunoPorUUID (HH:MM:SS.mmmuuu):", timeFormatted)
 
-	alunoJSON, err := json.Marshal(aluno)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro na conversão para JSON",
-		})
-		return
-	}
-
-	// /* ESSE TRECHO DEVERIA ESTAR NO CachedRequest() */
-	// if cfg.FeatureFlags.CacheEnabled {
-	// 	cacheClient := c.MustGet("cacheClient").(interfaces.CacheClient)
-
-	// 	err := cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
-	// 	if err != nil {
-	// 		slog.Error("cannot set key: %s error: %v", aluno.UUID, err)
-	// 	}
-	// }
-
-	c.Set("queryResult", string(alunoJSON))
+	c.Set("queryResult", aluno)
 	c.JSON(http.StatusOK, aluno)
 }
 
@@ -301,6 +261,11 @@ func BuscaAlunoPorCPF(c *gin.Context) {
 		return
 	}
 
+	currentTime := time.Now()
+	timeFormatted := currentTime.Format("15:04:05.000000")
+	fmt.Println("CONTROLLER BuscaAlunoPorCPF (HH:MM:SS.mmmuuu):", timeFormatted)
+
+	c.Set("queryResult", aluno)
 	c.JSON(http.StatusOK, aluno)
 }
 

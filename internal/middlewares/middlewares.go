@@ -37,7 +37,6 @@ func CacheClientInject(cacheClient interfaces.CacheClient) gin.HandlerFunc {
 }
 
 func CachedRequest() gin.HandlerFunc {
-	//func CachedRequest(c *gin.Context) {
 	return func(c *gin.Context) {
 		cfg := c.MustGet("cfg").(config.API)
 		var cacheClient interfaces.CacheClient
@@ -51,7 +50,6 @@ func CachedRequest() gin.HandlerFunc {
 				param = extractParamFromPath(c.FullPath())
 				paramValue = c.Params.ByName(param)
 				// TODO: capturar queryString completa para cachear TODAS requests inclusive
-				// as parametrizadas. CachedRequest deve ser agnostica quanto a rotas e params
 
 				cachedData, err := cacheClient.GetWithCtx(c, paramValue)
 				slog.Info("cachedData ", cachedData, paramValue)
@@ -70,28 +68,33 @@ func CachedRequest() gin.HandlerFunc {
 
 					currentTime := time.Now()
 					timeFormatted := currentTime.Format("15:04:05.000000")
-					fmt.Println("1 - RETORNANDO DO MIDDLEWARE (HH:MM:SS.mmmuuu):", timeFormatted)
+					fmt.Println("MIDDLEWARE CachedRequest (HH:MM:SS.mmmuuu):", timeFormatted)
 
 					c.JSON(statusCodeReturn, returnData)
 					c.Abort()
-				} else {
-					slog.Error("ERRO CARALIO:", err)
 				}
 			}
 		}
 
 		c.Next()
 
-		// /* ESSE TRECHO DEVERIA ESTAR DESCOMENTADO, ELE Q DEVE GERENCIAR O cacheClient */
 		if cfg.FeatureFlags.CacheEnabled {
-			queryResult := c.GetString("queryResult")
+			queryResult, queryResultExists := c.Get("queryResult")
+			if queryResultExists {
+				queryResultJSON, err := json.Marshal(queryResult)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"error": "Erro na conversão para JSON",
+					})
+					return
+				}
 
-			err := cacheClient.SetWithCtx(c, paramValue, queryResult, cacheClient.GetDefaultExpiration())
-			if err != nil {
-				slog.Error("cannot set key: %s error: %v", paramValue, err)
+				err = cacheClient.SetWithCtx(c, paramValue, string(queryResultJSON), cacheClient.GetDefaultExpiration())
+				if err != nil {
+					slog.Error("cannot set key: %s error: %v", paramValue, err)
+				}
 			}
 		}
-
 	}
 }
 

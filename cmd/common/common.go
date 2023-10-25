@@ -1,7 +1,7 @@
 package common
 
 import (
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/cenkalti/backoff"
@@ -28,7 +28,7 @@ func InitDatabase(cfg config.Database, RetryMaxElapsedTime time.Duration) error 
 		dbErr = database.Init(cfg)
 		return dbErr
 	}, retryCfg, func(err error, t time.Duration) {
-		log.Printf("Retrying connect to Database after error: %v", err)
+		slog.Error("Retrying connect to Database after error: %v", err)
 	})
 
 	return err
@@ -45,7 +45,7 @@ func NewMessageBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClie
 		messageBroker, msgBrokerErr = message.NewBroker(cfg, cacheClient)
 		return msgBrokerErr
 	}, retryCfg, func(err error, t time.Duration) {
-		log.Printf("Retrying connect to MessageBroker after error: %v", err)
+		slog.Error("Retrying connect to MessageBroker after error: %v", err)
 	})
 
 	return messageBroker, err

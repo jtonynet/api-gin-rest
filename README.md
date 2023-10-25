@@ -452,12 +452,13 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
 - [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
 - [Exponential Backoff](https://github.com/cenkalti/backoff)
+- [go-redis](https://github.com/redis/go-redis)
 - [amqp091-go]([amqp091-go](https://github.com/rabbitmq/amqp091-go))
+- [gjson](https://github.com/tidwall/gjson)
 - [Postgres v16.0](https://www.postgresql.org/)
 - [Docker v24.0.6](https://www.docker.com/)
 - [Docker compose v2.21.0](https://www.docker.com/)
 - [Gatling v3.9.5](https://gatling.io/)
-- [go-redis](https://github.com/redis/go-redis)
 - [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
 
 GUIs:

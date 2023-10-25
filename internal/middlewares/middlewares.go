@@ -1,12 +1,10 @@
 package middlewares
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jtonynet/api-gin-rest/config"
-
-	//"golang.org/x/exp/slog"
 
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 )
@@ -37,56 +35,27 @@ func CachedRequest(cacheClient interfaces.CacheClient) gin.HandlerFunc {
 		cfg := c.MustGet("cfg").(config.API)
 		uuid := c.Params.ByName("uuid")
 
-		log.Println("OLHA O UIUIUIID")
-		log.Println(uuid)
-
 		if cfg.FeatureFlags.CacheEnabled {
 			if cacheClient.IsConnected() {
-				log.Println("TEM ACESSO")
-				// Agora, use o cacheClient fornecido como argumento
 				msg, err := cacheClient.Get("f1")
 				if err != nil {
-					log.Printf("Cannot cache get, error: %v", err)
+					slog.Error("Cannot cache get, error: %v", err)
 				}
-				log.Printf("Cached message: %s", msg)
+				slog.Info("Cached message: %s", msg)
 
 				msg, err = cacheClient.Get(uuid)
 				if err != nil {
-					log.Printf("Cannot cache get, error: %v", err)
+					slog.Error("Cannot cache get, error: %v", err)
 				}
-				log.Printf("Cached message: %s", msg)
+				slog.Info("Cached message: %s", msg)
 
 			} else {
-				log.Println("NOT A NOT!!!")
+				slog.Info("CacheClient is disconnected")
 			}
 		} else {
-			log.Println("NAO ENTREI NO CACHE")
+			slog.Info("CacheClient is disabled")
 		}
 
 		c.Next()
 	}
 }
-
-// func Cache(
-// 	key string,
-// 	queryFunc func() (interface{}, error),
-// 	c *interfaces.CacheClient,
-// gin.HandlerFunc {
-// 	cachedValue, err := c.Get(key)
-// 	if err == nil {
-// 		return cachedValue, nil
-// 	}
-
-// 	result, err := queryFunc()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	expiration := time.Duration(c.cfg.Expiration)
-// 	err = c.Set(key, result, expiration)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return result, nil
-// }

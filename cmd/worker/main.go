@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
@@ -14,33 +13,33 @@ import (
 func main() {
 	cfg, err := common.InitConfig()
 	if err != nil {
-		log.Fatal("cannot load config: ", err)
+		slog.Error("cannot load config error: %v", err)
 	}
 
 	RetryMaxElapsedTime := time.Duration(cfg.API.RetryMaxElapsedTimeInMs) * time.Millisecond
 
 	err = common.InitDatabase(cfg.Database, RetryMaxElapsedTime)
 	if err != nil {
-		log.Fatal("cannot initialize Database: ", err)
+		slog.Error("cannot initialize Database, error: %v", err)
 	}
 
 	var cacheClient interfaces.CacheClient
 	if cfg.API.FeatureFlags.CacheEnabled {
 		cacheClient, err = cache.NewClient(cfg.Cache)
 		if err != nil {
-			fmt.Println("NAO SE CONECTOU AO CACHE!")
+			slog.Error("cannot initialize CacheClient, error: %v", err)
 		}
 	}
 
 	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
 		messageBroker, err := common.NewMessageBroker(cfg.MessageBroker, cacheClient, RetryMaxElapsedTime)
 		if err != nil {
-			log.Fatal("cannot initialize MessageBroker: ", err)
+			slog.Error("cannot initialize MessageBroker, error: %v", err)
 		}
 
 		err = messageBroker.RunConsumer(handlers.InsertAluno)
 		if err != nil {
-			log.Fatal("cannot consume messages from Broker: ", err)
+			slog.Error("cannot consume messages from Broker, error: %v", err)
 		}
 
 		select {}

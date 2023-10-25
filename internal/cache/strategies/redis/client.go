@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/config"
@@ -28,7 +28,7 @@ func NewClient(cfg config.Cache) (*Client, error) {
 
 	db := redis.NewClient(&redis.Options{
 		Addr:     strAddr,
-		Password: cfg.Pass, // "",
+		Password: cfg.Pass,
 		DB:       cfg.DB,
 		Protocol: cfg.Protocol,
 	})
@@ -55,7 +55,7 @@ func (c *Client) Set(key string, value interface{}, expiration time.Duration) er
 func (c *Client) Get(key string) (string, error) {
 	val, err := c.db.Get(c.ctx, key).Result()
 	if err != nil {
-		log.Printf("MAS Q PORRA %v", err)
+		slog.Error("Cannot get key: %v, CacheClient error: %v", key, err)
 		return "", err
 	}
 
@@ -65,7 +65,7 @@ func (c *Client) Get(key string) (string, error) {
 func (c *Client) Delete(key string) error {
 	err := c.db.Del(c.ctx, key).Err()
 	if err != nil {
-		log.Printf("Erro ao excluir chave: %v\n", err)
+		slog.Error("Cannot delete key: %v, CacheClient error: %v", key, err)
 		return err
 	}
 	return nil
@@ -76,6 +76,6 @@ func (c *Client) IsConnected() bool {
 	return err == nil
 }
 
-func (c *Client) GetExpiration() time.Duration {
+func (c *Client) GetDefaultExpiration() time.Duration {
 	return c.Expiration
 }

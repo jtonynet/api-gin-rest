@@ -3,16 +3,17 @@ package routes
 import (
 	"fmt"
 
-	pprof "github.com/gin-contrib/pprof"
-	"github.com/gin-gonic/gin"
-	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/jtonynet/api-gin-rest/controllers"
-	docs "github.com/jtonynet/api-gin-rest/docs"
-	"github.com/jtonynet/api-gin-rest/internal/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
+
+	"github.com/jtonynet/api-gin-rest/config"
+	"github.com/jtonynet/api-gin-rest/controllers"
+	"github.com/jtonynet/api-gin-rest/docs"
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
+	"github.com/jtonynet/api-gin-rest/internal/middlewares"
 )
 
 func HandleRequests(
@@ -39,6 +40,7 @@ func HandleRequests(
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
+	//apiGroup.GET("/aluno/uuid/:uuid", controllers.BuscaAlunoPorUUID)
 	apiGroup.GET("/aluno/uuid/:uuid", middlewares.CachedRequest(cacheClient), controllers.BuscaAlunoPorUUID)
 
 	apiGroup.POST("/aluno", controllers.CriaNovoAluno)

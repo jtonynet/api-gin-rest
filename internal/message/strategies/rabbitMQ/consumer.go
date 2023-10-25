@@ -12,7 +12,7 @@ Fortemente baseado no exemplo da lib streadway consumer.go
 https://github.com/streadway/amqp/blob/master/_examples/simple-consumer/consumer.go
 */
 
-func (b *Broker) RunConsumer(userConsumerHandler func(string) (string, string, error)) error {
+func (b *Broker) RunConsumer(consumerHandler func(string) (string, string, error)) error {
 	slog.Info("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
 		b.cfg.Queue,       // name
@@ -28,7 +28,7 @@ func (b *Broker) RunConsumer(userConsumerHandler func(string) (string, string, e
 		return err
 	}
 
-	go b.handle(userConsumerHandler, deliveries, b.done)
+	go b.handle(consumerHandler, deliveries, b.done)
 
 	return nil
 }
@@ -36,7 +36,7 @@ func (b *Broker) RunConsumer(userConsumerHandler func(string) (string, string, e
 func (b *Broker) Shutdown() error {
 	// will close() the deliveries channel
 	if err := b.channel.Cancel(b.cfg.ConsumerTag, true); err != nil {
-		return fmt.Errorf("Consumer cancel failed: %s", err)
+		return fmt.Errorf("consumer cancel failed: %s", err)
 	}
 
 	if err := b.conn.Close(); err != nil {
@@ -49,15 +49,15 @@ func (b *Broker) Shutdown() error {
 	return <-b.done
 }
 
-func (b *Broker) handle(userConsumerHandler func(string) (string, string, error), deliveries <-chan amqp.Delivery, done chan error) {
+func (b *Broker) handle(consumerHandler func(string) (string, string, error), deliveries <-chan amqp.Delivery, done chan error) {
 	var attempt int32
 	requeue := true
 
-	b.userConsumerHandler = userConsumerHandler
+	b.consumerHandler = consumerHandler
 
 	for d := range deliveries {
 
-		msgKey, msgValue, err := userConsumerHandler(string(d.Body))
+		msgKey, msgValue, err := consumerHandler(string(d.Body))
 		if err != nil {
 
 			// TODO:
@@ -93,7 +93,8 @@ func (b *Broker) handle(userConsumerHandler func(string) (string, string, error)
 		}
 
 		if b.cacheClient != nil {
-			err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetExpiration())
+			b.cacheClient.Delete(msgKey)
+			err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetDefaultExpiration())
 			if err != nil {
 				slog.Error("cmd:worker:main:messageBroker:RunConsumer:handle:b.cacheClient.Set error set%v", err)
 			}
@@ -115,6 +116,6 @@ func (b *Broker) reconnectAndConsume() error {
 		return err
 	}
 
-	go b.RunConsumer(b.userConsumerHandler)
+	go b.RunConsumer(b.consumerHandler)
 	return nil
 }

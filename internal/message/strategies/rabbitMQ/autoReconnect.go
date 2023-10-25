@@ -2,7 +2,7 @@ package rabbitMQ
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/cenkalti/backoff"
@@ -21,13 +21,13 @@ func (b *Broker) autoReconnect() {
 			retryCfg := backoff.NewExponentialBackOff()
 			retryCfg.MaxElapsedTime = RetryMaxElapsedTime
 
-			if b.userConsumerHandler != nil {
+			if b.consumerHandler != nil {
 				var msgReconnectAndConsumeErr error
 				err = backoff.RetryNotify(func() error {
 					msgReconnectAndConsumeErr = b.reconnectAndConsume()
 					return msgReconnectAndConsumeErr
 				}, retryCfg, func(err error, t time.Duration) {
-					log.Printf("Attempting to resume consumer: %v", err)
+					slog.Error("Attempting to resume consumer: %v", err)
 				})
 
 			} else {
@@ -36,7 +36,7 @@ func (b *Broker) autoReconnect() {
 					msgReconnectErr = b.reconnect()
 					return msgReconnectErr
 				}, retryCfg, func(err error, t time.Duration) {
-					log.Printf("Attempting to resume publish: %v", err)
+					slog.Error("Attempting to resume publish: %v", err)
 				})
 			}
 

@@ -40,20 +40,6 @@ func main() {
 		}
 	}
 
-	// expiration := time.Duration(cfg.Cache.Expiration)
-	// err = cacheClient.Set("f1", "Minha primeira mensagem KKKKKKKK", expiration)
-	// if err != nil {
-	// 	fmt.Println("NAO SALVOU NO CACHE!")
-	// }
-
-	// msg, err := cacheClient.Get("f1")
-	// if err != nil {
-	// 	fmt.Println("NAO RECUPEROU DO CACHE!")
-	// }
-	// fmt.Println("FI ABAIXO CARAIAO ----------------------------------------------")
-	// fmt.Println(msg)
-	// fmt.Println("FI ACIMA CARAIAO -----------------------------------------------")
-
 	routes.HandleRequests(
 		cfg.API,
 		messageBroker,

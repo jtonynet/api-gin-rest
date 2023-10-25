@@ -7,5 +7,5 @@ type CacheClient interface {
 	Get(key string) (string, error)
 	Delete(key string) error
 	IsConnected() bool
-	GetExpiration() time.Duration
+	GetDefaultExpiration() time.Duration
 }

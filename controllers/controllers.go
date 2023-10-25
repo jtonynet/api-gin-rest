@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
+	"github.com/tidwall/gjson"
 
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 	"github.com/jtonynet/api-gin-rest/models"
@@ -109,9 +110,17 @@ func CriaNovoAluno(c *gin.Context) {
 
 	if cfg.FeatureFlags.CacheEnabled {
 		cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
+		var err error
+
+		var msgJson map[string]interface{}
+		msg := fmt.Sprintf(`{"HTTPStatusCode":202, "uuid":"%s", "Message":" in processing."}`, aluno.UUID)
+		err = json.Unmarshal([]byte(msg), &msgJson)
+		if err != nil {
+			slog.Error("controllers:CriaNovoAluno:json.Unmarshal error: %v", err)
+		}
 
 		expiration := time.Duration(0 * time.Millisecond) // Request Post no expires INFO cache. Only DATA cache expires
-		err := cacheClient.Set(aluno.UUID, "{\"Status\":\"202\" \"Message\":\"UUID in processing.\"}", expiration)
+		err = cacheClient.Set(aluno.UUID, msg, expiration)
 		if err != nil {
 			slog.Error("controllers:CriaNovoAluno:cacheClient.Set error: %v", err)
 		}
@@ -147,13 +156,13 @@ func CriaNovoAluno(c *gin.Context) {
 			})
 		}
 
-		if cacheClient != nil {
+		if cfg.FeatureFlags.CacheEnabled {
 			alunoJSON, err := json.Marshal(aluno)
 			if err != nil {
 				slog.Error("controllers:CriaNovoAluno:json.Marshal error %v", err)
 			}
 
-			err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetExpiration())
+			err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
 			if err != nil {
 				slog.Error("controllers:CriaNovoAluno:cacheClient.Set error set%v", err)
 			}
@@ -196,8 +205,38 @@ func BuscaAlunoPorId(c *gin.Context) {
 // @Failure 404 {string} Not Found
 // @Router /aluno/uuid/{uuid} [get]
 func BuscaAlunoPorUUID(c *gin.Context) {
+	cfg := c.MustGet("cfg").(config.API)
+
 	var aluno models.Aluno
+	var cacheClient interfaces.CacheClient
 	uuid := c.Params.ByName("uuid")
+
+	if cfg.FeatureFlags.CacheEnabled {
+		cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
+
+		dataStr, err := cacheClient.Get(uuid)
+		if err == nil {
+
+			var data map[string]interface{}
+			if err := json.Unmarshal([]byte(dataStr), &data); err != nil {
+				slog.Error("controllers:BuscaAlunoPorUUID:json.Unmarshal error: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Erro ao recuperar dados",
+				})
+				return
+			}
+
+			statusCodeReturn := http.StatusOK
+			httpStatus := gjson.Get(dataStr, "HTTPStatusCode")
+			if httpStatus.Exists() {
+				statusCodeReturn = int(httpStatus.Int())
+			}
+
+			c.JSON(statusCodeReturn, data)
+			return
+		}
+	}
+
 	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
 
 	if aluno.ID == 0 {
@@ -205,6 +244,18 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 			"Not Found": "Aluno Nao Encontrado",
 		})
 		return
+	}
+
+	if cfg.FeatureFlags.CacheEnabled {
+		alunoJSON, err := json.Marshal(aluno)
+		if err != nil {
+			slog.Error("controllers:BuscaAlunoPorUUID:json.Marshal error: %v", err)
+		}
+
+		err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
+		if err != nil {
+			slog.Error("controllers:BuscaAlunoPorUUID:cacheClient.Set error: %v", err)
+		}
 	}
 
 	c.JSON(http.StatusOK, aluno)

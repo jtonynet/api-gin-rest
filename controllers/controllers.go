@@ -3,15 +3,17 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
 
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 	"github.com/jtonynet/api-gin-rest/models"
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 )
 
 func Liveness(c *gin.Context) {
@@ -27,7 +29,6 @@ func Liveness(c *gin.Context) {
 
 func Readiness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
-	messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
 
 	var err error
 
@@ -38,14 +39,27 @@ func Readiness(c *gin.Context) {
 		return
 	}
 
-	if !messageBroker.IsConnected() {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"message": "MessageBroker Service unavailable",
-		})
-		return
+	if cfg.FeatureFlags.CacheEnabled {
+		cacheClient := c.MustGet("cacheClient").(interfaces.CacheClient)
+		if !cacheClient.IsConnected() {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"message": "CacheClient Service unavailable",
+			})
+			return
+		}
 	}
 
-	sumaryData := fmt.Sprintf("%s:%s in TagVersion: %s responds: {Database: OK, MessageBroker: OK}",
+	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
+		messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
+		if !messageBroker.IsConnected() {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"message": "MessageBroker Service unavailable",
+			})
+			return
+		}
+	}
+
+	sumaryData := fmt.Sprintf("%s:%s in TagVersion: %s responds: OK",
 		cfg.Name,
 		cfg.Port,
 		cfg.TagVersion)
@@ -81,39 +95,74 @@ func ExibeTodosAlunos(c *gin.Context) {
 // @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
-	messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
 
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("controllers:CriaNovoAluno:ShouldBindJSON error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
 	}
+
 	aluno.UUID = uuid.New().String()
+	var cacheClient interfaces.CacheClient
+
+	if cfg.FeatureFlags.CacheEnabled {
+		cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
+
+		expiration := time.Duration(0 * time.Millisecond) // Request Post no expires INFO cache. Only DATA cache expires
+		err := cacheClient.Set(aluno.UUID, "{\"Status\":\"202\" \"Message\":\"UUID in processing.\"}", expiration)
+		if err != nil {
+			slog.Error("controllers:CriaNovoAluno:cacheClient.Set error: %v", err)
+		}
+	}
 
 	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
+		messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
+
 		alunoJSON, err := json.Marshal(aluno)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("controllers:CriaNovoAluno:json.Marshal error: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Erro ao serializar Aluno em JSON",
 			})
+
 			return
 		}
 
 		err = messageBroker.Publish(string(alunoJSON))
-
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("controllers:CriaNovoAluno:messageBroker.Publish error: %v", err)
 		}
 
 		c.JSON(http.StatusAccepted, gin.H{
 			"uuid": aluno.UUID})
+
 		return
 	} else {
-		database.DB.Create(&aluno)
-		c.JSON(http.StatusOK, aluno)
+		err := database.DB.Create(&aluno).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erro ao tentar inserir o aluno",
+			})
+		}
+
+		if cacheClient != nil {
+			alunoJSON, err := json.Marshal(aluno)
+			if err != nil {
+				slog.Error("controllers:CriaNovoAluno:json.Marshal error %v", err)
+			}
+
+			err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetExpiration())
+			if err != nil {
+				slog.Error("controllers:CriaNovoAluno:cacheClient.Set error set%v", err)
+			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"uuid": aluno.UUID})
+
+		return
 	}
 }
 

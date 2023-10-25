@@ -4,8 +4,8 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
-    container_name:
-     nginx-gin-rest
+    container_name: nginx-gin-rest
+    hostname: nginx-gin-rest
     ports:
       - 8080:80
     depends_on:
@@ -16,21 +16,36 @@ services:
   postgres-gin-rest:
     image: postgres:16.0-alpine
     container_name: postgres-gin-rest
+    hostname: postgres-gin-rest
     restart: always
     environment:
       POSTGRES_USER: api_user
       POSTGRES_PASSWORD: api_pass
       POSTGRES_DB: api_gin_rest_db
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - ./docker_conf/postgres-data:/var/lib/postgresql/data  
     networks:
       - gin-rest-network
 
+  redis-gin-rest:
+    container_name: redis-gin-rest
+    hostname: redis-gin-rest
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass admin
+    volumes:
+      - ./docker_conf/redis/data/:/data
+    networks:
+      - gin-rest-network
+
   rabbitmq-gin-rest:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq-gin-rest'
+    container_name: rabbitmq-gin-rest
+    hostname: rabbitmq-gin-rest
     ports:
       - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
       - 15672:15672
@@ -47,8 +62,8 @@ services:
     build:
       context: ./tests/gatling
       dockerfile: Dockerfile
-    container_name:
-      gatling-api-test
+    container_name: gatling-api-test
+    hostname: gatling-api-test
     env_file: 
       - .env
     ports:
@@ -66,6 +81,7 @@ services:
       dockerfile: Dockerfile
       target: api
     container_name: ${API_NAME}
+    hostname: ${API_NAME}
     environment:
       DATABASE_HOST: postgres-gin-rest
       RABBITMQ_HOST: rabbitmq-gin-rest
@@ -73,6 +89,7 @@ services:
       - "${API_PORT}:${API_PORT}"
     depends_on:
       - postgres-gin-rest
+      - redis-gin-rest
       - rabbitmq-gin-rest
     volumes:
       - .:/usr/src/app
@@ -85,6 +102,7 @@ services:
 #    deploy:
 #      replicas: 1
     container_name: worker-gin
+    hostname: worker-gin
     build:
       context: .
       dockerfile: Dockerfile
@@ -94,6 +112,7 @@ services:
       RABBITMQ_HOST: rabbitmq-gin-rest
     depends_on:
       - postgres-gin-rest
+      - redis-gin-rest
       - rabbitmq-gin-rest
     volumes:
       - .:/usr/src/app
@@ -104,3 +123,4 @@ services:
 
 networks:
   gin-rest-network:
+    driver: bridge

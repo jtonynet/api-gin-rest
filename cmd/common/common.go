@@ -7,8 +7,8 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 	"github.com/jtonynet/api-gin-rest/internal/message"
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
 )
 
 func InitConfig() (*config.Config, error) {
@@ -34,15 +34,15 @@ func InitDatabase(cfg config.Database, RetryMaxElapsedTime time.Duration) error 
 	return err
 }
 
-func InitMessageBroker(cfg config.MessageBroker, RetryMaxElapsedTime time.Duration) (interfaces.Broker, error) {
+func NewMessageBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClient, RetryMaxElapsedTime time.Duration) (interfaces.Broker, error) {
 	retryCfg := backoff.NewExponentialBackOff()
 	retryCfg.MaxElapsedTime = RetryMaxElapsedTime
 
 	var msgBrokerErr error
 	var messageBroker interfaces.Broker
-	
+
 	err := backoff.RetryNotify(func() error {
-		messageBroker, msgBrokerErr = message.InitBroker(cfg)
+		messageBroker, msgBrokerErr = message.NewBroker(cfg, cacheClient)
 		return msgBrokerErr
 	}, retryCfg, func(err error, t time.Duration) {
 		log.Printf("Retrying connect to MessageBroker after error: %v", err)

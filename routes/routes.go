@@ -12,10 +12,14 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 )
 
-func HandleRequests(cfg config.API, messageBroker interfaces.Broker) {
+func HandleRequests(
+	cfg config.API,
+	messageBroker interfaces.Broker,
+	cacheClient interfaces.CacheClient,
+) {
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/"
 
@@ -25,8 +29,9 @@ func HandleRequests(cfg config.API, messageBroker interfaces.Broker) {
 
 	apiGroup := r.Group("/")
 
-	apiGroup.Use(middlewares.ConfigInjectHandler(cfg))
-	apiGroup.Use(middlewares.MessageBrokerInjectHandler(messageBroker))
+	apiGroup.Use(middlewares.ConfigInject(cfg))
+	apiGroup.Use(middlewares.CacheClientInject(cacheClient))
+	apiGroup.Use(middlewares.MessageBrokerInject(messageBroker))
 
 	apiGroup.GET("/liveness", controllers.Liveness)
 	apiGroup.GET("/readiness", controllers.Readiness)
@@ -34,7 +39,7 @@ func HandleRequests(cfg config.API, messageBroker interfaces.Broker) {
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
-	apiGroup.GET("/aluno/uuid/:uuid", controllers.BuscaAlunoPorUUID)
+	apiGroup.GET("/aluno/uuid/:uuid", middlewares.CachedRequest(cacheClient), controllers.BuscaAlunoPorUUID)
 
 	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
 	apiGroup.GET("/aluno/:id", controllers.BuscaAlunoPorId)

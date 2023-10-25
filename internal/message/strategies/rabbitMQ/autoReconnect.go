@@ -1,51 +1,48 @@
 package rabbitMQ
 
 import (
-    "log"
-    "fmt"
-    "time"
+	"fmt"
+	"log"
+	"time"
 
-    "github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff"
 )
 
-func (b *BrokerData) autoReconnect() {
-    tickInterval := 100 * time.Millisecond
-    ticker := time.NewTicker(tickInterval)
-    defer ticker.Stop()
+func (b *Broker) autoReconnect() {
+	tickInterval := 100 * time.Millisecond
+	ticker := time.NewTicker(tickInterval)
+	defer ticker.Stop()
 
-    for {
-        select {
-        case <-ticker.C:
-            if !b.IsConnected() {
-                var err error
-                RetryMaxElapsedTime := time.Duration(b.cfg.AutoReconnectRetryMaxElapsedInMs) * time.Millisecond
+	for range ticker.C {
+		if !b.IsConnected() {
+			var err error
+			RetryMaxElapsedTime := time.Duration(b.cfg.AutoReconnectRetryMaxElapsedInMs) * time.Millisecond
 
-                retryCfg := backoff.NewExponentialBackOff()
-                retryCfg.MaxElapsedTime = RetryMaxElapsedTime
+			retryCfg := backoff.NewExponentialBackOff()
+			retryCfg.MaxElapsedTime = RetryMaxElapsedTime
 
-                if b.userConsumerHandler != nil {
-                    var msgReconnectAndConsumeErr error
-                    err = backoff.RetryNotify(func() error {
-                        msgReconnectAndConsumeErr = b.reconnectAndConsume()
-                        return msgReconnectAndConsumeErr
-                    }, retryCfg, func(err error, t time.Duration) {
-                        log.Printf("Attempting to resume consumer: %v", err)
-                    })
-                    
-                } else {
-                    var msgReconnectErr error
-                    err = backoff.RetryNotify(func() error {
-                        msgReconnectErr = b.reconnect()
-                        return msgReconnectErr
-                    }, retryCfg, func(err error, t time.Duration) {
-                        log.Printf("Attempting to resume publish: %v", err)
-                    })
-                }
+			if b.userConsumerHandler != nil {
+				var msgReconnectAndConsumeErr error
+				err = backoff.RetryNotify(func() error {
+					msgReconnectAndConsumeErr = b.reconnectAndConsume()
+					return msgReconnectAndConsumeErr
+				}, retryCfg, func(err error, t time.Duration) {
+					log.Printf("Attempting to resume consumer: %v", err)
+				})
 
-                if err != nil {
-                    panic(fmt.Sprintf("Connection lost, failed to reestablish the connection: %v", err))
-                }
-            }
-        }
-    }
+			} else {
+				var msgReconnectErr error
+				err = backoff.RetryNotify(func() error {
+					msgReconnectErr = b.reconnect()
+					return msgReconnectErr
+				}, retryCfg, func(err error, t time.Duration) {
+					log.Printf("Attempting to resume publish: %v", err)
+				})
+			}
+
+			if err != nil {
+				panic(fmt.Sprintf("Connection lost, failed to reestablish the connection: %v", err))
+			}
+		}
+	}
 }

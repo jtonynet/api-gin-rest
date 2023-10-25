@@ -30,6 +30,6 @@ class Alunos extends Simulation {
   val testAlunos = scenario("Teste Alunos").exec(alunos)
 
   setUp(
-    testAlunos.inject(rampUsers(10000).during(10.seconds))
+    testAlunos.inject(rampUsers(20000).during(10.seconds))
   ).protocols(httpProtocol)
 }

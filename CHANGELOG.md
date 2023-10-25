@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Adicionado `Redis` ao `docker-compose.yml`
+- Adicionado classes de cliente `Redis`
+
+### Fixed
+- Quando `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` esta habilitada, worker nao executa e Readiness nao faz checagem de conexao no messageBroker
 
 ## [0.0.7] - 2023-10-21
 ### Added

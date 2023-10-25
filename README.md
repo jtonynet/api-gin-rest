@@ -19,6 +19,7 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 
 <a id="indice"></a>
 ## :arrow_heading_up: Índice
+
 <!--ts-->
 - [Go: Go e Gin: criando API rest com simplicidade](#estudo-api-rest-em-golang-com-gin)<br/>
   :arrow_heading_up: [Índice](#arrow_heading_up-índice)<br/>
@@ -108,10 +109,7 @@ A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz 
 <br/>
 
 #### Recomendações para Devs:
-Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente. As versões mais recentes da linguagem já têm a instalação simplificada pelo `snap`
-```bash
-$ sudo snap install go --classic
-```
+Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente.
 
 Recomendo a instalação do [GVM](https://github.com/moovweb/gvm) para controle de versões da linguagem
 
@@ -461,8 +459,11 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - [Gatling v3.9.5](https://gatling.io/)
 - [go-redis](https://github.com/redis/go-redis)
 - [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
+
+GUIs:
 - [VsCode](https://code.visualstudio.com/)
 - [DBeaver](https://dbeaver.io/)
+- [another-redis-desktop-manager](https://github.com/qishibo/AnotherRedisDesktopManager)
 
 
 [:arrow_heading_up: voltar](#indice)
@@ -498,4 +499,8 @@ https://tutorialedge.net/golang/go-decorator-function-pattern-tutorial/
 https://srinjoysantra.medium.com/decorator-pattern-in-golang-a831ecae0d38
 
 https://www.omgubuntu.co.uk/2017/02/peek-animated-gif-screen-capture-linux-update
+
+OpenTelemetry Redis
+https://github.com/redis/go-redis/blob/master/example/otel/client.go
 -->
+

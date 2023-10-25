@@ -204,7 +204,8 @@ func BuscaAlunoPorId(c *gin.Context) {
 // @Failure 404 {string} Not Found
 // @Router /aluno/uuid/{uuid} [get]
 func BuscaAlunoPorUUID(c *gin.Context) {
-	// cfg := c.MustGet("cfg").(config.API)
+	cfg := c.MustGet("cfg").(config.API)
+	slog.Info("OK ", cfg.Name)
 
 	var aluno models.Aluno
 	uuid := c.Params.ByName("uuid")
@@ -218,45 +219,29 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 		return
 	}
 
-	// var cacheClient interfaces.CacheClient
-	// if cfg.FeatureFlags.CacheEnabled {
-	// 	cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
-
-	// 	alunoJSON, err := json.Marshal(aluno)
-	// 	if err != nil {
-	// 		slog.Error("controllers:BuscaAlunoPorUUID:json.Marshal error: %v", err)
-	// 	}
-
-	// 	err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
-	// 	if err != nil {
-	// 		slog.Error("controllers:BuscaAlunoPorUUID:cacheClient.Set error: %v", err)
-	// 	}
-	// }
-
 	currentTime := time.Now()
 	timeFormatted := currentTime.Format("15:04:05.000000")
 	fmt.Println("2 - RETORNANDO DA ROTA CONTROLLER (HH:MM:SS.mmmuuu):", timeFormatted)
 
-	alunoJSON, err := json.MarshalIndent(aluno, "", "  ")
+	alunoJSON, err := json.Marshal(aluno)
 	if err != nil {
-		// Lida com erros se a conversão falhar
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro na conversão para JSON",
 		})
 		return
 	}
 
-	var returnData map[string]interface{}
-	if err := json.Unmarshal([]byte(alunoJSON), &returnData); err != nil {
-		slog.Error("middlewares:CachedRequest:json.Unmarshal error: ", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro ao recuperar dados",
-		})
-		c.Abort()
-	}
+	// /* ESSE TRECHO DEVERIA ESTAR NO CachedRequest() */
+	// if cfg.FeatureFlags.CacheEnabled {
+	// 	cacheClient := c.MustGet("cacheClient").(interfaces.CacheClient)
+
+	// 	err := cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
+	// 	if err != nil {
+	// 		slog.Error("cannot set key: %s error: %v", aluno.UUID, err)
+	// 	}
+	// }
 
 	c.Set("queryResult", string(alunoJSON))
-
 	c.JSON(http.StatusOK, aluno)
 }
 

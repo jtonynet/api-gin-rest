@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -53,10 +54,38 @@ func (c *Client) Set(key string, value interface{}, expiration time.Duration) er
 }
 
 func (c *Client) Get(key string) (string, error) {
+	slog.Info("++++++++++++++++++CONSULTANDO A CHAVE: ", key)
 	val, err := c.db.Get(c.ctx, key).Result()
 	if err != nil {
 		slog.Error("Cannot get key: %v, CacheClient error: %v ", key, err)
 		return "", err
+	}
+	if val == "" {
+		slog.Error("-------------VALOR VAZIO: ", err)
+		return "", errors.New("data empty")
+	}
+
+	return val, nil
+}
+
+func (c *Client) SetWithCtx(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+	err := c.db.Set(ctx, key, value, expiration).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) GetWithCtx(ctx context.Context, key string) (string, error) {
+	slog.Info("++++++++++++++++++CONSULTANDO A CHAVE: ", key)
+	val, err := c.db.Get(c.ctx, key).Result()
+	if err != nil {
+		slog.Error("Cannot get key: %v, CacheClient error: %v ", key, err)
+		return "", err
+	}
+	if val == "" {
+		slog.Error("-------------VALOR VAZIO: ", err)
+		return "", errors.New("data empty")
 	}
 
 	return val, nil

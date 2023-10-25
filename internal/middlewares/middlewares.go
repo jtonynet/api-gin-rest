@@ -53,14 +53,12 @@ func CachedRequest() gin.HandlerFunc {
 				// TODO: capturar queryString completa para cachear TODAS requests inclusive
 				// as parametrizadas. CachedRequest deve ser agnostica quanto a rotas e params
 
-				cachedData, err := cacheClient.Get(paramValue)
+				cachedData, err := cacheClient.GetWithCtx(c, paramValue)
+				slog.Info("cachedData ", cachedData, paramValue)
 				if err == nil {
 					var returnData map[string]interface{}
 					if err := json.Unmarshal([]byte(cachedData), &returnData); err != nil {
 						slog.Error("middlewares:CachedRequest:json.Unmarshal error: ", err)
-						c.JSON(http.StatusInternalServerError, gin.H{
-							"error": "Erro ao recuperar dados",
-						})
 						c.Abort()
 					}
 
@@ -76,25 +74,24 @@ func CachedRequest() gin.HandlerFunc {
 
 					c.JSON(statusCodeReturn, returnData)
 					c.Abort()
+				} else {
+					slog.Error("ERRO CARALIO:", err)
 				}
 			}
 		}
 
 		c.Next()
 
+		// /* ESSE TRECHO DEVERIA ESTAR DESCOMENTADO, ELE Q DEVE GERENCIAR O cacheClient */
 		if cfg.FeatureFlags.CacheEnabled {
 			queryResult := c.GetString("queryResult")
 
-			resultJSON, err := json.Marshal(queryResult)
-			if err != nil {
-				slog.Error("cannot unmarshal resultJSON error: %v", err)
-			}
-
-			err = cacheClient.Set(paramValue, string(resultJSON), cacheClient.GetDefaultExpiration())
+			err := cacheClient.SetWithCtx(c, paramValue, queryResult, cacheClient.GetDefaultExpiration())
 			if err != nil {
 				slog.Error("cannot set key: %s error: %v", paramValue, err)
 			}
 		}
+
 	}
 }
 

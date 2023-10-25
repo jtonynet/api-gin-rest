@@ -55,7 +55,7 @@ func (c *Client) Set(key string, value interface{}, expiration time.Duration) er
 func (c *Client) Get(key string) (string, error) {
 	val, err := c.db.Get(c.ctx, key).Result()
 	if err != nil {
-		slog.Error("Cannot get key: %v, CacheClient error: %v", key, err)
+		slog.Error("Cannot get key: %v, CacheClient error: %v ", key, err)
 		return "", err
 	}
 

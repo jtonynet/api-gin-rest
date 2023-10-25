@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/internal/database"
-	"github.com/tidwall/gjson"
 
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 	"github.com/jtonynet/api-gin-rest/models"
@@ -205,37 +204,10 @@ func BuscaAlunoPorId(c *gin.Context) {
 // @Failure 404 {string} Not Found
 // @Router /aluno/uuid/{uuid} [get]
 func BuscaAlunoPorUUID(c *gin.Context) {
-	cfg := c.MustGet("cfg").(config.API)
+	// cfg := c.MustGet("cfg").(config.API)
 
 	var aluno models.Aluno
-	var cacheClient interfaces.CacheClient
 	uuid := c.Params.ByName("uuid")
-
-	if cfg.FeatureFlags.CacheEnabled {
-		cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
-
-		dataStr, err := cacheClient.Get(uuid)
-		if err == nil {
-
-			var data map[string]interface{}
-			if err := json.Unmarshal([]byte(dataStr), &data); err != nil {
-				slog.Error("controllers:BuscaAlunoPorUUID:json.Unmarshal error: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error": "Erro ao recuperar dados",
-				})
-				return
-			}
-
-			statusCodeReturn := http.StatusOK
-			httpStatus := gjson.Get(dataStr, "HTTPStatusCode")
-			if httpStatus.Exists() {
-				statusCodeReturn = int(httpStatus.Int())
-			}
-
-			c.JSON(statusCodeReturn, data)
-			return
-		}
-	}
 
 	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
 
@@ -246,17 +218,44 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 		return
 	}
 
-	if cfg.FeatureFlags.CacheEnabled {
-		alunoJSON, err := json.Marshal(aluno)
-		if err != nil {
-			slog.Error("controllers:BuscaAlunoPorUUID:json.Marshal error: %v", err)
-		}
+	// var cacheClient interfaces.CacheClient
+	// if cfg.FeatureFlags.CacheEnabled {
+	// 	cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
 
-		err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
-		if err != nil {
-			slog.Error("controllers:BuscaAlunoPorUUID:cacheClient.Set error: %v", err)
-		}
+	// 	alunoJSON, err := json.Marshal(aluno)
+	// 	if err != nil {
+	// 		slog.Error("controllers:BuscaAlunoPorUUID:json.Marshal error: %v", err)
+	// 	}
+
+	// 	err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
+	// 	if err != nil {
+	// 		slog.Error("controllers:BuscaAlunoPorUUID:cacheClient.Set error: %v", err)
+	// 	}
+	// }
+
+	currentTime := time.Now()
+	timeFormatted := currentTime.Format("15:04:05.000000")
+	fmt.Println("2 - RETORNANDO DA ROTA CONTROLLER (HH:MM:SS.mmmuuu):", timeFormatted)
+
+	alunoJSON, err := json.MarshalIndent(aluno, "", "  ")
+	if err != nil {
+		// Lida com erros se a conversão falhar
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erro na conversão para JSON",
+		})
+		return
 	}
+
+	var returnData map[string]interface{}
+	if err := json.Unmarshal([]byte(alunoJSON), &returnData); err != nil {
+		slog.Error("middlewares:CachedRequest:json.Unmarshal error: ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erro ao recuperar dados",
+		})
+		c.Abort()
+	}
+
+	c.Set("queryResult", string(alunoJSON))
 
 	c.JSON(http.StatusOK, aluno)
 }

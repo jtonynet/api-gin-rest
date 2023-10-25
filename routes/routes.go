@@ -40,8 +40,7 @@ func HandleRequests(
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
-	//apiGroup.GET("/aluno/uuid/:uuid", controllers.BuscaAlunoPorUUID)
-	apiGroup.GET("/aluno/uuid/:uuid", middlewares.CachedRequest(cacheClient), controllers.BuscaAlunoPorUUID)
+	apiGroup.GET("/aluno/uuid/:uuid", middlewares.CachedRequest(), controllers.BuscaAlunoPorUUID)
 
 	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
 	apiGroup.GET("/aluno/:id", controllers.BuscaAlunoPorId)

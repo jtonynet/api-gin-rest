@@ -40,8 +40,8 @@ func HandleRequests(
 	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
-	apiGroup.GET("/aluno/:uuid", middlewares.CachedRequest(), controllers.BuscaAlunoPorUUID)
-	apiGroup.GET("/aluno/cpf/:cpf", middlewares.CachedRequest(), controllers.BuscaAlunoPorCPF)
+	apiGroup.GET("/aluno/:uuid", middlewares.CachedGetRequest(), controllers.BuscaAlunoPorUUID)
+	apiGroup.GET("/aluno/cpf/:cpf", middlewares.CachedGetRequest(), controllers.BuscaAlunoPorCPF)
 
 	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
 	apiGroup.DELETE("/aluno/:id", controllers.DeletaAluno)

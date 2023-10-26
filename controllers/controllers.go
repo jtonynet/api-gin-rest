@@ -108,7 +108,12 @@ func CriaNovoAluno(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
-	aluno.UUID = uuid.New().String()
+
+	UUID := c.GetString("UUID")
+	if UUID == "" {
+		UUID = uuid.New().String()
+	}
+	aluno.UUID = UUID
 
 	var cacheClient interfaces.CacheClient
 	var paramName string

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,23 +35,27 @@ func CacheClientInject(cacheClient interfaces.CacheClient) gin.HandlerFunc {
 	}
 }
 
+// Tratamento adequedo de Middlewares para obter "Separation of Concerns"
+// https://gin-gonic.com/docs/examples/custom-middleware/
 func CachedRequest() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cfg := c.MustGet("cfg").(config.API)
 		var cacheClient interfaces.CacheClient
-		var param, paramValue string
+		var cacheKey string
 
 		if cfg.FeatureFlags.CacheEnabled {
-
 			cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
 
 			if cacheClient.IsConnected() {
-				param = extractParamFromPath(c.FullPath())
-				paramValue = c.Params.ByName(param)
-				// TODO: capturar queryString completa para cachear TODAS requests inclusive
+				paramKeyName, paramKeyValue, err := cacheClient.GetNameAndKeyFromPath(c.FullPath())
+				if err != nil {
+					slog.Error("cacheClient.GetNameAndKeyFromPath error: ", err)
+					c.Abort()
+				}
+				cacheKey = fmt.Sprintf("%s:%s", paramKeyName, c.Params.ByName(paramKeyValue))
 
-				cachedData, err := cacheClient.GetWithCtx(c, paramValue)
-				slog.Info("cachedData ", cachedData, paramValue)
+				cachedData, err := cacheClient.Get(cacheKey)
+				slog.Info("cachedData ", cacheKey, cachedData)
 				if err == nil {
 					var returnData map[string]interface{}
 					if err := json.Unmarshal([]byte(cachedData), &returnData); err != nil {
@@ -78,30 +81,20 @@ func CachedRequest() gin.HandlerFunc {
 
 		c.Next()
 
-		if cfg.FeatureFlags.CacheEnabled {
+		if cfg.FeatureFlags.CacheEnabled && cacheClient.IsConnected() {
 			queryResult, queryResultExists := c.Get("queryResult")
 			if queryResultExists {
 				queryResultJSON, err := json.Marshal(queryResult)
 				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{
-						"error": "Erro na conversão para JSON",
-					})
-					return
+					slog.Error("middlewares:CachedRequest:json.Marshal error: ", err)
+					c.Abort()
 				}
 
-				err = cacheClient.SetWithCtx(c, paramValue, string(queryResultJSON), cacheClient.GetDefaultExpiration())
+				err = cacheClient.Set(cacheKey, string(queryResultJSON), cacheClient.GetDefaultExpiration())
 				if err != nil {
-					slog.Error("cannot set key: %s error: %v", paramValue, err)
+					slog.Error("cannot set key: %s error: %v", cacheKey, err)
 				}
 			}
 		}
 	}
-}
-
-func extractParamFromPath(path string) string {
-	pathSplited := strings.Split(path, ":")
-	if len(pathSplited) > 1 {
-		return pathSplited[1]
-	}
-	return path
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 
 	"github.com/jtonynet/api-gin-rest/internal/database"
@@ -26,5 +27,6 @@ func InsertAluno(msg string) (string, string, error) {
 		return "", "", err
 	}
 
-	return aluno.UUID, string(alunoJSON), nil
+	key := fmt.Sprintf("aluno:%s", aluno.UUID)
+	return key, string(alunoJSON), nil
 }

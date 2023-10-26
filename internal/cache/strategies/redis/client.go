@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/config"
@@ -54,38 +55,13 @@ func (c *Client) Set(key string, value interface{}, expiration time.Duration) er
 }
 
 func (c *Client) Get(key string) (string, error) {
-	slog.Info("++++++++++++++++++CONSULTANDO A CHAVE: ", key)
 	val, err := c.db.Get(c.ctx, key).Result()
 	if err != nil {
 		slog.Error("Cannot get key: %v, CacheClient error: %v ", key, err)
 		return "", err
 	}
 	if val == "" {
-		slog.Error("-------------VALOR VAZIO: ", err)
-		return "", errors.New("data empty")
-	}
-
-	return val, nil
-}
-
-func (c *Client) SetWithCtx(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
-	err := c.db.Set(ctx, key, value, expiration).Err()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Client) GetWithCtx(ctx context.Context, key string) (string, error) {
-	slog.Info("++++++++++++++++++CONSULTANDO A CHAVE: ", key)
-	val, err := c.db.Get(c.ctx, key).Result()
-	if err != nil {
-		slog.Error("Cannot get key: %v, CacheClient error: %v ", key, err)
-		return "", err
-	}
-	if val == "" {
-		slog.Error("-------------VALOR VAZIO: ", err)
-		return "", errors.New("data empty")
+		return "", errors.New("Get data empty")
 	}
 
 	return val, nil
@@ -107,4 +83,37 @@ func (c *Client) IsConnected() bool {
 
 func (c *Client) GetDefaultExpiration() time.Duration {
 	return c.Expiration
+}
+
+func (c *Client) GetNameFromPath(path string) (string, error) {
+	segments := strings.Split(path, "/")
+	if len(segments) > 0 {
+		return segments[len(segments)-1], nil
+	}
+	return "", errors.New("improperly formatted path.")
+}
+
+func (c *Client) GetNameAndKeyFromPath(path string) (string, string, error) {
+	// TODO: Criar um metodo que receba o path e a queryString e devolva
+	// a cacheKey adequada para Setar ou obter o dado, mas isso deve estar
+	// no Middleware e nao na lib de cacheClient pois depende de parse
+	// do gin
+
+	var paramName, paramKey string = "", ""
+
+	pathSplited := strings.Split(path, "/")
+	if len(pathSplited) > 2 {
+		paramName = pathSplited[len(pathSplited)-2]
+	}
+
+	paramSplited := strings.Split(path, ":")
+	if len(paramSplited) > 1 {
+		paramKey = paramSplited[1]
+	}
+
+	if paramName == "" || paramKey == "" {
+		return paramName, paramKey, errors.New("improperly formatted path.")
+	}
+
+	return paramName, paramKey, nil
 }

@@ -94,6 +94,11 @@ func ExibeTodosAlunos(c *gin.Context) {
 // @Failure 400 {string} Error
 // @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
+
+	// TODO: MOVER CacheClient E messageBroker PARA LOGICAS DE MIDDLEWARE COMO FEITO COM CachedRequest
+	// isso aqui esta MUITO FEIO, varias logicas emaranhadas. dividir a responsabilidade entre middlewares
+	// Vai melhorar a legibilidade e a testabilidade
+
 	cfg := c.MustGet("cfg").(config.API)
 
 	var aluno models.Aluno
@@ -103,13 +108,19 @@ func CriaNovoAluno(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
-
 	aluno.UUID = uuid.New().String()
+
 	var cacheClient interfaces.CacheClient
+	var paramName string
 
 	if cfg.FeatureFlags.CacheEnabled {
 		cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
 		var err error
+
+		paramName, err = cacheClient.GetNameFromPath(c.FullPath())
+		if err != nil {
+			slog.Error("controllers:CriaNovoAluno:cacheClient.GetNameFromPath error: %v", err)
+		}
 
 		var msgJson map[string]interface{}
 		msg := fmt.Sprintf(`{"HTTPStatusCode":202, "uuid":"%s", "Message":" in processing."}`, aluno.UUID)
@@ -119,7 +130,7 @@ func CriaNovoAluno(c *gin.Context) {
 		}
 
 		expiration := time.Duration(0 * time.Millisecond) // Request Post no expires INFO cache. Only DATA cache expires
-		err = cacheClient.Set(aluno.UUID, msg, expiration)
+		err = cacheClient.Set(fmt.Sprintf("%s:%s", paramName, aluno.UUID), msg, expiration)
 		if err != nil {
 			slog.Error("controllers:CriaNovoAluno:cacheClient.Set error: %v", err)
 		}
@@ -161,7 +172,7 @@ func CriaNovoAluno(c *gin.Context) {
 				slog.Error("controllers:CriaNovoAluno:json.Marshal error %v", err)
 			}
 
-			err = cacheClient.Set(aluno.UUID, string(alunoJSON), cacheClient.GetDefaultExpiration())
+			err = cacheClient.Set(fmt.Sprintf("%s:%s", paramName, aluno.UUID), string(alunoJSON), cacheClient.GetDefaultExpiration())
 			if err != nil {
 				slog.Error("controllers:CriaNovoAluno:cacheClient.Set error set%v", err)
 			}
@@ -182,9 +193,6 @@ func CriaNovoAluno(c *gin.Context) {
 // @Failure 404 {string} Not Found
 // @Router /aluno/uuid/{uuid} [get]
 func BuscaAlunoPorUUID(c *gin.Context) {
-	cfg := c.MustGet("cfg").(config.API)
-	slog.Info("OK ", cfg.Name)
-
 	var aluno models.Aluno
 	uuid := c.Params.ByName("uuid")
 
@@ -196,10 +204,6 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 		})
 		return
 	}
-
-	currentTime := time.Now()
-	timeFormatted := currentTime.Format("15:04:05.000000")
-	fmt.Println("CONTROLLER BuscaAlunoPorUUID (HH:MM:SS.mmmuuu):", timeFormatted)
 
 	c.Set("queryResult", aluno)
 	c.JSON(http.StatusOK, aluno)

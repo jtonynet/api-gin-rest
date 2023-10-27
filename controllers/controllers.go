@@ -1,18 +1,26 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/jtonynet/api-gin-rest/internal/database"
-
 	"github.com/jtonynet/api-gin-rest/models"
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
+
+	"github.com/jtonynet/api-gin-rest/internal/database"
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 )
+
+type InfraReturn struct {
+	message string
+	sumary  string
+}
+
+// @BasePath /alunos
 
 func Liveness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
@@ -27,7 +35,6 @@ func Liveness(c *gin.Context) {
 
 func Readiness(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
-	messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
 
 	var err error
 
@@ -38,14 +45,27 @@ func Readiness(c *gin.Context) {
 		return
 	}
 
-	if !messageBroker.IsConnected() {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"message": "MessageBroker Service unavailable",
-		})
-		return
+	if cfg.FeatureFlags.CacheEnabled {
+		cacheClient := c.MustGet("cacheClient").(interfaces.CacheClient)
+		if !cacheClient.IsConnected() {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"message": "CacheClient Service unavailable",
+			})
+			return
+		}
 	}
 
-	sumaryData := fmt.Sprintf("%s:%s in TagVersion: %s responds: {Database: OK, MessageBroker: OK}",
+	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
+		messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
+		if !messageBroker.IsConnected() {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"message": "MessageBroker Service unavailable",
+			})
+			return
+		}
+	}
+
+	sumaryData := fmt.Sprintf("%s:%s in TagVersion: %s responds: OK",
 		cfg.Name,
 		cfg.Port,
 		cfg.TagVersion)
@@ -56,8 +76,6 @@ func Readiness(c *gin.Context) {
 	})
 }
 
-// @BasePath /alunos
-
 // @Summary Retorna todos os alunos
 // @Description Obtém a lista completa de alunos
 // @Tags Alunos
@@ -67,6 +85,8 @@ func Readiness(c *gin.Context) {
 func ExibeTodosAlunos(c *gin.Context) {
 	var alunos []models.Aluno
 	database.DB.Find(&alunos)
+
+	c.Set("result", alunos)
 	c.JSON(200, alunos)
 }
 
@@ -81,73 +101,49 @@ func ExibeTodosAlunos(c *gin.Context) {
 // @Router /aluno [post]
 func CriaNovoAluno(c *gin.Context) {
 	cfg := c.MustGet("cfg").(config.API)
-	messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
 
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("controllers:CriaNovoAluno:ShouldBindJSON error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
 	}
-	aluno.UUID = uuid.New().String()
 
+	UUID := c.GetString("UUID")
+	if UUID == "" {
+		UUID = uuid.New().String()
+	}
+	aluno.UUID = UUID
+
+	c.Set("model", aluno)
 	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
-		alunoJSON, err := json.Marshal(aluno)
-		if err != nil {
-			fmt.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Erro ao serializar Aluno em JSON",
-			})
-			return
-		}
-
-		err = messageBroker.Publish(string(alunoJSON))
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		c.JSON(http.StatusAccepted, gin.H{
-			"uuid": aluno.UUID})
 		return
-	} else {
-		database.DB.Create(&aluno)
-		c.JSON(http.StatusOK, aluno)
 	}
-}
 
-// @Summary Busca aluno por id
-// @Description Busca aluno por id
-// @Tags Aluno
-// @Produce json
-// @Success 200 {object} models.Aluno
-// @Failure 404 {string} Not Found
-// @Router /aluno/{id} [get]
-func BuscaAlunoPorId(c *gin.Context) {
-	var aluno models.Aluno
-	id := c.Params.ByName("id")
-	database.DB.First(&aluno, id)
-
-	if aluno.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"Not Found": "Aluno Nao Encontrado",
+	err := database.DB.Create(&aluno).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erro ao tentar inserir o aluno",
 		})
-		return
 	}
 
-	c.JSON(http.StatusOK, aluno)
+	c.Set("result", aluno)
+	c.JSON(http.StatusOK, gin.H{
+		"uuid": aluno.UUID})
+
 }
 
-// @Summary Busca aluno por id
-// @Description Busca aluno por id
+// @Summary Busca aluno por uuid
+// @Description Busca aluno por uuid
 // @Tags Aluno
 // @Produce json
 // @Success 200 {object} models.Aluno
 // @Failure 404 {string} Not Found
-// @Router /aluno/uuid/{uuid} [get]
+// @Router /aluno/{uuid} [get]
 func BuscaAlunoPorUUID(c *gin.Context) {
 	var aluno models.Aluno
+
 	uuid := c.Params.ByName("uuid")
 	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
 
@@ -158,35 +154,46 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 		return
 	}
 
+	c.Set("result", aluno)
 	c.JSON(http.StatusOK, aluno)
 }
 
-// @Summary Deleta aluno por id
-// @Description Deleta aluno por id
+// @Summary Deleta aluno por uuid
+// @Description Deleta aluno por uuid
 // @Tags Aluno
 // @Produce json
 // @Success 200 {string} data
-// @Router /aluno/{id} [delete]
+// @Router /aluno/{uuid} [delete]
 func DeletaAluno(c *gin.Context) {
 	var aluno models.Aluno
-	id := c.Params.ByName("id")
-	database.DB.Delete(&aluno, id)
+
+	uuid := c.Params.ByName("uuid")
+	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
+
+	if err := database.DB.Delete(&aluno).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Aluno inexistente",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"data": "Aluno deletado com sucesso"})
 }
 
-// @Summary Edita aluno por id
-// @Description Edita aluno por id
+// @Summary Edita aluno por uuid
+// @Description Edita aluno por uuid
 // @Tags Aluno
 // @Produce json
 // @Accept json
-// @Success 200 {object} models.Aluno
+// @Success 202 {uuid} uuid
 // @Failure 400 {string} error
-// @Router /aluno/{id} [patch]
+// @Router /aluno/{uuid} [patch]
 func EditaAluno(c *gin.Context) {
 	var aluno models.Aluno
-	id := c.Params.ByName("id")
-	database.DB.First(&aluno, id)
+
+	uuid := c.Params.ByName("uuid")
+	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
 
 	if err := c.ShouldBindJSON(&aluno); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -195,7 +202,8 @@ func EditaAluno(c *gin.Context) {
 	}
 
 	database.DB.Model(&aluno).UpdateColumns(aluno)
-	c.JSON(http.StatusOK, aluno)
+	c.JSON(http.StatusOK, gin.H{
+		"uuid": aluno.UUID})
 }
 
 // @Summary Busca aluno por CPF
@@ -217,6 +225,11 @@ func BuscaAlunoPorCPF(c *gin.Context) {
 		return
 	}
 
+	currentTime := time.Now()
+	timeFormatted := currentTime.Format("15:04:05.000000")
+	fmt.Println("CONTROLLER BuscaAlunoPorCPF (HH:MM:SS.mmmuuu):", timeFormatted)
+
+	c.Set("result", aluno)
 	c.JSON(http.StatusOK, aluno)
 }
 

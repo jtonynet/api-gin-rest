@@ -1,25 +1,8 @@
 {
-    "schemes": [
-        "http"
-    ],
     "swagger": "2.0",
     "info": {
-        "description": "Estudo API Rest em Golang com Gin",
-        "title": "api-gin-rest",
-        "termsOfService": "https://github.com/jtonynet/api-gin-rest",
-        "contact": {
-            "name": "API GIN Support",
-            "url": "https://github.com/jtonynet/api-gin-rest",
-            "email": "learningingenuity@gmail.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        },
-        "version": "0.0.3"
+        "contact": {}
     },
-    "host": "localhost:8080",
-    "basePath": "/alunos",
     "paths": {
         "/aluno": {
             "post": {
@@ -82,42 +65,16 @@
                 }
             }
         },
-        "/aluno/uuid/{uuid}": {
+        "/aluno/{uuid}": {
             "get": {
-                "description": "Busca aluno por id",
+                "description": "Busca aluno por uuid",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Aluno"
                 ],
-                "summary": "Busca aluno por id",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Aluno"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/aluno/{id}": {
-            "get": {
-                "description": "Busca aluno por id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Aluno"
-                ],
-                "summary": "Busca aluno por id",
+                "summary": "Busca aluno por uuid",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -134,14 +91,14 @@
                 }
             },
             "delete": {
-                "description": "Deleta aluno por id",
+                "description": "Deleta aluno por uuid",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Aluno"
                 ],
-                "summary": "Deleta aluno por id",
+                "summary": "Deleta aluno por uuid",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -152,7 +109,7 @@
                 }
             },
             "patch": {
-                "description": "Edita aluno por id",
+                "description": "Edita aluno por uuid",
                 "consumes": [
                     "application/json"
                 ],
@@ -162,12 +119,12 @@
                 "tags": [
                     "Aluno"
                 ],
-                "summary": "Edita aluno por id",
+                "summary": "Edita aluno por uuid",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "$ref": "#/definitions/models.Aluno"
+                            "type": "uuid"
                         }
                     },
                     "400": {
@@ -226,8 +183,14 @@
     "definitions": {
         "models.Aluno": {
             "type": "object",
+            "required": [
+                "cpf",
+                "nome",
+                "rg"
+            ],
             "properties": {
                 "cpf": {
+                    "description": "para fins de teste de carga, não valido e nem considero esse campo como unique",
                     "type": "string",
                     "example": "00000000000"
                 },
@@ -236,6 +199,7 @@
                     "example": "Jonh Doe"
                 },
                 "rg": {
+                    "description": "para fins de teste de carga, não valido e nem considero esse campo como unique",
                     "type": "string",
                     "example": "12345678901234"
                 },

@@ -3,19 +3,24 @@ package routes
 import (
 	"fmt"
 
-	pprof "github.com/gin-contrib/pprof"
-	"github.com/gin-gonic/gin"
-	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/jtonynet/api-gin-rest/controllers"
-	docs "github.com/jtonynet/api-gin-rest/docs"
-	"github.com/jtonynet/api-gin-rest/internal/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/jtonynet/api-gin-rest/internal/message/interfaces"
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
+
+	"github.com/jtonynet/api-gin-rest/config"
+	"github.com/jtonynet/api-gin-rest/controllers"
+	"github.com/jtonynet/api-gin-rest/docs"
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
+	"github.com/jtonynet/api-gin-rest/internal/middlewares"
 )
 
-func HandleRequests(cfg config.API, messageBroker interfaces.Broker) {
+func HandleRequests(
+	cfg config.API,
+	messageBroker interfaces.Broker,
+	cacheClient interfaces.CacheClient,
+) {
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/"
 
@@ -25,22 +30,44 @@ func HandleRequests(cfg config.API, messageBroker interfaces.Broker) {
 
 	apiGroup := r.Group("/")
 
-	apiGroup.Use(middlewares.ConfigInjectHandler(cfg))
-	apiGroup.Use(middlewares.MessageBrokerInjectHandler(messageBroker))
+	apiGroup.Use(middlewares.ConfigInject(cfg))
+	apiGroup.Use(middlewares.CacheClientInject(cacheClient))
+	apiGroup.Use(middlewares.MessageBrokerInject(messageBroker))
 
 	apiGroup.GET("/liveness", controllers.Liveness)
 	apiGroup.GET("/readiness", controllers.Readiness)
 
-	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
-	apiGroup.GET("/aluno/uuid/:uuid", controllers.BuscaAlunoPorUUID)
+	apiGroup.GET("/alunos",
+		middlewares.CachedGetRequest(),
+		controllers.ExibeTodosAlunos,
+	)
 
-	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
-	apiGroup.GET("/aluno/:id", controllers.BuscaAlunoPorId)
-	apiGroup.DELETE("/aluno/:id", controllers.DeletaAluno)
-	apiGroup.PATCH("/aluno/:id", controllers.EditaAluno)
-	apiGroup.GET("/aluno/cpf/:cpf", controllers.BuscaAlunoPorCPF)
+	apiGroup.GET("/aluno/:uuid",
+		middlewares.CachedGetRequest(),
+		controllers.BuscaAlunoPorUUID,
+	)
+
+	apiGroup.GET("/aluno/cpf/:cpf",
+		middlewares.CachedGetRequest(),
+		controllers.BuscaAlunoPorCPF,
+	)
+
+	apiGroup.POST("/aluno",
+		middlewares.CachedPostRequest(),
+		middlewares.MessageBrokerPublishPostRequest(),
+		controllers.CriaNovoAluno,
+	)
+
+	apiGroup.DELETE("/aluno/:uuid",
+		middlewares.CachedDeleteRequest(),
+		controllers.DeletaAluno,
+	)
+	apiGroup.PATCH("/aluno/:uuid",
+		middlewares.CachedDeleteRequest(),
+		controllers.EditaAluno,
+	)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

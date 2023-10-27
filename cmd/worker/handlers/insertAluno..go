@@ -2,22 +2,31 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log/slog"
 
 	"github.com/jtonynet/api-gin-rest/internal/database"
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
-func InsertAluno(msg string) error {
-    var aluno models.Aluno
-    err := json.Unmarshal([]byte(msg), &aluno)
-    if err != nil {
-        return err
-    }
+func InsertAluno(msg string) (string, string, error) {
+	var aluno models.Aluno
+	err := json.Unmarshal([]byte(msg), &aluno)
+	if err != nil {
+		return "", "", err
+	}
 
-    err = database.DB.Create(&aluno).Error
-    if err != nil {
-        return err
-    }
+	err = database.DB.Create(&aluno).Error
+	if err != nil {
+		slog.Error("cmd:worker:handler:InsertAluno:database.DB.Create error %v", err)
+		return "", "", err
+	}
 
-    return nil
+	alunoJSON, err := json.Marshal(aluno)
+	if err != nil {
+		return "", "", err
+	}
+
+	key := fmt.Sprintf("aluno:%s", aluno.UUID)
+	return key, string(alunoJSON), nil
 }

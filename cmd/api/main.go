@@ -1,32 +1,48 @@
 package main
 
 import (
-    "log"
-    "time"
+	"log"
+	"log/slog"
+	"time"
 
-    "github.com/jtonynet/api-gin-rest/cmd/common"
-    "github.com/jtonynet/api-gin-rest/routes"
+	"github.com/jtonynet/api-gin-rest/cmd/common"
+	"github.com/jtonynet/api-gin-rest/routes"
+
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
+
+	"github.com/jtonynet/api-gin-rest/internal/cache"
 )
 
 func main() {
-    cfg, err := common.InitConfig()
-    if err != nil {
-        log.Fatal("cannot load config: ", err)
-    }
+	cfg, err := common.InitConfig()
+	if err != nil {
+		log.Fatal("cannot load config: ", err)
+	}
 
-    RetryMaxElapsedTime := time.Duration(cfg.API.RetryMaxElapsedTimeInMs) * time.Millisecond
+	RetryMaxElapsedTime := time.Duration(cfg.API.RetryMaxElapsedTimeInMs) * time.Millisecond
 
-    err = common.InitDatabase(cfg.Database, RetryMaxElapsedTime)
-    if err != nil {
-        log.Fatal("cannot initialize Database: ", err)
-    }
+	err = common.InitDatabase(cfg.Database, RetryMaxElapsedTime)
+	if err != nil {
+		slog.Error("cannot initialize Database, error: %v", err)
+	}
 
-    messageBroker, err := common.InitMessageBroker(cfg.MessageBroker, RetryMaxElapsedTime)
-    if err != nil {
-        log.Fatal("cannot initialize MessageBroker: ", err)
-    }
-    //Monitora quedas de conexão e tenta reconectar
-    go messageBroker.AutoReconnect() 
+	var cacheClient interfaces.CacheClient
+	cacheClient, err = cache.NewClient(cfg.Cache)
+	if err != nil {
+		slog.Error("cannot initialize cacheClient, error: %v", err)
+	}
 
-    routes.HandleRequests(cfg.API, messageBroker)
+	var messageBroker interfaces.Broker
+	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
+		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, cacheClient, RetryMaxElapsedTime)
+		if err != nil {
+			slog.Error("cannot initialize MessageBroker, error: %v", err)
+		}
+	}
+
+	routes.HandleRequests(
+		cfg.API,
+		messageBroker,
+		cacheClient,
+	)
 }

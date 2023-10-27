@@ -5,8 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+---
+
 ## [Unreleased]
 ### Added
+
+### Fixed
+
+---
+
+## [0.0.8] - 2023-10-27
+### Added
+- Adicionado Strategy Pattern para cacheClient
+- Adicionado [Redis](https://redis.io/) ao `docker-compose.yml`
+- Adicionado classes de cliente `Redis`
+- Uso adequado de [custom-middleware](https://gin-gonic.com/docs/examples/custom-middleware/) para gerenciar cache e publicação de mensagen no messageBroker a partir das rotas `Get` e `Post` "decoradas"
+
+### Fixed
+- Quando `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` esta habilitada, worker nao executa e Readiness nao faz checagem de conexão no messageBroker
 
 ## [0.0.7] - 2023-10-21
 ### Added
@@ -61,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Projeto com base no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) finalizado de acordo com a trilha seguida
 - API Gin `dockerizada`
 
+[0.0.8]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.4...v0.0.5

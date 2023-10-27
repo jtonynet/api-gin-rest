@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
@@ -23,20 +23,20 @@ func main() {
 
 	err = common.InitDatabase(cfg.Database, RetryMaxElapsedTime)
 	if err != nil {
-		log.Fatal("cannot initialize Database: ", err)
+		slog.Error("cannot initialize Database, error: %v", err)
 	}
 
 	var cacheClient interfaces.CacheClient
 	cacheClient, err = cache.NewClient(cfg.Cache)
 	if err != nil {
-		fmt.Println("NAO SE CONECTOU AO CACHE!")
+		slog.Error("cannot initialize cacheClient, error: %v", err)
 	}
 
 	var messageBroker interfaces.Broker
 	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
 		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, cacheClient, RetryMaxElapsedTime)
 		if err != nil {
-			log.Fatal("cannot initialize MessageBroker: ", err)
+			slog.Error("cannot initialize MessageBroker, error: %v", err)
 		}
 	}
 

@@ -9,16 +9,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "https://github.com/jtonynet/api-gin-rest",
-        "contact": {
-            "name": "API GIN Support",
-            "url": "https://github.com/jtonynet/api-gin-rest",
-            "email": "learningingenuity@gmail.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -85,42 +76,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/aluno/uuid/{uuid}": {
+        "/aluno/{uuid}": {
             "get": {
-                "description": "Busca aluno por id",
+                "description": "Busca aluno por uuid",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Aluno"
                 ],
-                "summary": "Busca aluno por id",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Aluno"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/aluno/{id}": {
-            "get": {
-                "description": "Busca aluno por id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Aluno"
-                ],
-                "summary": "Busca aluno por id",
+                "summary": "Busca aluno por uuid",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -137,14 +102,14 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Deleta aluno por id",
+                "description": "Deleta aluno por uuid",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Aluno"
                 ],
-                "summary": "Deleta aluno por id",
+                "summary": "Deleta aluno por uuid",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -155,7 +120,7 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "description": "Edita aluno por id",
+                "description": "Edita aluno por uuid",
                 "consumes": [
                     "application/json"
                 ],
@@ -165,12 +130,12 @@ const docTemplate = `{
                 "tags": [
                     "Aluno"
                 ],
-                "summary": "Edita aluno por id",
+                "summary": "Edita aluno por uuid",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "$ref": "#/definitions/models.Aluno"
+                            "type": "uuid"
                         }
                     },
                     "400": {
@@ -229,8 +194,14 @@ const docTemplate = `{
     "definitions": {
         "models.Aluno": {
             "type": "object",
+            "required": [
+                "cpf",
+                "nome",
+                "rg"
+            ],
             "properties": {
                 "cpf": {
+                    "description": "para fins de teste de carga, não valido e nem considero esse campo como unique",
                     "type": "string",
                     "example": "00000000000"
                 },
@@ -239,6 +210,7 @@ const docTemplate = `{
                     "example": "Jonh Doe"
                 },
                 "rg": {
+                    "description": "para fins de teste de carga, não valido e nem considero esse campo como unique",
                     "type": "string",
                     "example": "12345678901234"
                 },
@@ -253,12 +225,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.0.3",
-	Host:             "localhost:8080",
-	BasePath:         "/alunos",
-	Schemes:          []string{"http"},
-	Title:            "api-gin-rest",
-	Description:      "Estudo API Rest em Golang com Gin",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
+	Schemes:          []string{},
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -37,15 +37,37 @@ func HandleRequests(
 	apiGroup.GET("/liveness", controllers.Liveness)
 	apiGroup.GET("/readiness", controllers.Readiness)
 
-	apiGroup.GET("/alunos", controllers.ExibeTodosAlunos)
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
-	apiGroup.GET("/aluno/:uuid", middlewares.CachedGetRequest(), controllers.BuscaAlunoPorUUID)
-	apiGroup.GET("/aluno/cpf/:cpf", middlewares.CachedGetRequest(), controllers.BuscaAlunoPorCPF)
+	apiGroup.GET("/alunos",
+		middlewares.CachedGetRequest(),
+		controllers.ExibeTodosAlunos,
+	)
 
-	apiGroup.POST("/aluno", controllers.CriaNovoAluno)
-	apiGroup.DELETE("/aluno/:id", controllers.DeletaAluno)
-	apiGroup.PATCH("/aluno/:id", controllers.EditaAluno)
+	apiGroup.GET("/aluno/:uuid",
+		middlewares.CachedGetRequest(),
+		controllers.BuscaAlunoPorUUID,
+	)
+
+	apiGroup.GET("/aluno/cpf/:cpf",
+		middlewares.CachedGetRequest(),
+		controllers.BuscaAlunoPorCPF,
+	)
+
+	apiGroup.POST("/aluno",
+		middlewares.CachedPostRequest(),
+		middlewares.MessageBrokerPublishPostRequest(),
+		controllers.CriaNovoAluno,
+	)
+
+	apiGroup.DELETE("/aluno/:uuid",
+		middlewares.CachedDeleteRequest(),
+		controllers.DeletaAluno,
+	)
+	apiGroup.PATCH("/aluno/:uuid",
+		middlewares.CachedDeleteRequest(),
+		controllers.EditaAluno,
+	)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

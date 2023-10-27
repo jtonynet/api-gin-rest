@@ -25,9 +25,9 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
   :arrow_heading_up: [Índice](#arrow_heading_up-índice)<br/>
   :green_book: [Sobre](#green_book-sobre)<br/>
   :computer: [Rodando o Projeto](#computer-rodando-o-projeto)<br/>
+  :bar_chart: [Diagramas](#bar_chart-diagramas)<br/>
   :newspaper: [Gerando documentação com swagger](#newspaper-gerando-documentação-com-swagger)<br/>
   :camera: [Imagens do Projeto](#camera-imagens-do-projeto)<br/>
-  :bar_chart: [Diagramas](#bar_chart-diagramas)<br/>
   :train: [Teste de Carga](#train-teste-de-carga)<br>
   :mag: [Profilling](#mag-profilling)<br/>
   :hammer: [Ferramentas](#hammer-ferramentas)<br/>
@@ -40,18 +40,21 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 ---
 <a id="sobre"></a>
 ## :green_book: Sobre
-Este projeto visa aprimorar o curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa. Continuo incorporando padrões e melhorias para estudar aplicações práticas.
+Este projeto visa aprimorar a `API` de **Alunos** do curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) de forma estritamente educativa. Continuo incorporando padrões e melhorias para estudar aplicações práticas.
 
 Não considero colisões nos números de `CPF` e `RG`, pois o objetivo é criar uma API que lide com alta carga de inserções no momento, simulando um **game day** (dia de uso intenso em condições adversas)
 
 Para alcançar essas melhorias, adotei as seguintes medidas que não estavam presentes no curso original:
-- Teste de carga com Gatling
 - Técnicas de debbuging
-- Profiling da aplicação para identificar os pontos de "stress".
+- [Teste de carga com Gatling](#train-teste-de-carga)
+- Técnicas de `Caching` usando `redis`
+- Técnica de `Fila` com `messageBroker` para criacao de aluno usando `RabbitMQ`
+- POC de [Escalabilidade Horizontal](#escalando-workers) nos workers
+- Feature Flag para acionar `caching` e `messageBroker`
+- [Profiling da aplicação](#mag-profilling) para identificar os pontos de "stress".
   - Profiling acionados por feature flag
   - Profiling em middleware
-- Criação de novos alunos em filas/workers concorrentes usando goroutines.
-- (A ser implementado) Uso de Cache Redis como uma feature flag.
+
 
 O projeto foi desenvolvido no SO Ubuntu e testado tanto no Ubuntu quanto no Windows, informações de desenvolvimento estão voltadas para o sistema operacional Linux.
 
@@ -62,7 +65,7 @@ O projeto foi desenvolvido no SO Ubuntu e testado tanto no Ubuntu quanto no Wind
 
 ### :computer: Rodando o Projeto
 
-Crie uma copia do arquivo `sample.env` com o nome `.env` e rode o comando `docker compose up` (de acordo com sua versão do `docker compose`) no diretorio raiz do projeto:
+Crie uma cópia do arquivo `sample.env` com o nome `.env` e rode o comando `docker compose up` (de acordo com sua versão do `docker compose`) no diretorio raiz do projeto:
 ```bash
 $ docker compose up
 ```
@@ -77,9 +80,10 @@ $ docker compose up
 Aguarde até que as imagens sejam criadas e acesse:
 #### Rotas REST:
 - `http://localhost:8080/alunos` Rota para **API** 
-- `http://localhost:8080/aluno/{id}` Rota para **API**
+- `http://localhost:8080/aluno/{uuid}` Rota para **API**
 - `http://localhost:8080/aluno/cpf/{cpf}` Rota para **API**
-*_maiores detalhes na rota [swagger](#rotas-de-uso-de-desenvolvimento)_
+- etc... *
+*_maiores detalhes de rotas em: [swagger](#rotas-de-uso-de-desenvolvimento)_
 <br/>
 
 #### Rotas de uso de infra/suporte:
@@ -90,26 +94,39 @@ Aguarde até que as imagens sejam criadas e acesse:
 
 #### Rotas de uso de desenvolvimento:
 - `http://localhost:8080/swagger/index.html` Rota para **documentação Swagger**
-- `http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1`. Consulte [Profiling](#mag-profilling) para maiores informações.
 - `http://localhost:8082` Rota para **ultimo resultado de teste de carga**
+- `http://localhost:8080/debug/pprof` Rota de **Profiling, disponível apenas caso** `PPROF_FEATURE_FLAG_ENABLED=1`. Consulte [Profiling](#mag-profilling) para maiores informações.
+
+
+
+<br/>
+
+#### Feature Flags:
+
+:triangular_flag_on_post: Flag | :heavy_check_mark: Efeito quando ligada
+-----|--------
+PPROF_CPU_FEATURE_FLAG_ENABLED | Habilita rota de `Profiling` direto na controller
+CACHE_FEATURE_FLAG_ENABLED | Habilita estratégia de `cache` em `redis` para as rotas via `middleware`
+POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED | Rota de criação de aluno publica mensagens via `middleware` para `workers` consumirem ao invés de criar direto no DB
 
 <br>
 
 #### Escalando Workers:
-A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `1`, para aumentar a capacidade de inserção de dados no banco de dados. Para que essa abordagem surta efeito comente a linha `container_name: worker-gin`,  nomear containers conflita com a funcionalidade `replicas` do docker
+A feature flag `POST_ALUNO_AS_MESSAGE_FEATURE_FLAG_ENABLED` quando acionada faz o sistema enviar mensagens de criação de alunos para o RabbitMQ na rota `POST aluno`. No arquivo `docker-compose.yml`. Você pode ajustar a [quantidade de réplicas](https://stackoverflow.com/questions/63408708/how-to-scale-from-within-docker-compose-file) do worker, que começa com `1`, para aumentar a capacidade de inserção de dados no banco de dados. Para que essa abordagem surta efeito comente a linha `container_name: worker-gin` e `hostname: worker-gin`. Nomear containers conflita com a funcionalidade `replicas` do docker
 
 ```docker-compose
-84    worker-gin:
-85        deploy:
-86          replicas: 1
-87 #       container_name: worker-gin
+101    worker-gin:
+102        deploy:
+103          replicas: 1
+104 #      container_name: worker-gin
+105 #      hostname: worker-gin
 ```
-<!-- https://www.rabbitmq.com/dlx.html -->
+<!-- aplicar: https://www.rabbitmq.com/dlx.html -->
 
 <br/>
 
 #### Recomendações para Devs:
-Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver localmente.
+Embora seja desnecessária a instalação local de nada além do Docker para levantar o projeto, pode haver a necessidade de desenvolver/debbugar localmente.
 
 Recomendo a instalação do [GVM](https://github.com/moovweb/gvm) para controle de versões da linguagem
 
@@ -119,6 +136,113 @@ Recomendo a instalação da extensão [Golang do VsCode](https://marketplace.vis
 [:arrow_heading_up: voltar](#indice)
 
 ---
+
+ ### :bar_chart: Diagramas
+
+<br/>
+
+**Fluxo do Serviço Alunos:**
+
+```mermaid
+graph LR
+  subgraph Ações Admin Alunos
+    A(fa:fa-user ADMIN User)
+    B["fa:fa-globe Cria novo aluno"]
+    C["fa:fa-globe Obtém a lista completa de alunos"]
+    D["fa:fa-globe Busca aluno por uuid"]
+    E["fa:fa-globe Deleta aluno por uuid"]
+    F["fa:fa-globe Edita aluno por uuid"]
+    G["fa:fa-globe Busca aluno por CPF"]
+  end
+
+  subgraph Backend 
+    subgraph Message Broker
+        RabbitMQ(["fa:fa-envelope  Aluno-RabbitMQ"])
+    end
+
+    subgraph CMD
+      subgraph WORKER
+        Worker["fa:fa-gears  Aluno-Worker"]
+      end
+
+      subgraph API
+        CriaNovoAluno["fa:fa-code CriaNovoAluno"]
+        ExibeTodosAlunos["fa:fa-code ExibeTodosAlunos"]
+        BuscaAlunoPorUUId["fa:fa-code BuscaAlunoPorUUId"]
+        DeletaAluno["fa:fa-code DeletaAluno"]
+        EditaAluno["fa:fa-code EditaAluno"]
+        BuscaAlunoPorCPF["fa:fa-code BuscaAlunoPorCPF"]
+      end
+
+      subgraph CACHE
+        Aluno-Redis(["fa:fa-memory Aluno-Redis"])
+      end 
+
+      subgraph Models
+        Aluno["fa:fa-cube Aluno"]
+      end
+    end
+
+    subgraph DATABASE
+      Aluno-DB[("fa:fa-database Aluno-DB")]
+    end 
+   
+  end
+
+  A --> B
+  A --> C
+  A --> D
+  A --> E
+  A --> F
+  A --> G
+
+  C -->|GET| ExibeTodosAlunos
+  D -->|GET| BuscaAlunoPorUUId
+  E -->|DELETE| DeletaAluno
+  F -->|PATCH| EditaAluno
+  G -->|GET| BuscaAlunoPorCPF
+
+  ExibeTodosAlunos --> Aluno-Redis
+  BuscaAlunoPorUUId --> Aluno-Redis
+  BuscaAlunoPorCPF --> Aluno-Redis
+  Aluno-Redis ---|cached| Aluno
+  DeletaAluno --> Aluno
+  EditaAluno --> Aluno
+
+  Aluno -->|Queries| Aluno-DB
+  B -->|POST| CriaNovoAluno
+
+  CriaNovoAluno -.->|Publica| RabbitMQ
+  RabbitMQ -.->|Consome| Worker
+
+  Worker --> Aluno
+```
+
+<br/>
+
+**Sequência de criação de aluno:**
+
+```mermaid
+sequenceDiagram
+    participant A as ADMIN User
+    participant B as "Cria novo aluno"
+    participant CriaNovoAluno as CriaNovoAluno
+    participant RabbitMQ as Aluno-RabbitMQ
+    participant Worker as Aluno-Worker
+
+    A ->> B: Inicia a criação de um novo aluno
+    B ->> CriaNovoAluno: Envia a solicitação de criação
+    CriaNovoAluno -->> RabbitMQ: Produz mensagem
+    RabbitMQ -->> Worker: Consome mensagem
+
+```
+
+<br/>
+
+[:arrow_heading_up: voltar](#indice)
+
+---
+
 ### :newspaper: Gerando documentação com swagger
 
 Como a imagem `api-gin-rest` rodando, digite:
@@ -165,111 +289,6 @@ Para os desenvolvedores que irão manipular o código ou se inspirar para seus p
 
 ---
 
- ### :bar_chart: Diagramas
-
-<br/>
-
-**Fluxo do Serviço Alunos:**
-
-```mermaid
-graph LR
-  subgraph Ações Admin Alunos
-    A(fa:fa-user ADMIN User)
-    B["fa:fa-globe Cria novo aluno"]
-    C["fa:fa-globe Obtém a lista completa de alunos"]
-    D["fa:fa-globe Busca aluno por id"]
-    E["fa:fa-globe Deleta aluno por id"]
-    F["fa:fa-globe Edita aluno por id"]
-    G["fa:fa-globe Busca aluno por CPF"]
-  end
-
-  subgraph Backend 
-    subgraph Message Broker
-        RabbitMQ(["fa:fa-envelope  Aluno-RabbitMQ"])
-    end
-
-    subgraph CMD
-      subgraph WORKER
-        Worker["fa:fa-gears  Aluno-Worker"]
-      end
-
-      subgraph API
-        CriaNovoAluno["fa:fa-code CriaNovoAluno"]
-        ExibeTodosAlunos["fa:fa-code ExibeTodosAlunos"]
-        BuscaAlunoPorId["fa:fa-code BuscaAlunoPorId"]
-        DeletaAluno["fa:fa-code DeletaAluno"]
-        EditaAluno["fa:fa-code EditaAluno"]
-        BuscaAlunoPorCPF["fa:fa-code BuscaAlunoPorCPF"]
-      end
-
-      subgraph CACHE
-        Aluno-Redis(["fa:fa-memory Aluno-Redis"])
-      end 
-
-      subgraph Models
-        Aluno["fa:fa-cube Aluno"]
-      end
-    end
-
-    subgraph DATABASE
-      Aluno-DB[("fa:fa-database Aluno-DB")]
-    end 
-   
-  end
-
-  A --> B
-  A --> C
-  A --> D
-  A --> E
-  A --> F
-  A --> G
-
-  C -->|GET| ExibeTodosAlunos
-  D -->|GET| BuscaAlunoPorId
-  E -->|DELETE| DeletaAluno
-  F -->|PATCH| EditaAluno
-  G -->|GET| BuscaAlunoPorCPF
-
-  ExibeTodosAlunos --> Aluno-Redis
-  BuscaAlunoPorId --> Aluno-Redis
-  BuscaAlunoPorCPF --> Aluno-Redis
-  Aluno-Redis ---|cached| Aluno
-  DeletaAluno --> Aluno
-  EditaAluno --> Aluno
-
-  Aluno -->|Queries| Aluno-DB
-  B -->|POST| CriaNovoAluno
-
-  CriaNovoAluno -.->|Publica| RabbitMQ
-  RabbitMQ -.->|Consome| Worker
-
-  Worker --> Aluno
-```
-
-<br/>
-
-**Sequência de criação de aluno:**
-
-```mermaid
-sequenceDiagram
-    participant A as ADMIN User
-    participant B as "Cria novo aluno"
-    participant CriaNovoAluno as CriaNovoAluno
-    participant RabbitMQ as Aluno-RabbitMQ
-    participant Worker as Aluno-Worker
-
-    A ->> B: Inicia a criação de um novo aluno
-    B ->> CriaNovoAluno: Envia a solicitação de criação
-    CriaNovoAluno -->> RabbitMQ: Produz mensagem
-    RabbitMQ -->> Worker: Consome mensagem
-
-```
-
-<br/>
-
-[:arrow_heading_up: voltar](#indice)
-
----
 
 ### :train: Teste de Carga
 
@@ -373,6 +392,8 @@ Após a instalação do Gatling, que ocorre na primeira vez que você solicita a
 
 ### :mag: Profilling
 
+#### API:
+
 O profiling da aplicação para fins de testes e validação está vinculado às rotas. O processo não é executado de maneira dockerizada, necessitando ter o [Go](#recomendações-para-devs) e o Graphviz instalados na sua máquina.
 
 ```shell
@@ -444,27 +465,35 @@ https://github.com/gin-contrib/pprof/blob/v1.4.0/_example/default/server.go
 ## :hammer: Ferramentas
 As seguintes ferramentas foram usadas na construção do projeto:
 
-- [Go v1.21.1](https://go.dev/)
-- [GVM v1.0.22](https://github.com/moovweb/gvm)
-- [Gin](https://gin-gonic.com/)
-- [GORM](https://gorm.io/index.html)
-- [Viper](https://github.com/spf13/viper)
-- [Gin-Swagger](https://github.com/swaggo/gin-swagger)
-- [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
-- [Exponential Backoff](https://github.com/cenkalti/backoff)
-- [go-redis](https://github.com/redis/go-redis)
-- [amqp091-go]([amqp091-go](https://github.com/rabbitmq/amqp091-go))
-- [gjson](https://github.com/tidwall/gjson)
-- [Postgres v16.0](https://www.postgresql.org/)
-- [Docker v24.0.6](https://www.docker.com/)
-- [Docker compose v2.21.0](https://www.docker.com/)
-- [Gatling v3.9.5](https://gatling.io/)
-- [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
+- Linguagem:
+  - [Go v1.21.1](https://go.dev/)
+  - [GVM v1.0.22](https://github.com/moovweb/gvm)
 
-GUIs:
-- [VsCode](https://code.visualstudio.com/)
-- [DBeaver](https://dbeaver.io/)
-- [another-redis-desktop-manager](https://github.com/qishibo/AnotherRedisDesktopManager)
+- Framework & Libs:
+  - [Gin](https://gin-gonic.com/)
+  - [GORM](https://gorm.io/index.html)
+  - [Viper](https://github.com/spf13/viper)
+  - [Gin-Swagger](https://github.com/swaggo/gin-swagger)
+  - [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
+  - [Exponential Backoff](https://github.com/cenkalti/backoff)
+  - [go-redis](https://github.com/redis/go-redis)
+  - [amqp091-go]([amqp091-go](https://github.com/rabbitmq/amqp091-go))
+  - [gjson](https://github.com/tidwall/gjson)
+  - [uuid](github.com/google/uuid)
+
+- Infra & Tecnologias
+  - [Docker v24.0.6](https://www.docker.com/)
+  - [Docker compose v2.21.0](https://www.docker.com/)
+  - [Postgres v16.0](https://www.postgresql.org/)
+  - [Redis 6.2](https://redis.io/)
+  - [RabbitMQ v3.12.6](https://www.rabbitmq.com/)
+  - [Gatling v3.9.5](https://gatling.io/)
+
+
+- GUIs:
+  - [VsCode](https://code.visualstudio.com/)
+  - [DBeaver](https://dbeaver.io/)
+  - [another-redis-desktop-manager](https://github.com/qishibo/AnotherRedisDesktopManager)
 
 
 [:arrow_heading_up: voltar](#indice)

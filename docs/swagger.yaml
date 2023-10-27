@@ -1,33 +1,29 @@
-basePath: /alunos
 definitions:
   models.Aluno:
     properties:
       cpf:
+        description: para fins de teste de carga, não valido e nem considero esse
+          campo como unique
         example: "00000000000"
         type: string
       nome:
         example: Jonh Doe
         type: string
       rg:
+        description: para fins de teste de carga, não valido e nem considero esse
+          campo como unique
         example: "12345678901234"
         type: string
       uuid:
         example: 00000000-a0a0-0aa0-0aa0-a0aa0000a000
         type: string
+    required:
+    - cpf
+    - nome
+    - rg
     type: object
-host: localhost:8080
 info:
-  contact:
-    email: learningingenuity@gmail.com
-    name: API GIN Support
-    url: https://github.com/jtonynet/api-gin-rest
-  description: Estudo API Rest em Golang com Gin
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
-  termsOfService: https://github.com/jtonynet/api-gin-rest
-  title: api-gin-rest
-  version: 0.0.3
+  contact: {}
 paths:
   /aluno:
     post:
@@ -52,9 +48,9 @@ paths:
       summary: Cria novo aluno
       tags:
       - Aluno
-  /aluno/{id}:
+  /aluno/{uuid}:
     delete:
-      description: Deleta aluno por id
+      description: Deleta aluno por uuid
       produces:
       - application/json
       responses:
@@ -62,11 +58,11 @@ paths:
           description: OK
           schema:
             type: string
-      summary: Deleta aluno por id
+      summary: Deleta aluno por uuid
       tags:
       - Aluno
     get:
-      description: Busca aluno por id
+      description: Busca aluno por uuid
       produces:
       - application/json
       responses:
@@ -78,25 +74,25 @@ paths:
           description: Not Found
           schema:
             type: string
-      summary: Busca aluno por id
+      summary: Busca aluno por uuid
       tags:
       - Aluno
     patch:
       consumes:
       - application/json
-      description: Edita aluno por id
+      description: Edita aluno por uuid
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            $ref: '#/definitions/models.Aluno'
+            type: uuid
         "400":
           description: Bad Request
           schema:
             type: string
-      summary: Edita aluno por id
+      summary: Edita aluno por uuid
       tags:
       - Aluno
   /aluno/cpf/{cpf}:
@@ -114,23 +110,6 @@ paths:
           schema:
             type: string
       summary: Busca aluno por CPF
-      tags:
-      - Aluno
-  /aluno/uuid/{uuid}:
-    get:
-      description: Busca aluno por id
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Aluno'
-        "404":
-          description: Not Found
-          schema:
-            type: string
-      summary: Busca aluno por id
       tags:
       - Aluno
   /alunos:
@@ -161,6 +140,4 @@ paths:
       summary: Busca o número de alunos no banco de dados
       tags:
       - Aluno
-schemes:
-- http
 swagger: "2.0"

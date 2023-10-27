@@ -19,7 +19,9 @@ func InitConfig() (*config.Config, error) {
 	return cfg, nil
 }
 
-func InitDatabase(cfg config.Database, RetryMaxElapsedTime time.Duration) error {
+func InitDatabase(cfg config.Database,
+	RetryMaxElapsedTime time.Duration,
+) error {
 	retryCfg := backoff.NewExponentialBackOff()
 	retryCfg.MaxElapsedTime = RetryMaxElapsedTime
 
@@ -28,13 +30,16 @@ func InitDatabase(cfg config.Database, RetryMaxElapsedTime time.Duration) error 
 		dbErr = database.Init(cfg)
 		return dbErr
 	}, retryCfg, func(err error, t time.Duration) {
-		slog.Error("Retrying connect to Database after error: %v", err)
+		slog.Info("Retrying connect to Database after error: %v", err)
 	})
 
 	return err
 }
 
-func NewMessageBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClient, RetryMaxElapsedTime time.Duration) (interfaces.Broker, error) {
+func NewMessageBroker(cfg config.MessageBroker,
+	cacheClient interfaces.CacheClient,
+	RetryMaxElapsedTime time.Duration,
+) (interfaces.Broker, error) {
 	retryCfg := backoff.NewExponentialBackOff()
 	retryCfg.MaxElapsedTime = RetryMaxElapsedTime
 
@@ -45,7 +50,7 @@ func NewMessageBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClie
 		messageBroker, msgBrokerErr = message.NewBroker(cfg, cacheClient)
 		return msgBrokerErr
 	}, retryCfg, func(err error, t time.Duration) {
-		slog.Error("Retrying connect to MessageBroker after error: %v", err)
+		slog.Info("Retrying connect to MessageBroker after error: %v", err)
 	})
 
 	return messageBroker, err

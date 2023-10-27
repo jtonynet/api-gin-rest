@@ -17,27 +17,6 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 )
 
-func ConfigInject(cfg config.API) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("cfg", cfg)
-		c.Next()
-	}
-}
-
-func MessageBrokerInject(messageBroker interfaces.Broker) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("messageBroker", messageBroker)
-		c.Next()
-	}
-}
-
-func CacheClientInject(cacheClient interfaces.CacheClient) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("cacheClient", cacheClient)
-		c.Next()
-	}
-}
-
 // Tratamento adequedo de Middlewares para obter "Separation of Concerns"
 // https://gin-gonic.com/docs/examples/custom-middleware/
 
@@ -54,14 +33,13 @@ func CachedGetRequest() gin.HandlerFunc {
 				var err error
 				cacheKey, err = getCacheKeyFromPath(c)
 				if err != nil {
-					slog.Error("cacheClient.getCacheKeyFromPath error: ", err)
+					slog.Error("middlewares:CachedGetRequest:cacheClient.getCacheKeyFromPath error: ", err)
 					c.Abort()
 				}
 
 				cachedData, err := cacheClient.Get(cacheKey)
-				slog.Info("cachedData ", cacheKey, cachedData)
 				if err == nil {
-					var returnData map[string]interface{}
+					var returnData interface{}
 					if err := json.Unmarshal([]byte(cachedData), &returnData); err != nil {
 						slog.Error("middlewares:CachedGetRequest:json.Unmarshal error: ", err)
 						c.Abort()
@@ -73,10 +51,6 @@ func CachedGetRequest() gin.HandlerFunc {
 						statusCodeReturn = int(cachedHttpStatus.Int())
 					}
 
-					currentTime := time.Now()
-					timeFormatted := currentTime.Format("15:04:05.000000")
-					fmt.Println("MIDDLEWARE CachedGetRequest (HH:MM:SS.mmmuuu):", timeFormatted)
-
 					c.JSON(statusCodeReturn, returnData)
 					c.Abort()
 				}
@@ -86,19 +60,7 @@ func CachedGetRequest() gin.HandlerFunc {
 		c.Next()
 
 		if cfg.FeatureFlags.CacheEnabled && cacheClient.IsConnected() {
-			queryResult, queryResultExists := c.Get("queryResult")
-			if queryResultExists {
-				queryResultJSON, err := json.Marshal(queryResult)
-				if err != nil {
-					slog.Error("middlewares:CachedGetRequest:json.Marshal error: ", err)
-					c.Abort()
-				}
-
-				err = cacheClient.Set(cacheKey, string(queryResultJSON), cacheClient.GetDefaultExpiration())
-				if err != nil {
-					slog.Error("cannot set key: %s error: %v", cacheKey, err)
-				}
-			}
+			setCacheResult(c, cacheKey)
 		}
 	}
 }
@@ -123,6 +85,8 @@ func CachedPostRequest() gin.HandlerFunc {
 				UUID := uuid.New().String()
 				c.Set("UUID", UUID)
 
+				cacheKey = fmt.Sprintf("%s:%s", segmentCacheKey, UUID)
+
 				var msgJson map[string]interface{}
 				msg := fmt.Sprintf(`{"HTTPStatusCode":202, "SegmentKey":"%s", "uuid":"%s", "Message":" in processing"}`, segmentCacheKey, UUID)
 				err = json.Unmarshal([]byte(msg), &msgJson)
@@ -130,8 +94,6 @@ func CachedPostRequest() gin.HandlerFunc {
 					slog.Error("middlewares:CachedPostRequest:json.Unmarshal error: ", err)
 					c.Abort()
 				}
-
-				cacheKey = fmt.Sprintf("%s:%s", segmentCacheKey, UUID)
 
 				// Request Post data no expires INFO cache. Only Request Get data cache expires
 				// Request Get data has the same key as the Request Post, it overwrites.
@@ -148,35 +110,32 @@ func CachedPostRequest() gin.HandlerFunc {
 		c.Next()
 
 		if cfg.FeatureFlags.CacheEnabled && cacheClient.IsConnected() {
-			queryResult, queryResultExists := c.Get("queryResult")
-			if queryResultExists {
-				queryResultJSON, err := json.Marshal(queryResult)
-				if err != nil {
-					slog.Info("middlewares:CachedRequest:json.Marshal error: ", err)
-					c.Abort()
-				}
-
-				err = cacheClient.Set(cacheKey, string(queryResultJSON), cacheClient.GetDefaultExpiration())
-				if err != nil {
-					slog.Error("cannot set key: %s error: %v", cacheKey, err)
-				}
-			}
+			setCacheResult(c, cacheKey)
 		}
 	}
 }
 
-// func PublishPostRequestAsync() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		cfg := c.MustGet("cfg").(config.API)
-// 		var messageBroker interfaces.Broker
+func CachedDeleteRequest() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
 
-// 		c.Next()
+		cfg := c.MustGet("cfg").(config.API)
 
-// 		if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
-// 			messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
-// 		}
-// 	}
-// }
+		if cfg.FeatureFlags.CacheEnabled {
+			cacheClient := c.MustGet("cacheClient").(interfaces.CacheClient)
+
+			if cacheClient.IsConnected() {
+				cacheKey, err := getCacheKeyFromPath(c)
+				if err != nil {
+					slog.Error("middlewares:CachedEditAndDeleteRequest:cacheClient.getCacheKeyFromPath error: ", err)
+					c.Abort()
+				}
+				cacheClient.Delete(cacheKey)
+			}
+		}
+	}
+
+}
 
 func getCacheKeyFromPath(c *gin.Context) (string, error) {
 	path := c.FullPath()
@@ -208,4 +167,22 @@ func getCacheKeyFromPath(c *gin.Context) (string, error) {
 	}
 
 	return "", errors.New("improperly formatted path")
+}
+
+func setCacheResult(c *gin.Context, cacheKey string) {
+	result, resultExists := c.Get("result")
+	if resultExists {
+		cacheClient := c.MustGet("cacheClient").(interfaces.CacheClient)
+
+		resultJSON, err := json.Marshal(result)
+		if err != nil {
+			slog.Error("middlewares:setCacheResult:json.Marshal error: ", err)
+			c.Abort()
+		}
+
+		err = cacheClient.Set(cacheKey, string(resultJSON), cacheClient.GetDefaultExpiration())
+		if err != nil {
+			slog.Error("cannot set key: %s error: %v", cacheKey, err)
+		}
+	}
 }

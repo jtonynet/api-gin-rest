@@ -9,7 +9,5 @@ type CacheClient interface {
 	Get(key string) (string, error)
 	Delete(key string) error
 	IsConnected() bool
-	GetNameFromPath(path string) (string, error)
-	GetNameAndKeyFromPath(path string) (string, string, error)
 	GetDefaultExpiration() time.Duration
 }

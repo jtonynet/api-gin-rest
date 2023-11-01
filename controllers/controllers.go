@@ -56,7 +56,7 @@ func Readiness(c *gin.Context) {
 	}
 
 	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
-		messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
+		messageBroker := c.MustGet("messageBroker").(interfaces.MessageBroker)
 		if !messageBroker.IsConnected() {
 			c.JSON(http.StatusServiceUnavailable, gin.H{
 				"message": "MessageBroker Service unavailable",

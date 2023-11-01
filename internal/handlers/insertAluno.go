@@ -1,4 +1,4 @@
-package messageHandlers
+package handlers
 
 import (
 	"encoding/json"
@@ -9,13 +9,11 @@ import (
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
-type InsertAlunoHandler struct{}
-
-func NewInsertAluno() interfaces.MessageHandler {
-	return &InsertAlunoHandler{}
+func NewInsertAluno() interfaces.Handler {
+	return &Handler{}
 }
 
-func (i *InsertAlunoHandler) Execute(msg string) (string, error) {
+func (h *Handler) Execute(msg string) (string, error) {
 	var aluno models.Aluno
 	err := json.Unmarshal([]byte(msg), &aluno)
 	if err != nil {

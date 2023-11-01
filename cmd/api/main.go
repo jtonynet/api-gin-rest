@@ -32,7 +32,7 @@ func main() {
 		slog.Error("cannot initialize cacheClient, error: %v", err)
 	}
 
-	var messageBroker interfaces.Broker
+	var messageBroker interfaces.MessageBroker
 	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
 		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, RetryMaxElapsedTime)
 		if err != nil {

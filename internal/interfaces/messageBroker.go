@@ -1,6 +1,6 @@
 package interfaces
 
-type Broker interface {
+type MessageBroker interface {
 	IsConnected() bool
 	Publish(body string) error
 	Shutdown() error

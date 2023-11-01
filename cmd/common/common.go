@@ -38,12 +38,12 @@ func InitDatabase(cfg config.Database,
 
 func NewMessageBroker(cfg config.MessageBroker,
 	RetryMaxElapsedTime time.Duration,
-) (interfaces.Broker, error) {
+) (interfaces.MessageBroker, error) {
 	retryCfg := backoff.NewExponentialBackOff()
 	retryCfg.MaxElapsedTime = RetryMaxElapsedTime
 
 	var msgBrokerErr error
-	var messageBroker interfaces.Broker
+	var messageBroker interfaces.MessageBroker
 
 	err := backoff.RetryNotify(func() error {
 		messageBroker, msgBrokerErr = message.NewBroker(cfg)

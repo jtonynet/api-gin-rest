@@ -18,7 +18,7 @@ import (
 
 func HandleRequests(
 	cfg config.API,
-	messageBroker interfaces.Broker,
+	messageBroker interfaces.MessageBroker,
 	cacheClient interfaces.CacheClient,
 ) {
 	r := gin.Default()

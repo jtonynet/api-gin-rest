@@ -1,4 +1,4 @@
-package messageHandlers
+package decorators
 
 import (
 	"fmt"
@@ -8,25 +8,25 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-type CachedDecorator struct {
-	next            interfaces.MessageHandler
+type Cached struct {
+	next            interfaces.Handler
 	cacheClient     interfaces.CacheClient
 	cacheKeySegment string
 }
 
-func NewCachedDecorator(
-	next interfaces.MessageHandler,
+func NewCached(
+	next interfaces.Handler,
 	cacheClient interfaces.CacheClient,
 	cacheKeySegment string,
-) interfaces.MessageHandler {
-	return &CachedDecorator{
+) interfaces.Handler {
+	return &Cached{
 		next:            next,
 		cacheClient:     cacheClient,
 		cacheKeySegment: cacheKeySegment,
 	}
 }
 
-func (c *CachedDecorator) Execute(msg string) (string, error) {
+func (c *Cached) Execute(msg string) (string, error) {
 	msgValue, err := c.next.Execute(msg)
 
 	if err != nil {

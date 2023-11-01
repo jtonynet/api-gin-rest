@@ -49,9 +49,7 @@ func main() {
 			cfg.MessageBroker.Queue,
 		)
 
-		err = messageBroker.RunConsumer(
-			insertAlunoHandlerCached.Execute,
-		)
+		err = messageBroker.RunConsumer(insertAlunoHandlerCached.Execute)
 		if err != nil {
 			slog.Error("cannot consume messages from Broker, error: %v", err)
 		}

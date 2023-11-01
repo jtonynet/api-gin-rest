@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
-	"github.com/jtonynet/api-gin-rest/cmd/worker/handlers"
+	"github.com/jtonynet/api-gin-rest/cmd/worker/messageHandlers"
 	"github.com/jtonynet/api-gin-rest/internal/cache"
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 )
@@ -41,10 +41,10 @@ func main() {
 			slog.Error("cannot initialize MessageBroker, error: %v", err)
 		}
 
-		insertAluno := handlers.NewInsertAluno()
-		inserAlunoCached := handlers.NewInsertCached(insertAluno, cacheClient, cfg.MessageBroker.Queue)
+		insertAluno := messageHandlers.NewInsertAluno()
+		inserAlunoCached := messageHandlers.NewCached(insertAluno, cacheClient, cfg.MessageBroker.Queue)
 
-		err = messageBroker.RunConsumer(inserAlunoCached.InsertMethod)
+		err = messageBroker.RunConsumer(inserAlunoCached.Execute)
 		if err != nil {
 			slog.Error("cannot consume messages from Broker, error: %v", err)
 		}

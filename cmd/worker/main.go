@@ -42,7 +42,10 @@ func main() {
 			slog.Error("cannot initialize MessageBroker, error: %v", err)
 		}
 
-		err = messageBroker.RunConsumer(handlers.InsertAluno)
+		insertAluno := handlers.NewInsertAluno()
+		inserAlunoCached := handlers.NewInsertAlunoCached(insertAluno, cacheClient, cfg.MessageBroker.Queue)
+
+		err = messageBroker.RunConsumer(inserAlunoCached.InsertMethod)
 		if err != nil {
 			slog.Error("cannot consume messages from Broker, error: %v", err)
 		}

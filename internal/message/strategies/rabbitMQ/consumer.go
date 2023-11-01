@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/tidwall/gjson"
 )
 
 /*
@@ -59,7 +58,7 @@ func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries
 
 	for d := range deliveries {
 
-		msgValue, err := consumerHandler(string(d.Body))
+		_, err := consumerHandler(string(d.Body))
 
 		if err != nil {
 
@@ -95,21 +94,21 @@ func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries
 			d.Ack(false)
 		}
 
-		if b.cacheClient != nil {
+		// if b.cacheClient != nil {
 
-			msgUUID := gjson.Get(msgValue, "uuid")
-			msgKey := fmt.Sprintf("%s:%s", b.cfg.Queue, msgUUID)
+		// 	msgUUID := gjson.Get(msgValue, "uuid")
+		// 	msgKey := fmt.Sprintf("%s:%s", b.cfg.Queue, msgUUID)
 
-			fmt.Println("//------------------------------------------")
-			fmt.Println(msgKey)
-			fmt.Println("//------------------------------------------")
+		// 	fmt.Println("//------------------------------------------")
+		// 	fmt.Println(msgKey)
+		// 	fmt.Println("//------------------------------------------")
 
-			b.cacheClient.Delete(msgKey)
-			err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetDefaultExpiration())
-			if err != nil {
-				slog.Error("cmd:worker:main:messageBroker:RunConsumer:handle:b.cacheClient.Set error set%v", err)
-			}
-		}
+		// 	b.cacheClient.Delete(msgKey)
+		// 	err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetDefaultExpiration())
+		// 	if err != nil {
+		// 		slog.Error("cmd:worker:main:messageBroker:RunConsumer:handle:b.cacheClient.Set error set%v", err)
+		// 	}
+		// }
 	}
 
 	slog.Info("handle: deliveries channel closed")

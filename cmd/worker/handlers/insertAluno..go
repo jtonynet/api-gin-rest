@@ -8,7 +8,17 @@ import (
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
-func InsertAluno(msg string) (string, error) {
+type iInsert interface {
+	InsertMethod(msg string) (string, error)
+}
+
+type InsertAluno struct{}
+
+func NewInsertAluno() iInsert {
+	return &InsertAluno{}
+}
+
+func (i *InsertAluno) InsertMethod(msg string) (string, error) {
 	var aluno models.Aluno
 	err := json.Unmarshal([]byte(msg), &aluno)
 	if err != nil {

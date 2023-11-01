@@ -8,26 +8,27 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-type InsertAlunoCached struct {
-	next            iInsert
+type InsertCached struct {
+	next            interfaces.Insert
 	cacheClient     interfaces.CacheClient
 	cacheKeySegment string
 }
 
-func NewInsertAlunoCached(
-	next iInsert,
+func NewInsertCached(
+	next interfaces.Insert,
 	cacheClient interfaces.CacheClient,
 	cacheKeySegment string,
-) iInsert {
-	return &InsertAlunoCached{
+) interfaces.Insert {
+	return &InsertCached{
 		next:            next,
 		cacheClient:     cacheClient,
 		cacheKeySegment: cacheKeySegment,
 	}
 }
 
-func (i *InsertAlunoCached) InsertMethod(msg string) (string, error) {
+func (i *InsertCached) InsertMethod(msg string) (string, error) {
 	msgValue, err := i.next.InsertMethod(msg)
+
 	if err != nil {
 		return msgValue, err
 	}

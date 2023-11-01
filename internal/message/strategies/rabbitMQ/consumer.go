@@ -93,22 +93,6 @@ func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries
 		} else {
 			d.Ack(false)
 		}
-
-		// if b.cacheClient != nil {
-
-		// 	msgUUID := gjson.Get(msgValue, "uuid")
-		// 	msgKey := fmt.Sprintf("%s:%s", b.cfg.Queue, msgUUID)
-
-		// 	fmt.Println("//------------------------------------------")
-		// 	fmt.Println(msgKey)
-		// 	fmt.Println("//------------------------------------------")
-
-		// 	b.cacheClient.Delete(msgKey)
-		// 	err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetDefaultExpiration())
-		// 	if err != nil {
-		// 		slog.Error("cmd:worker:main:messageBroker:RunConsumer:handle:b.cacheClient.Set error set%v", err)
-		// 	}
-		// }
 	}
 
 	slog.Info("handle: deliveries channel closed")

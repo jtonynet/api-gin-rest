@@ -34,7 +34,6 @@ func main() {
 	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
 		messageBroker, err := common.NewMessageBroker(
 			cfg.MessageBroker,
-			cacheClient,
 			RetryMaxElapsedTime,
 		)
 
@@ -43,7 +42,7 @@ func main() {
 		}
 
 		insertAluno := handlers.NewInsertAluno()
-		inserAlunoCached := handlers.NewInsertAlunoCached(insertAluno, cacheClient, cfg.MessageBroker.Queue)
+		inserAlunoCached := handlers.NewInsertCached(insertAluno, cacheClient, cfg.MessageBroker.Queue)
 
 		err = messageBroker.RunConsumer(inserAlunoCached.InsertMethod)
 		if err != nil {

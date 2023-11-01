@@ -34,7 +34,7 @@ func main() {
 
 	var messageBroker interfaces.Broker
 	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
-		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, cacheClient, RetryMaxElapsedTime)
+		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, RetryMaxElapsedTime)
 		if err != nil {
 			slog.Error("cannot initialize MessageBroker, error: %v", err)
 		}

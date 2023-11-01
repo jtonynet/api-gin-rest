@@ -5,16 +5,13 @@ import (
 	"log/slog"
 
 	"github.com/jtonynet/api-gin-rest/internal/database"
+	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 	"github.com/jtonynet/api-gin-rest/models"
 )
 
-type iInsert interface {
-	InsertMethod(msg string) (string, error)
-}
-
 type InsertAluno struct{}
 
-func NewInsertAluno() iInsert {
+func NewInsertAluno() interfaces.Insert {
 	return &InsertAluno{}
 }
 

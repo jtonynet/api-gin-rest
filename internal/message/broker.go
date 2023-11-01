@@ -7,10 +7,10 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/message/strategies/rabbitMQ"
 )
 
-func NewBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClient) (interfaces.Broker, error) {
+func NewBroker(cfg config.MessageBroker) (interfaces.Broker, error) {
 	switch cfg.Strategy {
 	case "rabbitmq":
-		return rabbitMQ.NewBroker(cfg, cacheClient)
+		return rabbitMQ.NewBroker(cfg)
 	default:
 		return nil, nil
 	}

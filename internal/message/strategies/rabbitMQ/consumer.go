@@ -60,15 +60,6 @@ func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries
 	for d := range deliveries {
 
 		msgValue, err := consumerHandler(string(d.Body))
-		msgUUID := gjson.Get(msgValue, "uuid")
-		msgKey := fmt.Sprintf("aluno:%s", msgUUID)
-
-		fmt.Println("//------------------------------------------")
-		fmt.Println(msgKey)
-		fmt.Println("//------------------------------------------")
-
-		//err := json.Unmarshal([]byte(msg), &msgValue)
-		//msgValueJson := json.Marshal(msgValue)
 
 		if err != nil {
 
@@ -105,6 +96,14 @@ func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries
 		}
 
 		if b.cacheClient != nil {
+
+			msgUUID := gjson.Get(msgValue, "uuid")
+			msgKey := fmt.Sprintf("%s:%s", b.cfg.Queue, msgUUID)
+
+			fmt.Println("//------------------------------------------")
+			fmt.Println(msgKey)
+			fmt.Println("//------------------------------------------")
+
 			b.cacheClient.Delete(msgKey)
 			err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetDefaultExpiration())
 			if err != nil {

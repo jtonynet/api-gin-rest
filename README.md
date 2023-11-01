@@ -8,10 +8,11 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 <br> 
 <img src="./misc/images/gin_mediun.png">
 
-[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs) <!-- icons by https://simpleicons.org/?q=types -->
+[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs)
 <!--   <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
 
-
+<!-- icons by: https://simpleicons.org/?q=types -->
+<!-- markdown emojis: https://gist.github.com/rxaviers/7360908 -->
 
 ![Badge Status](https://img.shields.io/badge/STATUS-EM_DESENVOLVIMENTO-green)
 
@@ -83,6 +84,7 @@ Aguarde até que as imagens sejam criadas e acesse:
 - `http://localhost:8080/aluno/{uuid}` Rota para **API**
 - `http://localhost:8080/aluno/cpf/{cpf}` Rota para **API**
 - etc... *
+
 *_maiores detalhes de rotas em: [swagger](#rotas-de-uso-de-desenvolvimento)_
 <br/>
 
@@ -477,7 +479,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
   - [gin-contrib/pprof](https://github.com/gin-contrib/pprof)
   - [Exponential Backoff](https://github.com/cenkalti/backoff)
   - [go-redis](https://github.com/redis/go-redis)
-  - [amqp091-go]([amqp091-go](https://github.com/rabbitmq/amqp091-go))
+  - [amqp091-go](https://github.com/rabbitmq/amqp091-go)
   - [gjson](https://github.com/tidwall/gjson)
   - [uuid](github.com/google/uuid)
 
@@ -528,9 +530,16 @@ Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.m
 https://tutorialedge.net/golang/go-decorator-function-pattern-tutorial/
 https://srinjoysantra.medium.com/decorator-pattern-in-golang-a831ecae0d38
 
+Gifs para readme.md ricos
 https://www.omgubuntu.co.uk/2017/02/peek-animated-gif-screen-capture-linux-update
+
+Golang and Redis
+https://voskan.host/2023/08/14/golang-redis-caching/
 
 OpenTelemetry Redis
 https://github.com/redis/go-redis/blob/master/example/otel/client.go
+
+Clean Architecture Gin
+https://github.com/wesionaryTEAM/go_clean_architecture
 -->
 

@@ -40,6 +40,7 @@ func HandleRequests(
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
 	apiGroup.GET("/alunos",
+		middlewares.PaginateRequest(),
 		middlewares.CachedGetRequest(),
 		controllers.ExibeTodosAlunos,
 	)

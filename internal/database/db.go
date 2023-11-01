@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/jtonynet/api-gin-rest/models"
 	"gorm.io/driver/postgres"
@@ -38,4 +39,15 @@ func CheckReadiness() error {
 		return err
 	}
 	return nil
+}
+
+func Paginate(c *gin.Context) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		limit := c.MustGet("Limit").(int64)
+		page := c.MustGet("Page").(int64)
+
+		offset := (page - 1) * limit
+
+		return db.Offset(int(offset)).Limit(int(limit))
+	}
 }

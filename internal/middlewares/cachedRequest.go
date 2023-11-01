@@ -134,11 +134,19 @@ func CachedDeleteRequest() gin.HandlerFunc {
 			}
 		}
 	}
-
 }
 
 func getCacheKeyFromPath(c *gin.Context) (string, error) {
 	path := c.FullPath()
+	var key string
+	queryStringCacheKey := ""
+
+	queryParameters := c.Request.URL.Query()
+	for queryKey, queryValues := range queryParameters {
+		for _, queryValue := range queryValues {
+			queryStringCacheKey = queryStringCacheKey + fmt.Sprintf(":%s=%s", queryKey, queryValue)
+		}
+	}
 
 	hasColon := strings.Contains(path, ":")
 	if hasColon {
@@ -157,13 +165,14 @@ func getCacheKeyFromPath(c *gin.Context) (string, error) {
 		if paramName == "" || paramKey == "" {
 			return "", errors.New("improperly formatted path")
 		}
-		key := fmt.Sprintf("%s:%s", paramName, c.Params.ByName(paramKey))
+		key = fmt.Sprintf("%s:%s%s", paramName, c.Params.ByName(paramKey), queryStringCacheKey)
 		return key, nil
 	}
 
 	pathSplited := strings.Split(path, "/")
 	if len(pathSplited) > 0 {
-		return pathSplited[len(pathSplited)-1], nil
+		key = fmt.Sprintf("%s%s", pathSplited[len(pathSplited)-1], queryStringCacheKey)
+		return key, nil
 	}
 
 	return "", errors.New("improperly formatted path")

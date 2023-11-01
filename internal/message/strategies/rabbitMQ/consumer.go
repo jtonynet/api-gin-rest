@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/tidwall/gjson"
 )
 
 /*
@@ -12,7 +13,7 @@ Fortemente baseado no exemplo da lib streadway consumer.go
 https://github.com/streadway/amqp/blob/master/_examples/simple-consumer/consumer.go
 */
 
-func (b *Broker) RunConsumer(consumerHandler func(string) (string, string, error)) error {
+func (b *Broker) RunConsumer(consumerHandler func(string) (string, error)) error {
 	slog.Info("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
 		b.cfg.Queue,       // name
@@ -49,7 +50,8 @@ func (b *Broker) Shutdown() error {
 	return <-b.done
 }
 
-func (b *Broker) handle(consumerHandler func(string) (string, string, error), deliveries <-chan amqp.Delivery, done chan error) {
+// ESSE METODO DEVERIA SER DECORADO PELO CACHE
+func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries <-chan amqp.Delivery, done chan error) {
 	var attempt int32
 	requeue := true
 
@@ -57,7 +59,17 @@ func (b *Broker) handle(consumerHandler func(string) (string, string, error), de
 
 	for d := range deliveries {
 
-		msgKey, msgValue, err := consumerHandler(string(d.Body))
+		msgValue, err := consumerHandler(string(d.Body))
+		msgUUID := gjson.Get(msgValue, "uuid")
+		msgKey := fmt.Sprintf("aluno:%s", msgUUID)
+
+		fmt.Println("//------------------------------------------")
+		fmt.Println(msgKey)
+		fmt.Println("//------------------------------------------")
+
+		//err := json.Unmarshal([]byte(msg), &msgValue)
+		//msgValueJson := json.Marshal(msgValue)
+
 		if err != nil {
 
 			// TODO:

@@ -83,8 +83,16 @@ func Readiness(c *gin.Context) {
 // @Success 200 {array} models.Aluno
 // @Router /alunos [get]
 func ExibeTodosAlunos(c *gin.Context) {
+
+	limit := c.MustGet("Limit").(int64)
+	page := c.MustGet("Page").(int64)
+
+	offset := (page - 1) * limit
+	//return db.Offset(int(offset)).Limit(int(limit))
+
 	var alunos []models.Aluno
-	database.DB.Find(&alunos)
+	database.DB.Offset(int(offset)).Limit(int(limit)).Find(&alunos)
+	//database.DB.Find(&alunos)
 
 	c.Set("result", alunos)
 	c.JSON(200, alunos)
@@ -126,6 +134,7 @@ func CriaNovoAluno(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro ao tentar inserir o aluno",
 		})
+		return
 	}
 
 	c.Set("result", aluno)

@@ -20,7 +20,7 @@ type Broker struct {
 	cfg     config.MessageBroker
 	done    chan error
 
-	consumerHandler func(string) (string, string, error)
+	consumerHandler func(string) (string, error)
 
 	cacheClient interfaces.CacheClient
 }

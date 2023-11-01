@@ -42,7 +42,11 @@ func main() {
 		}
 
 		insertAluno := messageHandlers.NewInsertAluno()
-		inserAlunoCached := messageHandlers.NewCached(insertAluno, cacheClient, cfg.MessageBroker.Queue)
+		inserAlunoCached := messageHandlers.NewCachedDecorator(
+			insertAluno,
+			cacheClient,
+			cfg.MessageBroker.Queue,
+		)
 
 		err = messageBroker.RunConsumer(inserAlunoCached.Execute)
 		if err != nil {

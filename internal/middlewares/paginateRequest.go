@@ -12,7 +12,7 @@ import (
 
 func PaginateRequest() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		per_page, err := strconv.ParseInt(c.Query("per_page"), 5, 0)
+		per_page, err := strconv.ParseInt(c.Query("per_page"), 10, 0)
 		if err != nil {
 			per_page = 5
 		}

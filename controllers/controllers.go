@@ -15,11 +15,6 @@ import (
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 )
 
-type InfraReturn struct {
-	message string
-	sumary  string
-}
-
 // @BasePath /alunos
 
 func Liveness(c *gin.Context) {
@@ -118,11 +113,12 @@ func CriaNovoAluno(c *gin.Context) {
 		return
 	}
 
-	UUID := c.GetString("UUID")
-	if UUID == "" {
-		UUID = uuid.New().String()
+	//aluno.UUID = uuid.New()
+	UUIDstr := c.GetString("UUID")
+	if UUIDstr == "" {
+		UUIDstr = uuid.New().String()
 	}
-	aluno.UUID = UUID
+	aluno.UUID = uuid.MustParse(UUIDstr)
 
 	c.Set("model", aluno)
 	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
@@ -153,8 +149,8 @@ func CriaNovoAluno(c *gin.Context) {
 func BuscaAlunoPorUUID(c *gin.Context) {
 	var aluno models.Aluno
 
-	uuid := c.Params.ByName("uuid")
-	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
+	UUID := uuid.MustParse(c.Params.ByName("uuid"))
+	database.DB.Where(&models.Aluno{UUID: UUID}).First(&aluno)
 
 	if aluno.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -176,8 +172,8 @@ func BuscaAlunoPorUUID(c *gin.Context) {
 func DeletaAluno(c *gin.Context) {
 	var aluno models.Aluno
 
-	uuid := c.Params.ByName("uuid")
-	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
+	UUID := uuid.MustParse(c.Params.ByName("uuid"))
+	database.DB.Where(&models.Aluno{UUID: UUID}).First(&aluno)
 
 	if err := database.DB.Delete(&aluno).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -201,8 +197,8 @@ func DeletaAluno(c *gin.Context) {
 func EditaAluno(c *gin.Context) {
 	var aluno models.Aluno
 
-	uuid := c.Params.ByName("uuid")
-	database.DB.Where(&models.Aluno{UUID: uuid}).First(&aluno)
+	UUID := uuid.MustParse(c.Params.ByName("uuid"))
+	database.DB.Where(&models.Aluno{UUID: UUID}).First(&aluno)
 
 	if err := c.ShouldBindJSON(&aluno); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

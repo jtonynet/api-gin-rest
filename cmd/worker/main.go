@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
 	"log/slog"
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
-	"github.com/jtonynet/api-gin-rest/internal/cache"
+
 	"github.com/jtonynet/api-gin-rest/internal/decorators"
 	"github.com/jtonynet/api-gin-rest/internal/handlers"
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
@@ -14,7 +15,7 @@ import (
 func main() {
 	cfg, err := common.InitConfig()
 	if err != nil {
-		slog.Error("cannot load config error: %v", err)
+		log.Fatal("cannot load config: ", err)
 	}
 
 	RetryMaxElapsedTime := time.Duration(cfg.API.RetryMaxElapsedTimeInMs) * time.Millisecond
@@ -26,9 +27,9 @@ func main() {
 
 	var cacheClient interfaces.CacheClient
 	if cfg.API.FeatureFlags.CacheEnabled {
-		cacheClient, err = cache.NewClient(cfg.Cache)
+		cacheClient, err = common.NewCacheClient(cfg.Cache)
 		if err != nil {
-			slog.Error("cannot initialize CacheClient, error: %v", err)
+			slog.Error("cannot initialize cacheClient, error: %v", err)
 		}
 	}
 

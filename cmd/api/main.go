@@ -6,11 +6,9 @@ import (
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
-	"github.com/jtonynet/api-gin-rest/routes"
 
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
-
-	"github.com/jtonynet/api-gin-rest/internal/cache"
+	"github.com/jtonynet/api-gin-rest/routes"
 )
 
 func main() {
@@ -27,7 +25,7 @@ func main() {
 	}
 
 	var cacheClient interfaces.CacheClient
-	cacheClient, err = cache.NewClient(cfg.Cache)
+	cacheClient, err = common.NewCacheClient(cfg.Cache)
 	if err != nil {
 		slog.Error("cannot initialize cacheClient, error: %v", err)
 	}

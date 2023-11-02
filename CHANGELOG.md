@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.9] - 2023-11-02
+### Added
+- [Paginação](https://articles.wesionary.team/make-pagination-easy-in-golang-using-pagination-middleware-and-gorm-scope-a5f6eb3bebaa) para a rota de `buscarTodosAlunos`. Melhorias na Paginação em próximos ciclos
+- Utilizando [decorator pattern](https://www.henrydu.com/2022/01/05/golang-decorator-pattern/) para cachear o worker insereAluno
+- Melhorias na legibilidade geral da codebase
+
 ## [0.0.8] - 2023-10-27
 ### Added
 - Adicionado Strategy Pattern para cacheClient
@@ -77,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Projeto com base no curso [Go e Gin: criando API rest com simplicidade](https://www.alura.com.br/curso-online-go-gin-api-rest-simplicidade) finalizado de acordo com a trilha seguida
 - API Gin `dockerizada`
 
+[0.0.9]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/jtonynet/api-gin-rest/compare/v0.0.5...v0.0.6

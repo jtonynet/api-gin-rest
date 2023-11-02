@@ -22,7 +22,7 @@ func MessageBrokerPublishPostRequest() gin.HandlerFunc {
 		c.Next()
 
 		if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
-			messageBroker := c.MustGet("messageBroker").(interfaces.Broker)
+			messageBroker := c.MustGet("messageBroker").(interfaces.MessageBroker)
 
 			model, modelExists := c.Get("model")
 			if modelExists {

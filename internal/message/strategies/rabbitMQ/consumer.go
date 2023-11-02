@@ -12,7 +12,7 @@ Fortemente baseado no exemplo da lib streadway consumer.go
 https://github.com/streadway/amqp/blob/master/_examples/simple-consumer/consumer.go
 */
 
-func (b *Broker) RunConsumer(consumerHandler func(string) (string, string, error)) error {
+func (b *Broker) RunConsumer(consumerHandler func(string) (string, error)) error {
 	slog.Info("Queue bound to Exchange, starting Consume (consumer tag %q)", b.cfg.ConsumerTag)
 	deliveries, err := b.channel.Consume(
 		b.cfg.Queue,       // name
@@ -49,7 +49,8 @@ func (b *Broker) Shutdown() error {
 	return <-b.done
 }
 
-func (b *Broker) handle(consumerHandler func(string) (string, string, error), deliveries <-chan amqp.Delivery, done chan error) {
+// ESSE METODO DEVERIA SER DECORADO PELO CACHE
+func (b *Broker) handle(consumerHandler func(string) (string, error), deliveries <-chan amqp.Delivery, done chan error) {
 	var attempt int32
 	requeue := true
 
@@ -57,7 +58,8 @@ func (b *Broker) handle(consumerHandler func(string) (string, string, error), de
 
 	for d := range deliveries {
 
-		msgKey, msgValue, err := consumerHandler(string(d.Body))
+		_, err := consumerHandler(string(d.Body))
+
 		if err != nil {
 
 			// TODO:
@@ -90,14 +92,6 @@ func (b *Broker) handle(consumerHandler func(string) (string, string, error), de
 			requeue = true
 		} else {
 			d.Ack(false)
-		}
-
-		if b.cacheClient != nil {
-			b.cacheClient.Delete(msgKey)
-			err = b.cacheClient.Set(msgKey, string(msgValue), b.cacheClient.GetDefaultExpiration())
-			if err != nil {
-				slog.Error("cmd:worker:main:messageBroker:RunConsumer:handle:b.cacheClient.Set error set%v", err)
-			}
 		}
 	}
 

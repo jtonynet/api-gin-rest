@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/jtonynet/api-gin-rest/config"
-	"github.com/jtonynet/api-gin-rest/internal/interfaces"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -20,14 +19,12 @@ type Broker struct {
 	cfg     config.MessageBroker
 	done    chan error
 
-	consumerHandler func(string) (string, string, error)
-
-	cacheClient interfaces.CacheClient
+	consumerHandler func(string) (string, error)
 }
 
 var strConn string
 
-func NewBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClient) (*Broker, error) {
+func NewBroker(cfg config.MessageBroker) (*Broker, error) {
 	var b *Broker
 
 	conn, channel, err := connect(cfg)
@@ -52,8 +49,6 @@ func NewBroker(cfg config.MessageBroker, cacheClient interfaces.CacheClient) (*B
 		channel: channel,
 		cfg:     cfg,
 		done:    make(chan error),
-
-		cacheClient: cacheClient,
 	}
 
 	if cfg.AutoReconnectEnable {

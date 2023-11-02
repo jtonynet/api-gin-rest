@@ -6,11 +6,9 @@ import (
 	"time"
 
 	"github.com/jtonynet/api-gin-rest/cmd/common"
-	"github.com/jtonynet/api-gin-rest/routes"
 
 	"github.com/jtonynet/api-gin-rest/internal/interfaces"
-
-	"github.com/jtonynet/api-gin-rest/internal/cache"
+	"github.com/jtonynet/api-gin-rest/routes"
 )
 
 func main() {
@@ -27,14 +25,14 @@ func main() {
 	}
 
 	var cacheClient interfaces.CacheClient
-	cacheClient, err = cache.NewClient(cfg.Cache)
+	cacheClient, err = common.NewCacheClient(cfg.Cache)
 	if err != nil {
 		slog.Error("cannot initialize cacheClient, error: %v", err)
 	}
 
-	var messageBroker interfaces.Broker
+	var messageBroker interfaces.MessageBroker
 	if cfg.API.FeatureFlags.PostAlunoAsMessageEnabled {
-		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, cacheClient, RetryMaxElapsedTime)
+		messageBroker, err = common.NewMessageBroker(cfg.MessageBroker, RetryMaxElapsedTime)
 		if err != nil {
 			slog.Error("cannot initialize MessageBroker, error: %v", err)
 		}

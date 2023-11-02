@@ -18,7 +18,7 @@ import (
 
 func HandleRequests(
 	cfg config.API,
-	messageBroker interfaces.Broker,
+	messageBroker interfaces.MessageBroker,
 	cacheClient interfaces.CacheClient,
 ) {
 	r := gin.Default()
@@ -40,6 +40,7 @@ func HandleRequests(
 	apiGroup.GET("/alunos/count", controllers.ContaAlunos)
 
 	apiGroup.GET("/alunos",
+		middlewares.PaginateRequest(),
 		middlewares.CachedGetRequest(),
 		controllers.ExibeTodosAlunos,
 	)

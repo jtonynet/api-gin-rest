@@ -14,7 +14,7 @@ func ConfigInject(cfg config.API) gin.HandlerFunc {
 	}
 }
 
-func MessageBrokerInject(messageBroker interfaces.Broker) gin.HandlerFunc {
+func MessageBrokerInject(messageBroker interfaces.MessageBroker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("messageBroker", messageBroker)
 		c.Next()

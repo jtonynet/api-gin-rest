@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -113,15 +114,25 @@ func CriaNovoAluno(c *gin.Context) {
 		return
 	}
 
-	//aluno.UUID = uuid.New()
-	UUIDstr := c.GetString("UUID")
-	if UUIDstr == "" {
-		UUIDstr = uuid.New().String()
-	}
-	aluno.UUID = uuid.MustParse(UUIDstr)
+	aluno.UUID = uuid.New()
 
-	c.Set("model", aluno)
 	if cfg.FeatureFlags.PostAlunoAsMessageEnabled {
+		msg := fmt.Sprintf(`{"HTTPStatusCode":%v, "SegmentKey":"%s", "uuid":"%s", "Message":" in processing"}`,
+			http.StatusAccepted,
+			"aluno",
+			aluno.UUID,
+		)
+
+		var msgJson map[string]interface{}
+		err := json.Unmarshal([]byte(msg), &msgJson)
+		if err != nil {
+			slog.Error("middlewares:CachedPostRequest:json.Unmarshal error: ", err)
+			c.Abort()
+		}
+
+		c.Set("model", aluno)
+		c.Set("result", msgJson)
+		c.JSON(http.StatusAccepted, msgJson)
 		return
 	}
 

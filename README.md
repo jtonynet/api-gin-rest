@@ -527,6 +527,9 @@ Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.m
 [:arrow_heading_up: voltar](#indice)
 
 <!-- 
+PADRÕES de PROJETO em GO
+https://refactoring.guru/pt-br/design-patterns/go
+
 https://tutorialedge.net/golang/go-decorator-function-pattern-tutorial/
 https://srinjoysantra.medium.com/decorator-pattern-in-golang-a831ecae0d38
 
@@ -541,5 +544,9 @@ https://github.com/redis/go-redis/blob/master/example/otel/client.go
 
 Clean Architecture Gin
 https://github.com/wesionaryTEAM/go_clean_architecture
+
+Retornar barra lateral de extensões do vs
+https://pt.stackoverflow.com/questions/564199/retornar-barra-lateral-de-extens%C3%B5es-do-vs
+https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf
 -->
 

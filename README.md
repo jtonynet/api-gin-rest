@@ -15,7 +15,7 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
   title="LearnIngenuity"
 />
 
-[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go"> <img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker"> <img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv"> <img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub"> <img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="vscode" title="vscode"> <img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="Postgres" title="Postgres"> <img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger"> <img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling"> <img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis"> <img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq"> ](#estudo-de-autenticação-testes-e-segurança-em-nodejs)
+[<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go">](https://go.dev/) [<img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker">](https://www.docker.com/) [<img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv">](https://github.com/spf13/viper)  [<img src="./misc/images/icons/ubuntu-color.svg" width="25px" height="25px" title="Ubunto" alt="Ubunto" />](https://ubuntu.com/) [<img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub">](https://github.com/jtonynet) [<img src="./misc/images/icons/mermaidjs.svg" width="25px" height="25px" alt="MermaidJS" title="MermaidJS">](https://mermaid.js.org/) [<img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="VsCode" title="VsCode">](https://code.visualstudio.com/) [<img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="PostgresSQL" title="PostgresSQL">](https://www.postgresql.org/) [<img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger">](https://swagger.io/) [<img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](https://gatling.io/) [<img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis">](https://redis.io/) [<img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq">](https://www.rabbitmq.com/)
 <!--   <img src="./misc/images/icons/githubactions.svg" width="25px" height="25px" alt="Githubactions" title="Githubactions"> -->
 
 <!-- icons by: https://simpleicons.org/?q=types -->
@@ -25,7 +25,7 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 
 <br/>
 
-### 🕸️ Redes:
+### 🕸️ Minhas Redes:
 
 <!-- 
     https://dev.to/envoy_/150-badges-for-github-pnk

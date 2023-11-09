@@ -17,7 +17,6 @@ services:
     image: postgres:16.0-alpine
     container_name: postgres-gin-rest
     hostname: postgres-gin-rest
-    restart: always
     environment:
       POSTGRES_USER: api_user
       POSTGRES_PASSWORD: api_pass
@@ -33,7 +32,6 @@ services:
     container_name: redis-gin-rest
     hostname: redis-gin-rest
     image: redis:6.2-alpine
-    restart: always
     ports:
       - 6379:6379
     command: redis-server --save 20 1 --loglevel warning --requirepass admin

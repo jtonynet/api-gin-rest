@@ -564,5 +564,8 @@ https://github.com/wesionaryTEAM/go_clean_architecture
 Retornar barra lateral de extensões do vs
 https://pt.stackoverflow.com/questions/564199/retornar-barra-lateral-de-extens%C3%B5es-do-vs
 https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf
+
+Docker - Bind for 0.0.0.0:4000 failed: port is already allocated
+https://stackoverflow.com/questions/46176584/docker-bind-for-0-0-0-04000-failed-port-is-already-allocated
 -->
 

@@ -205,7 +205,7 @@
                 },
                 "uuid": {
                     "type": "string",
-                    "example": "00000000-a0a0-0aa0-0aa0-a0aa0000a000"
+                    "example": "db047cc5-193a-4989-93f7-08b81c83eea0"
                 }
             }
         }

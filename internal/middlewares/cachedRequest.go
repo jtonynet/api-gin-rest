@@ -7,10 +7,8 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/jtonynet/api-gin-rest/config"
 	"github.com/tidwall/gjson"
 
@@ -69,48 +67,43 @@ func CachedPostRequest() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cfg := c.MustGet("cfg").(config.API)
 		var cacheClient interfaces.CacheClient
-		var segmentCacheKey, cacheKey string
+
+		c.Next()
 
 		if cfg.FeatureFlags.CacheEnabled {
 			cacheClient = c.MustGet("cacheClient").(interfaces.CacheClient)
 
 			if cacheClient.IsConnected() {
-				var err error
-				segmentCacheKey, err = getCacheKeyFromPath(c)
+				segmentCacheKey, err := getCacheKeyFromPath(c)
 				if err != nil {
 					slog.Error("middlewares:CachedPostRequest:cacheClient.getCacheKeyFromPath error: ", err)
 					c.Abort()
 				}
 
-				UUID := uuid.New().String()
-				c.Set("UUID", UUID)
+				result, resultExists := c.Get("result")
+				if resultExists {
+					resultJSON, err := json.Marshal(result)
+					if err != nil {
+						slog.Error("middlewares:setCacheResult:json.Marshal error: ", err)
+						c.Abort()
+					}
 
-				cacheKey = fmt.Sprintf("%s:%s", segmentCacheKey, UUID)
+					cacheKey := fmt.Sprintf("%s:%s",
+						segmentCacheKey,
+						gjson.Get(string(resultJSON), "uuid"),
+					)
 
-				var msgJson map[string]interface{}
-				msg := fmt.Sprintf(`{"HTTPStatusCode":202, "SegmentKey":"%s", "uuid":"%s", "Message":" in processing"}`, segmentCacheKey, UUID)
-				err = json.Unmarshal([]byte(msg), &msgJson)
-				if err != nil {
-					slog.Error("middlewares:CachedPostRequest:json.Unmarshal error: ", err)
-					c.Abort()
-				}
+					expiration := cacheClient.GetDefaultExpiration()
+					if c.Writer.Status() == http.StatusAccepted {
+						expiration = 0
+					}
 
-				// Request Post data no expires INFO cache. Only Request Get data cache expires
-				// Request Get data has the same key as the Request Post, it overwrites.
-				expiration := time.Duration(0 * time.Millisecond)
-
-				err = cacheClient.Set(cacheKey, msg, expiration)
-				if err != nil {
-					slog.Error("middlewares:CachedPostRequest:cacheClient.Set error: ", err)
-					c.Abort()
+					err = cacheClient.Set(cacheKey, string(resultJSON), expiration)
+					if err != nil {
+						slog.Error("cannot set key: %s error: %v", cacheKey, err)
+					}
 				}
 			}
-		}
-
-		c.Next()
-
-		if cfg.FeatureFlags.CacheEnabled && cacheClient.IsConnected() {
-			setCacheResult(c, cacheKey)
 		}
 	}
 }

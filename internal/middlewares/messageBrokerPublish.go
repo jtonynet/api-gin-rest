@@ -26,6 +26,7 @@ func MessageBrokerPublishPostRequest() gin.HandlerFunc {
 
 			model, modelExists := c.Get("model")
 			if modelExists {
+
 				modelJSON, err := json.Marshal(model)
 				if err != nil {
 					slog.Error("middlewares:MessageBrokerPublishPostRequest:json.Marshal error: %v", err)
@@ -43,14 +44,11 @@ func MessageBrokerPublishPostRequest() gin.HandlerFunc {
 					})
 					c.Abort()
 				}
-				UUID := string(UUIDField.String())
 
 				err = messageBroker.Publish(string(modelJSON))
 				if err != nil {
 					slog.Error("controllers:CriaNovoAluno:messageBroker.Publish error: %v", err)
 				}
-				c.JSON(http.StatusAccepted, gin.H{
-					"uuid": UUID})
 			}
 			c.Abort()
 		}

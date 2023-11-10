@@ -50,6 +50,7 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
   :hammer: [Ferramentas](#hammer-ferramentas)<br/>
   :clap: [Boas Práticas](#clap-boas-práticas)<br/>
   :1234: [Versões](#1234-versões)<br/>
+  :robot: [Uso de IA](#ia)<br/>
 
   <!--:female_detective: [Debugging](#female_detective-debugging)<br/>-->
 
@@ -542,7 +543,37 @@ Para obter mais informações, consulte o [Histórico de Versões](./CHANGELOG.m
 
 [:arrow_heading_up: voltar](#indice)
 
+---
+
+<a id="ia"></a>
+### :robot: Uso de IA:
+
+O cabeçalho desta página foi criado com o auxílio de inteligência artificial e um mínimo de 
+retoque e construção no Gimp [<img src="./misc/images/icons/gimp.svg" width="30" height="30" title="Gimp" alt="Logo do Gimp" />](https://www.gimp.org/)
+
+
+__Foram utilizados os seguintes prompts para sua criação no [Bing IA:](https://www.bing.com/images/create/)__
+
+
+<details>
+  <summary><b>Gopher com roupa de estudante bebeno gin</b></summary>
+<i>"Gopher simbolo da linguagem golang azul em cores cartoon chapadas em uniforme escolar segurando um copo de drink com uma garrafde gin no chaco e fundo branco"<b>(sic)</b></i>
+</details>
+
+<br/>
+
+
+IA também é utilizada em minhas pesquisas e estudos como ferramenta de apoio; no entanto, __artes e desenvolvimento são, sobretudo, atividades criativas humanas.__
+
+Contrate artistas para projetos comerciais ou mais elaborados e Aprenda Engenhosidade!
+
 <!-- 
+
+<details>
+  <summary><b>Gopher school student, drunk on gin</b></summary>
+"Gopher simbolo da linguagem golang azul em cores cartoon chapadas em uniforme escolar segurando um copo de drink com uma garrafde gin no chaco e fundo branco"<b>(sic)</b>
+</details>
+
 PADRÕES de PROJETO em GO
 https://refactoring.guru/pt-br/design-patterns/go
 

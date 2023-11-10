@@ -11,8 +11,6 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 -->
 <img 
   src="./misc/images/layout/header.png" 
-  alt="LearnIngenuity, Because in PT-BR 'Ingenuity' does not mean naivety"
-  title="LearnIngenuity"
 />
 
 [<img src="./misc/images/icons/go.svg" width="25px" height="25px" alt="go" title="Go">](https://go.dev/) [<img src="./misc/images/icons/docker.svg" width="25px" height="25px" alt="Docker" title="Docker">](https://www.docker.com/) [<img src="./misc/images/icons/dotenv.svg" width="25px" height="25px" alt="DotEnv" title="DotEnv">](https://github.com/spf13/viper)  [<img src="./misc/images/icons/ubuntu-color.svg" width="25px" height="25px" title="Ubunto" alt="Ubunto" />](https://ubuntu.com/) [<img src="./misc/images/icons/github.svg" width="25px" height="25px" alt="GitHub" title="GitHub">](https://github.com/jtonynet) [<img src="./misc/images/icons/mermaidjs.svg" width="25px" height="25px" alt="MermaidJS" title="MermaidJS">](https://mermaid.js.org/) [<img src="./misc/images/icons/visualstudiocode.svg" width="25px" height="25px" alt="VsCode" title="VsCode">](https://code.visualstudio.com/) [<img src="./misc/images/icons/postgresql.svg" width="25px" height="25px" alt="PostgresSQL" title="PostgresSQL">](https://www.postgresql.org/) [<img src="./misc/images/icons/swagger.svg" width="25px" height="25px" alt="Swagger" title="Swagger">](https://swagger.io/) [<img src="./misc/images/icons/gatling.svg" width="25px" height="25px" alt="Gatling" title="Gatling">](https://gatling.io/) [<img src="./misc/images/icons/redis.svg" width="25px" height="25px" alt="Redis" title="Redis">](https://redis.io/) [<img src="./misc/images/icons/rabbitmq.svg" width="25px" height="25px" alt="Rabbitmq" title="Rabbitmq">](https://www.rabbitmq.com/)
@@ -566,6 +564,8 @@ __Foram utilizados os seguintes prompts para sua criação no [Bing IA:](https:/
 IA também é utilizada em minhas pesquisas e estudos como ferramenta de apoio; no entanto, __artes e desenvolvimento são, sobretudo, atividades criativas humanas.__
 
 Contrate artistas para projetos comerciais ou mais elaborados e Aprenda Engenhosidade!
+
+[:arrow_heading_up: voltar](#indice)
 
 <!-- 
 

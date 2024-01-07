@@ -19,7 +19,7 @@ https://stackoverflow.com/questions/60000125/fontawesome-on-github-flavored-mark
 <!-- icons by: https://simpleicons.org/?q=types -->
 <!-- markdown emojis: https://gist.github.com/rxaviers/7360908 -->
 
-![Badge Status](https://img.shields.io/badge/STATUS-EM_DESENVOLVIMENTO-green)
+![Badge Status](https://img.shields.io/badge/STATUS-ENCERRADO-blue)
 
 <br/>
 
